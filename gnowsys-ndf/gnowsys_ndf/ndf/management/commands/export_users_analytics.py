@@ -33,7 +33,7 @@ log_file = open(log_file_path, 'a+')
 script_start_str = "\n\n######### Script ran on : " + time.strftime("%c") + " #########\n----------------\n"
 log_file.write(str(script_start_str))
 
-column_keys_list = ["server_id", "school_name", "school_code", "module_name", "unit_name", "username", "user_id", "first_name", "last_name", "roll_no", "grade", "enrollment_status", "buddies", "total_lessons", "lessons_visited", "percentage_lessons_completed", "total_activities", "activities_visited", "percentage_activities_completed", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items"]
+column_keys_list = ["server_id", "school_name", "school_code", "module_name", "unit_name", "username", "user_id", "first_name", "last_name", "roll_no", "grade", "enrollment_status", "buddy_userids", "buddy_usernames", "total_lessons", "lessons_visited", "percentage_lessons_visited", "total_activities", "activities_visited", "percentage_activities_visited", "total_quizitems", "visited_quizitems", "attempted_quizitems", "unattempted_quizitems", "correct_attempted_quizitems", "notapplicable_quizitems", "incorrect_attempted_quizitems", "user_files", "total_files_viewed_by_user", "other_viewing_my_files", "unique_users_commented_on_user_files", "total_rating_rcvd_on_files", "commented_on_others_files", "cmts_on_user_files", "total_cmnts_by_user", "user_notes", "others_reading_my_notes", "cmts_on_user_notes", "cmnts_rcvd_by_user", "total_notes_read_by_user", "commented_on_others_notes", "total_rating_rcvd_on_notes", "correct_attempted_assessments", "unattempted_assessments", "visited_assessments", "notapplicable_assessments", "incorrect_attempted_assessments", "attempted_assessments", "total_assessment_items"]
 
 column_keys_dict = OrderedDict()
 map(lambda x: column_keys_dict.update({x: "NA"}), column_keys_list)
@@ -46,11 +46,23 @@ class Command(BaseCommand):
         gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('announced_unit')
         gst_course_ev_gr = node_collection.one({'_type': 'GSystemType', 'name': 'CourseEventGroup'})
         all_course_groups = node_collection.find({'_type': 'Group', 'member_of': {'$in': [gst_course_ev_gr._id, gst_base_unit_id]} })
+        all_course_groups_count = all_course_groups.count()
+        csv_created_count = 0
 
-        for each_group_obj in all_course_groups:
+        for gr_index, each_group_obj in enumerate(all_course_groups, 1):
             assessment_and_quiz_data = True
-            print "\n\n Exporting CSV for :", each_group_obj.name, "(Altnames:", each_group_obj.altnames, ")\n"
-            export_group_analytics(each_group_obj, assessment_and_quiz_data)
+            print "\n\n[ %d / %d ]" % (gr_index, all_course_groups_count)
+            try:
+                print "Exporting CSV for :", each_group_obj.name, "(Altnames:", each_group_obj.altnames, ")\n"
+            except Exception as e:
+                print "\n!! Exception in printing name of unit: ", e
+                print "\n\nExporting CSV for :", each_group_obj._id, "\n"
+                pass
+            csv_created_count += export_group_analytics(each_group_obj, assessment_and_quiz_data)
+
+        print "RESULT OF CSV EXPORT:\n\t- CREATED: %d\n\t- NOT CREATED: %d"%(csv_created_count, (all_course_groups_count - csv_created_count))
+        print "=" * 100
+
 
 
 def export_group_analytics(group_obj, assessment_and_quiz_data):
@@ -60,8 +72,8 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     # group_obj = Group.get_group_name_id(group_name_or_id, get_obj=True)
 
     # if not group_obj:
-    #     raise ValueError('\nSorry. Request could not be completed. \
-    #         \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!')
+    #     raise ValueError('\nSorry. Request could not be visited. \
+    #         \nGroup/Course, matching argument entered "' + group_name_or_id + '" does not exists!!')
 
     # group_users = group_obj.author_set
     # Previously, above was implementation strategy. Now we are using counter users instead of group's author_set,
@@ -74,7 +86,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
     try:
         group_name = slugify(group_obj['name'])
     except Exception, e:
-        print e
+        # print e
         group_name = str(group_obj['_id'])
 
     # dt: date time
@@ -89,8 +101,6 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
 
     if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
         os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
-
-
 
     file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
     column_keys_list_addons = []
@@ -112,11 +122,16 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             # each_row_dict[column_key_name] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act._id), 0)
         # print column_keys_list_addons
 
+    # FLAGS:
     header_written = False
-    for index, each_user in enumerate(group_users):
+    csv_created = 0
+    all_rows = []
+
+    for index, each_user in enumerate(group_users, 1):
         try:
             analytics_data = course_analytics(None, group_obj._id, each_user, get_result_dict=True, assessment_and_quiz_data=assessment_and_quiz_data, get_counter_obj_in_result=True)
             if not analytics_data:
+                print "\n!! Haven't got course analytics for group: %s \n" % group_name
                 continue
 
             user_attr_list = ['first_name', 'last_name', 'enrollment_code', 'educationallevel']
@@ -124,6 +139,7 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             try:
                 user_attr_dict = GAttribute.get_triples_from_sub_type_list(Group.get_group_name_id(analytics_data['username'])[1], user_attr_list, get_obj=False)
             except Exception as e:
+                print "\n!! Exception in getting triples values for user (%d): %s"%(each_user, e)
                 pass
 
             print index, "] Group User ID: ", each_user
@@ -144,8 +160,8 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             each_row_dict['activities_visited'] = int(temp_activities_stat_str.split(' ')[0])
             each_row_dict['total_activities'] = int(temp_activities_stat_str.split(' ')[3])
 
-            each_row_dict['percentage_lessons_completed'] = analytics_data['level1_progress_meter']
-            each_row_dict['percentage_activities_completed'] = analytics_data['level2_progress_meter']
+            each_row_dict['percentage_lessons_visited'] = analytics_data['level1_progress_meter']
+            each_row_dict['percentage_activities_visited'] = analytics_data['level2_progress_meter']
 
             each_row_dict['username'] = analytics_data['username']
             each_row_dict['user_id'] = each_user
@@ -185,30 +201,40 @@ def export_group_analytics(group_obj, assessment_and_quiz_data):
             each_row_dict["incorrect_attempted_assessments"] = analytics_data["incorrect_attempted_assessments"]
             each_row_dict["attempted_assessments"] = analytics_data["attempted_assessments"]
             each_row_dict["total_assessment_items"] = analytics_data["total_assessment_items"]
-            # each_row_dict["buddies"] = str(Buddy.get_buddy_userids_list_within_datetime(1, datetime.datetime.now()))
-            each_row_dict["buddies"] = Author.get_author_usernames_list_from_user_id_list\
-                (Buddy.get_buddy_userids_list_within_datetime(each_user, datetime.datetime.now()))
+
+            buddy_userids_list_within_datetime = Buddy.get_buddy_userids_list_within_datetime(each_user, datetime.datetime.now())
+            each_row_dict["buddy_userids"] = str(buddy_userids_list_within_datetime)
+            each_row_dict["buddy_usernames"] = Author.get_author_usernames_list_from_user_id_list(buddy_userids_list_within_datetime)
 
             for each_act_key, each_act_val in column_keys_dict_addons.iteritems():
                 each_row_dict[each_act_key] = analytics_data["counter_obj"]["visited_nodes"].get(unicode(each_act_val), 0)
 
-            # print analytics_data
-
-            with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
-                w = csv.DictWriter(f, (column_keys_list + column_keys_list_addons))
-                if not header_written:
-                    w.writeheader()
-                    header_written = True
-                w.writerow(each_row_dict)
+            all_rows.append(each_row_dict)
+            # with open(file_name_path, 'a') as f:  # Just use 'w' mode in 3.x
+            #     w = csv.DictWriter(f, (column_keys_list + column_keys_list_addons))
+            #     if not header_written:
+            #         w.writeheader()
+            #         header_written = True
+            #     w.writerow(each_row_dict)
+            #     csv_created = True
 
 
         except Exception, e:
-            print e
+            print "!! Exception in calculating analytics for user (%d) : %s"%(each_user, e)
             error_msg = "\nUser with id: " + str(each_user) + " does not exists!!"
             log_file.write(str(e))
             log_file.write(error_msg)
-            continue
+            # continue
 
-    print "\nExported user CSV: %s"%file_name_path
+    if all_rows:
+        with open(file_name_path, 'w') as f:
+            w = csv.DictWriter(f, (column_keys_list + column_keys_list_addons))
+            w.writeheader()
+            for each_row in all_rows:
+                w.writerow(each_row)
+            csv_created = 1
+            print "\nExported user CSV: %s"%file_name_path
+
     print "\n", "=" * 100
-            
+
+    return csv_created

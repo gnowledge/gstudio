@@ -19,15 +19,13 @@
    <!--  <h1>
         <div id="timer">2:00</div>
     </h1> -->
-    {% comment %}
+    
     <div class="upload-file small-12 medium-3 large-2 columns" id="upload_form_div">
                         <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'upload_file_ckeditor' group_id %}">
                             {% csrf_token %}
                             <label class="tiny button radius expand upload-btn" style="margin: 0px;">
                                 <i class="fa fa-upload"></i>
                                 &nbsp;
-                                <span>Upload File</span>
-                                <input type="file" name="filehive" id="docFile" style="display: none;" multiple/>
                             </label>
                             <br><br>
                             <div class="save_cancel" style="display:none">
@@ -64,7 +62,6 @@
     </div>
 
     <div id="audios-container"></div>
-    {% endcomment %}
      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
     <h4>Select Audio: </h4>
     <div class="row">
@@ -87,7 +84,6 @@
   </ul>
  -->   
 
-{% comment %}
     <script>
 
     // 
@@ -306,6 +302,7 @@
     };
     </script>
 
+{% comment %}
 <script type="text/javascript">
   var form = document.getElementById('docPost');
   var fileSelect = document.getElementById('docFile');
@@ -431,13 +428,12 @@ $(document).on('change','#docFile',function(){
     */
 
   });
-
 $("#btnUploadCancel").click(function() {
     $(".save_cancel").addClass("hide");
     $("#docFile").val("");
     $(".upload-btn").css("display","block")
 
   });
+{% endcomment %}
 
 </script>
-{% endcomment %}

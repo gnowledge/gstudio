@@ -6769,7 +6769,7 @@ def add_asset(request,group_id):
   if node_obj:
     context_variables.update({'asset_obj': node_obj,'topic_nodes':topic_nodes})
     context_variables.update({'edit': True})
-  context_variables.update({'group_obj': group_obj,'title':title,'topic_nodes':topic_nodes})
+  context_variables.update({'group_obj': group_obj, 'group_name': group_obj.name, 'title':title,'topic_nodes':topic_nodes})
   return render_to_response("ndf/add_asset.html",RequestContext(request,
     context_variables))
 

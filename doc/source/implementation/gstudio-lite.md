@@ -1,4 +1,4 @@
-# gStudio Lite
+# gStudio-Lite
 > Elastic Search & RCS implementation of gStudio
 
 

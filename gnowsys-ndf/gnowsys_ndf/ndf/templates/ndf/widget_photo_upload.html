@@ -8,7 +8,7 @@
     </div>
 
        <div class="text-center">
-
+        {% if not no_img %}
         <div class="div-height img-container-{{node.pk}}">
           {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
           {% get_relation_value node.pk 'has_logo' as grel_dict_logo %}
@@ -26,13 +26,14 @@
                   <i class="fi-torso style2 text-center"></i>
               {% elif node.if_file.mid.relurl %}
                    <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
-              {% elif "announced_unit" in  group_object.member_of_names_list %}
-                    <img src="/static/ndf/images/maths-cover.png" alt="Profile picture for this group." class="img-height">
+              {% elif "announced_unit" in  group_object.member_of_names_list or  "draft_unit" in  group_object.member_of_names_list %}
+                    <img src="/static/ndf/images/course_backbround-2.png" alt="Profile picture for this group." class="img-height">
               {% else %}
                     <img src="/static/ndf/css/themes/{{site.SITE_NAME|lower}}/images/default-bg.png" alt="Profile picture for this group." class="img-height">
               {% endif %}
           {% endif %}
         </div>
+        {% endif %}
         {% if not no_update_btn %}
         {% if request.user.is_authenticated %}
         {% check_is_gstaff groupid request.user as gstaff_access %}

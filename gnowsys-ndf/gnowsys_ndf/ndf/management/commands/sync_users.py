@@ -53,28 +53,27 @@ class Command(BaseCommand):
                 # user_id, school_code, username, password, oid
                 users = csv.reader(csvfile, delimiter=',')
 
+                for index, (user_id, school_code, username, password, oid) in enumerate(users, 1):
 
-                for user_id, school_code, username, password, oid in users:
-
-                    # temp_csv_log_list = [school_code, username, password]
-                    # temp_csv_log_list = [user_id, school_code, username, password, oid]
-                    # print temp_csv_log_list
-
+                    print "\n\n[", index, "]. User: ",username
                     user_id = int(user_id)
                     set_icon = True
                     if User.objects.filter(id=user_id):
-                        print "\nUser with id: '",user_id,"' and username: '",username,"' already exists."
+                        print '- Exists user with id: "%s" and username: "%s".'%(user_id, username)
 
                     else:
-                        print "\nCreating User object for user [", user_id, "]: ", username
+                        print "+ Creating User object for user [", user_id, "]: ", username
                         user_obj = User.objects.create_user(username=username, password=password, id=user_id)
                         user_id = user_obj.id
 
                     # temp_csv_log_list.append(str(user_id))
 
                     auth = node_collection.one({'_type': 'Author', 'created_by': user_id})
+                    if auth:
+                        print "- Exists Author object having '_id': ", auth._id
+
                     if not auth:
-                        print "\nCreating Author object for user: ", username
+                        print "+ Creating Author object for user: ", username
                         auth = node_collection.collection.Author()
                         auth['name'] = unicode(username)
                         auth['member_of'] = [auth_gst_id]
@@ -85,6 +84,7 @@ class Command(BaseCommand):
                         auth['contributors'] = [user_id]
                         auth['group_admin'] = [user_id]
                         auth['agency_type'] = 'Student'
+                        auth['origin'] = [{"script": "sync_users.py"}]
                         try:
                             auth['agency_type'] = 'Teacher' if (username.split('-')[1] in techer_element_set) else 'Student'
                         except Exception, e:
@@ -94,16 +94,19 @@ class Command(BaseCommand):
                         auth.save(groupid=oid)
 
                     try:
-                        if auth.relation_set:
-                            for each_rel in auth.relation_set:
-                                if each_rel and 'has_profile_pic' in each_rel:
-                                    set_icon = False
-                                    break
-                        if set_icon:
+                        # if auth.relation_set:
+                        #     for each_rel in auth.relation_set:
+                        #         if each_rel and 'has_profile_pic' in each_rel:
+                        #             set_icon = False
+                        #             break
+                        auth_grel = auth.get_relation(u'has_profile_pic', status=u'PUBLISHED')
+                        if auth_grel.count():
+                            print "- Exists GRelation 'has_profile_pic' object having '_id': ", auth_grel[0]._id
+                        else:
                             attach_user_icon(username, auth)
 
                     except Exception, e:
-                        print "\n !!!Error occurred: ", e
+                        print "!!! Error occurred: ", e
                         pass
                     # temp_csv_log_list.append(str(oid))
                     # csv_log_list.append(temp_csv_log_list)
@@ -113,7 +116,7 @@ class Command(BaseCommand):
             print "\nTotal users processed: ", cntr
 
         else:
-            msg = "\nPlease Enter correct file path. File does not exists at specified location !!\n\n\n"
+            msg = "\n!!! Please Enter correct file path. File does not exists at specified location.\n\n\n"
             print msg
 
         # with open(csv_log_file, 'wb') as csvfile:
@@ -145,7 +148,7 @@ def attach_user_icon(username, auth_node):
                                             uploaded_file=img_file,
                                             created_by=1,
                                             member_of=file_gst._id,
-                                            origin={'script_name':'sync-users.py'},
+                                            origin={'script': 'sync_users.py'},
                                             unique_gs_per_file=True
                                     )
 
@@ -155,14 +158,15 @@ def attach_user_icon(username, auth_node):
             file_gs_obj = node_collection.one({'_type':"GSystem", '$or': [
                         {'if_file.original.id':filehive_obj_exists._id},
                         {'if_file.mid.id':filehive_obj_exists._id},
-                        {'if_file.thumbnail.id':filehive_obj_exists._id}]})
+                        {'if_file.thumbnail.id':filehive_obj_exists._id}
+                    ]})
 
 
         # create GRelation 'has_profile_pic' with respective Author nodes
         if file_gs_obj:
             gr_node = create_grelation(auth_node._id, has_profile_pic_rt, file_gs_obj._id)
-            print "\n File : ", file_gs_obj.name , " -- linked -- ", auth_node.name
-            # log_file.write("\n File : " + str(file_gs_obj.name) + " -- linked -- "+ str(each_auth.name))
+            print '+ Created new GRelation "has_profile_pic" with file "%s"'%file_gs_obj.name
+            # log_filewrite("\n File : " + str(file_gs_obj.name) + " -- linked -- "+ str(each_auth.name))
 
     else:
-        print "\n Either User or Author does NOT exist."
+        print "!!! Either User or Author does NOT exist."

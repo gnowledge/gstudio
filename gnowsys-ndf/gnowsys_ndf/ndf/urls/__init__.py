@@ -120,7 +120,6 @@ urlpatterns = patterns('',
     #test url
     (r'^dev/', include('gnowsys_ndf.ndf.urls.dev_utils')),
     (r'^tools/', include('gnowsys_ndf.ndf.urls.tools')),
-    
     # meeting app
     # (r'^online/', include('online_status.urls')),   #for online_users.
     # url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
@@ -129,6 +128,11 @@ urlpatterns = patterns('',
     # url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'),
     # following url (name="meeting") kept uncommented to avoid errors
     url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='meeting'),
+    url(r'^about.html/','gnowsys_ndf.ndf.views.site.site_about',name='site_about'),    
+    url(r'^credits.html/','gnowsys_ndf.ndf.views.site.site_credits',name='site_credits'),    
+    url(r'^contact.html/','gnowsys_ndf.ndf.views.site.site_contact',name='site_contact'),    
+    url(r'^termsofuse.html/','gnowsys_ndf.ndf.views.site.site_termsofuse',name='site_termsofuse'),    
+    url(r'^privacypolicy.html/','gnowsys_ndf.ndf.views.site.site_privacypolicy',name='site_privacypolicy'),    
     # --end meeting app
 
     # (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),

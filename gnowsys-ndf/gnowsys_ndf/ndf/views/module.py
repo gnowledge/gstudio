@@ -110,7 +110,7 @@ def module_detail(request, group_id, node_id,title=""):
     module_obj = Node.get_node_by_id(ObjectId(node_id))
     context_variable = {
                         'group_id': group_id, 'groupid': group_id,
-                        'node': module_obj,
+                        'node': module_obj, 'title': title,
                         'card': 'ndf/event_card.html', 'card_url_name': 'groupchange'
                     }
 

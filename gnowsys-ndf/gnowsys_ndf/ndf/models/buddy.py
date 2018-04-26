@@ -271,6 +271,8 @@ class Buddy(DjangoDocument):
 
         active_buddy_auth_list = buddy_obj.get_active_authid_list_from_single_buddy()
 
+        buddy_obj.ends_at = None if active_buddy_auth_list else datetime.datetime.now()
+
         if current_active_buddy_auth_list != active_buddy_auth_list:
             buddy_obj.save()
 
@@ -345,13 +347,14 @@ class Buddy(DjangoDocument):
     @staticmethod
     def sitewide_remove_all_buddies():
         sitewide_all_active_buddies = Buddy.sitewide_all_active_buddies()
+        print "\nFound %d buddy/buddies container object(s)\n"%sitewide_all_active_buddies.count()
 
         for each_buddy in sitewide_all_active_buddies:
             each_buddy.end_buddy_session()
 
         return sitewide_all_active_buddies
 
-    # --- END OF method for sitewide buddies
+    # --- END OF methods for sitewide buddies
 
 
     def save(self, *args, **kwargs):
