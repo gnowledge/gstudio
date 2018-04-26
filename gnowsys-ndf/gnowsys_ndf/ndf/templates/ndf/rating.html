@@ -4,6 +4,7 @@
 <!-- <div id="rating-bar" class="show-on-hover"> -->
 {% block body_content %} 
 <script src="/static/ndf/js/rating.js"></script>
+<script src="/static/ndf/js/gstudio-functions.js"></script>
 {% if if_comments %}
     {% get_node nodeid as node %}
     
@@ -15,7 +16,10 @@
 
     <form style="display: inline-block" id="form-for-{{node.pk}}">
     <!-- Sets the rating values as data attributes -->
+        <input type="hidden" name="csrf_token" class="csrf_token"  value= "{{csrf_token}}">
+        <input type="hidden" name="group_id" class="group_id"  value= "{{group_id}}">
         <input type="hidden" name="is_contributor" class="is-contributor-{{node.pk}}" "{% if request.user.id in node.contributors %}" value= "True" "{% endif %}">
+        <input type="hidden" name="is_authenticated" class="is_authenticated" "{% if user.is_authenticated %}" value="True" "{% else %}"  value= "False"  "{% endif %}">
         <input type="hidden" name="user_access_priv" class="user_access_priv"  value= "{{user_access_priv}}">
         <span datat-tooltip title="Your rating" class="lbl_tag" style="display: inline-block">
             <div id="rating-area-{{node.pk}}" {% if user_access_priv == "allow" %}  data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}" class="rating-bar rating-bar-{{node.pk}}" data-user-rating="{{ratings.user_rating}}" {% else %} class=" rating-bar rating-bar-{{node.pk}}show user_not_enrolled" {% endif %}>
