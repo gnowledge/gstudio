@@ -4734,10 +4734,12 @@ $unit-card-lines-to-show: 3;
         letter-spacing: 0.6px;
     }
     .unit_header{
-    height: 120px !important;
+    //height: 120px !important;
     .unit_banner{
         height: 105px !important;
         border-radius: 4px;
+        margin-top: 31%;
+        padding-top: 14px;
     }
     }
     .unit-title-container {
