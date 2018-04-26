@@ -3947,6 +3947,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         font-weight: 500;
         font-size: 14px;
         letter-spacing: 0.6px;
+        z-index:99;
         
         @media screen and (min-width: 1025px) {
             float: right;
@@ -4646,7 +4647,7 @@ ul.nav_menu_1 {
       width: 1em;
       height: 1.4em;
       white-space: nowrap;
-      font-size: 1.2rem;
+      font-size: 2rem;
       margin:0;
       vertical-align: bottom;
 
@@ -6970,4 +6971,28 @@ font-size:100%; color: #713558;
 }
 .mod-detail-container{
     margin-left: 3.3%;
+}
+
+.rating-widget-container{
+    margin-bottom: 6em;
+    font-size: 20px;
+}
+
+.index-collapse-container{
+    padding: 12px 16px 9px;
+    background-color: #333;
+    font-size: .75rem;
+    border-bottom: 3px solid #333;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.activity-content-container{
+    //margin-top:-8vh;
+    margin-left: -4px;
+}
+
+.activity-player-controls{
+    min-width:100%;
+    margin-left: -15px;
 }
