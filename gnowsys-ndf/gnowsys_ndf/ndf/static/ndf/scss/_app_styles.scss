@@ -5051,7 +5051,7 @@ ul.nav_menu_1 {
     }
 }
 
-@media only screen and (max-width: 464px) {
+@media only screen and (max-width: 40em) {
   ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
@@ -5060,11 +5060,11 @@ ul.nav_menu_1 {
 
         >a{
             list-style-type: none;
-            display: inline-block;
+            /*display: inline-block;*/
             padding: 1px 2px 3px;
             color: $nav_menu_1_color;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             letter-spacing: 0.3px;
             border-bottom: 2px solid transparent;
         
@@ -5107,7 +5107,7 @@ ul.authoring-tab{
             }
 }
 
-@media only screen and (max-width: 464px) { 
+@media only screen and (max-width: 40em) { 
   ul.authoring-tab{
         margin-bottom: 0px;
         display:inline;
@@ -5121,8 +5121,8 @@ ul.authoring-tab{
                         background-color:$nav_menu_1_color;
                         padding: 1px 1px 1px;
                         cursor: pointer;
-                        font-size: 14px;
-                        display: inline-block;
+                        font-size: 16px;
+                       /* display: inline-block;*/
                         letter-spacing: 0.3px;
                         border-bottom: 3px solid transparent;
                         color:#ffffff !important;
@@ -6136,7 +6136,7 @@ ul.horizontal_tabs_gstudio {
                 background: #fff;
             }
             &>div{
-                height: 35px;
+                height: 45px;
                 a {
                     margin-right: 0.7em;
                 }
@@ -6156,13 +6156,25 @@ ul.horizontal_tabs_gstudio {
                 font-size: 19px;
                 font-weight: 600;
                 padding-bottom: 2px;
-            }
-            @media screen and (max-width: 400px) {
+            }    
+        }
+
+/*        @media screen and (max-width: 480px) {
               margin: 25px 10px;
               height: 55px;
-            }
-        }
+
+              >div {
+                  .jqtree-title {
+                      color: #3c5264;
+                      font-size: 16px;
+                      font-weight: 500;
+                      padding-bottom: 1px;
+                  }    
+              }
+
+          }*/
     }
+
     .course-activity-group >div {
         .jqtree-title {
             color: #74a0c0;
