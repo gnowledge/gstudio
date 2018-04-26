@@ -8,18 +8,18 @@
 {% endif %}
 <input type="button" data-reveal-id="enrollBuddiesModal-{{group_object.pk}}" class="fa enrollBtn enrollact-{{group_object.pk}} module-card-enrol unit-card-enrol"  
   "{% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:'full_enrolled' %}"  
-    "{% if is_workspace %}" value="Joined"
+    "{% if is_workspace %}" value="Enrolled"
       "{% else %}"  value="Enrolled" style="background-color:#006400;" onMouseOut="this.style.background='#006400';this.style.color='white'" onMouseOver="this.style.color='#a2238d';this.style.background='lightgrey'";  title="You are enrolled " 
     "{% endif %}" 
     "{% else %}" 
-      "{% if is_workspace %}" value="Join"
+      "{% if is_workspace %}" value="Enroll"
       "{% else %}"  value="Enroll &#xf234;"  title="Enroll your Buddies "
     "{% endif %}"
   "{%  endif %}" />
 
 <div id="enrollBuddiesModal-{{group_object.pk}}" class="reveal-modal medium radius" data-reveal data-alert>
     <h4 id="enrollBuddiesModalLabel">{% firstof group_object.altnames group_object.name %}
- {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Join Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %} {% endif %}  </h4><br/>
+ {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Enrollment Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %} {% endif %}  </h4><br/>
     <div class="small-12 medium-12 columns buddiesList center">
     <div class="row">
       <div class="small-8 medium-8 columns">
@@ -27,9 +27,9 @@
       </div>
       <div class="small-4 medium-4 columns">
       {% if request.user.pk in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:request.user.pk %}
-          <input id="enrollchk_{{group_object.pk}}_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{request.user.pk}}"> {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} </label>
+          <input id="enrollchk_{{group_object.pk}}_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{request.user.pk}}"> {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Enrolled" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} </label>
       {% else %}
-          <input id="enrollchk_{{group_object.pk}}_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}', '{{group_object.pk}}', '{{module_enrollment}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{group_object.pk}}_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
+          <input id="enrollchk_{{group_object.pk}}_{{request.user.pk}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{request.user.pk}}', '{{group_object.pk}}', '{{module_enrollment}}')" data-user-id='{{request.user.pk}}'><label for="enrollchk_{{group_object.pk}}_{{request.user.pk}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Enroll" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
       {% endif %}
       </div>
       <hr>
@@ -42,18 +42,18 @@
             </div>
             <div class="small-4 medium-4 columns">
                {% if userid in group_object.author_set and not module_enrollment or module_enrollment and enrolled_status_dict|get_dict_value_from_key:userid %}
-                <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Joined" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
+                <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" checked disabled><label for="enrollchk_{{group_object.pk}}_{{userid}}" > {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} {% if is_workspace %} {% trans "Enrolled" %} {% else %} {% trans "Enrolled" %} {% endif %} {% endif %} 
                 </label>
             {% else %}
               <input id="enrollchk_{{group_object.pk}}_{{userid}}" type="checkbox" class="enroll_chkbox" onclick="enroll_user('{{userid}}', '{{group_object.pk}}', '{{module_enrollment}}')" data-user-id='{{userid}}'><label for="enrollchk_{{group_object.pk}}_{{userid}}" class="enroll-act_lbl"> {% if 'announced_unit' in group_object.member_of_names_list or module_enrollment %} 
-                {% if is_workspace %} {% trans "Join" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
+                {% if is_workspace %} {% trans "Enroll" %} {% else %} {% trans "Enroll" %} {% endif %} {% endif %} </label>
             {% endif %}
             </div>
             <hr>
         {% endfor %}
       {% endwith %}
 
-    <input type="button" class="pink-button right enroll_all_users-{{group_object.pk}}" title="Enroll all" onclick="enroll_all_users('{{group_object.pk}}', '{{module_enrollment}}')" "{% if 'Group' in group_object.member_of_names_list %}" value="Join All"  "{% else %}" value="Enroll All" "{% endif %}" >
+    <input type="button" class="pink-button right enroll_all_users-{{group_object.pk}}" title="Enroll all" onclick="enroll_all_users('{{group_object.pk}}', '{{module_enrollment}}')" "{% if 'Group' in group_object.member_of_names_list %}" value="Enroll All"  "{% else %}" value="Enroll All" "{% endif %}" >
     {% endif %}
     </div>
     </div>

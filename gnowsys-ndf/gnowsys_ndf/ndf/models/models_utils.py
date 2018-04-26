@@ -69,7 +69,7 @@ class ActiveUsers(object):
                 request.session = engine.SessionStore(session.session_key)
 
                 request.user = User.objects.get(id=user_id)
-                print ('\nProcessing session of [ %d : "%s" ]\n' % (request.user.id, request.user.username))
+                print ('\nProcessing session of [ %d : "%s" ]' % (request.user.id, request.user.username))
 
                 logout(request)
                 print('- Successfully logout user with id: %r ' % user_id)

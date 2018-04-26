@@ -1,4 +1,4 @@
-# gStudio Data
+# Data
 
 ### [A]. [Quantitative data](counter-analytics-notes.html)
 1. Comments

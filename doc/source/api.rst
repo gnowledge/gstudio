@@ -1,5 +1,5 @@
-gstudio API
-==========================
+API
+===
 
 Providing version 1 ( ``v1`` ) API for gStudio, built with native python methods and mongo queries. In next version 2 ( ``v2`` ), we will be having comprehensive API's built on top of *Elastic-Search*.
 

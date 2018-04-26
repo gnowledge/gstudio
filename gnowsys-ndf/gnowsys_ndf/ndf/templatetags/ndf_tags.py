@@ -134,6 +134,7 @@ def get_site_variables():
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
 	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+	site_var['GSTUDIO_DOC_FOOTER_TEXT'] = GSTUDIO_DOC_FOOTER_TEXT
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -2216,7 +2217,9 @@ def user_access_policy(node, user):
         user_access = True
 
       else:
-        user_access = False
+        auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
+        if auth_obj and auth_obj.agency_type == 'Teacher':
+          user_access = True
 
     if user_access:
       return "allow"
@@ -4224,3 +4227,17 @@ def get_header_lang(lang):
         if lang in each_lang:
             return each_lang[1]
     return lang
+
+
+@get_execution_time
+@register.assignment_tag
+def get_profile_full_name(user_obj):
+	auth_obj = Author.get_author_by_userid(user_obj.pk)
+	list_of_attr = ['first_name', 'last_name']
+	auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
+	if auth_attr.values():
+		full_name = ' '.join("%s" % val for (key,val) in auth_attr.iteritems())
+		full_name += " (Username: " + user_obj.username + ", ID: " + str(user_obj.pk) + ")"
+	else:
+		full_name = "Username: " + user_obj.username  + ", ID: " + str(user_obj.pk)
+	return full_name

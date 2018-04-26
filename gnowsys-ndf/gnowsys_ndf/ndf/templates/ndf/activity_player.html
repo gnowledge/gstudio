@@ -5,7 +5,6 @@
 
 {% load ndf_tags %}
 
-
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
 {% user_access_policy groupid request.user as user_access_priv %}
@@ -16,151 +15,76 @@
 {% get_attribute_value thread_node_obj.pk 'thread_interaction_type' as thr_int_type %}
 {% get_default_discussion_lbl as disc_label %}
 
-
-
 <style type="text/css">
   .disabled , .disabled i {
     color:gray !important;
   }
-  .course_editor_section{
-    min-width:100%;
-    margin-left: -15px;
-  }
-  .node-content-div{
-    margin-left: -4px;
-
-  }
-
-  .collapse-container--open {
-    width: 160px;
-    position: relative;
-                -webkit-transition: all .6s ease;
-                -webkit-box-align: stretch;
-                align-items: stretch;
-                overflow-x: hidden;
-                color: #fff;
-                font-weight: 300;
-
-  }
-
-  .first-strip{
-                    padding: 12px 16px 9px;
-                    background-color: #333;
-                    font-size: .75rem;
-                    border-bottom: 3px solid #333;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                }
-
-  .svg-arrow {
-        height: 12px;
-        width: 8px;
-        position: absolute;
-        right: .5rem;
-        top: .9rem;
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-        -webkit-transition: all .6s ease;
-        transition: all .6s ease;
-    }
 </style>
 
 {% include 'ndf/widget_user_access_modal.html' %}
 
-
 {% if site.SITE_NAME == "NROER" %}
   <div class="activity_player_secondary_header activity_player_header sticky" style="margin-top:-8px;">
-
     <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
 {% else %}
   <div class="activity_player_secondary_header activity_player_header sticky">
-
     <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
 {% endif %}
-
-
-      {% comment %}
-    {% if site.SITE_NAME == "NROER" %}
-      {% endcomment %}
       <div class="small-1 columns end header_text_sm_block">
-        <a title="Go back to Overview" href="{% url 'course_content' group_id  %}">
+        <a title="Go back to Overview" href="{% url 'course_content' group_name  %}">
         <div class="header_icon_block prev_button">
           <span>
             <i class="fa fa-angle-left header_icon"></i> Back</span>
         </div>
         </a>
       </div>
-      {% comment %}
-    {% else %}
-      <div class="small-1 columns end header_text_sm_block">
-        <a title="Go back to all Lessons" href="{% url 'course_content' group_id  %}">
-        <div class="header_icon_block prev_button">
-          <i class="fa fa-angle-left header_icon"></i> Lessons
-          
-        </div>
-        </a>
+      <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
+        {% firstof group_object.altnames group_object.name  %}
+        {% if is_gstaff and "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+          <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
+        {% endif %}
       </div>
-    {% endif %}
-    {% endcomment %}
-
-        
-        <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
-          {% firstof group_object.altnames group_object.name  %}
-
-            {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
-              <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
-            {% endif %}
-        </div>
 
       <div class="lesson-nav">
-
         <div class="new_note header_text_block header_text_md_block">
-            <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_id %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
+            <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_name %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
                {% trans "e-Notes" %} 
             </a>
         </div>
         <div class="new_note header_text_block  header_text_lg_block">
-            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_name prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
                {% trans "Previous Lesson" %}  
             </a>
         </div>
         <div class="pagination prev_button header_text_block header_text_md_block">
-            
-              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_id lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
+              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_name lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
                   <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
               </a>
-            
         </div>
         <div class="pagination page_count " ><a title="You are on Activity {{resource_index|add:'1'}}  in this Lesson">
             {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}</a>
         </div>
         <div class="pagination page_count header_text_block header_text_md_block">
-              <a {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_id lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
+              <a {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_name lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
                   {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
               </a>
-            
         </div>
         <div class="new_note header_text_block header_text_lg_block">
-            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_id next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
+            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_name next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
                {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
             </a>
         </div>
       </div>
-
-
 </nav>
 </div>
 
-
-
 <div class="row activity_sheet ">
-
-    <div class="small-12 columns">
-        <div class="course_editor ">
-          <div class="small-3 columns colapse-container index">
+    <div class="course_editor ">
+        <div class="small-12 medium-12 large-12 columns ">
+          <div class="small-3 medium-3 large-3 columns index-section-collapse">
             <div class="course_tree ">
               <a>
-                <div class="first-strip">
+                <div class="index-collapse-container">
                   <div class="lesson-title" title="{{trans_lesson_name}}">
                     <b>{{trans_lesson_name}}</b> <i class="fa fa-angle-left right collapse-icon" style="font-size: 23px;"></i>
                   </div>
@@ -169,28 +93,28 @@
               <div class="activity-title"  style="height: 90vh;">
               {% for each in act_list %}
                   {% for k,v in each.items  %}
-                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_id lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
+                    <li  {% if v.basenodeid == activityid %} class="active" {% endif %}> <a href="{% url 'activity_player_detail' group_name lesson_node.pk v.basenodeid %}"> {% firstof v.altnames v.name %} </a></li>
                   {% endfor %}
               {% endfor %}
               </div>
               </div>
           </div>
-          
-          <div class="small-8 medium-9 large-9 columns section-expand">
-
-            <div class="course_editor_section">
+          <div class="small-9 medium-9 large-9 columns activity-section-expand">
+            <div class="activity-player-controls">
               {% with node.member_of_names_list as node_member_of_names_list %}
+              {% get_relation_value node.pk 'has_help' as grel_help %}
+              {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
+
               {% if "QuizItemEvent" not in node_member_of_names_list and "QuizItem" not in node_member_of_names_list%}
+              {% if grel_help.grel_id  or grel_admin_page.grel_id %}
               <div class="input_links row" style="margin-left:10px;">
-                {% include 'ndf/rating.html'%}
-                {% get_relation_value node.pk 'has_help' as grel_help %}
-                {% get_relation_value node.pk 'has_admin_page' as grel_admin_page %}
                   {% if grel_help.grel_id  %}
                     <a class="student-page right"> {% trans "Student Help" %}</a>
                   {% endif %}
-                  {% if  is_gstaff or user.is_superuser %}
-                    {% if grel_admin_page.grel_id %}<a class="admin-page right"> {% trans "Teacher's Help" %}</a>{% endif %}
-                  {% endif  %}
+                  {% if grel_admin_page.grel_id and is_gstaff or user.is_superuser %}
+                    <a class="admin-page right"> {% trans "Teacher's Help" %}</a>
+                  {% endif %}
+              {% endif %}
 
                 
                 {% if player_discussion or node_discussion %}
@@ -207,13 +131,14 @@
                 {% if "QuizItemEvent" in node_member_of_names_list or "QuizItem" in node_member_of_names_list%}
                   {% load_quiz_player request group_id node True %}
                 {% else %}
-                {# {{node.content|safe}} #}
-                <div style="margin-top:-80px;">
+                <div class="activity-content-container">
                   {% include "ndf/node_ajax_content.html" with node=trans_node expand_content=True  no_discussion=True hide_breadcrumbs=True %}
                 </div>
                 {% endif %}
+                <div class="rating-widget-container"><span>{% trans "Rating: " %}</span>{% include 'ndf/rating.html'%}</div>
               </div>
               {% endwith %}
+
               <div class="discussion-area activity_page_rendered">
                 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
                 {% if  player_discussion or node_discussion %}
@@ -237,7 +162,6 @@
       </div>
 </div>             
 
-
 <div id="confirm-finish-lesson-reveal" class="reveal-modal medium radius" data-reveal data-alert>
     <p id="finishLessonModalLabel">
       Confirm Finish Lesson: {% firstof lesson_node.altnames lesson_node.name %}?<br/>
@@ -252,16 +176,19 @@
 
 <script type="text/javascript">
 
-    $('.first-strip').click(function(){
-      $('.index').toggleClass('colapse-container collapse-container--open');
+    // Collapse and Expand events for lesson-content and activity-player
+    $('.index-collapse-container').click(function(){
       $('.collapse-icon').toggleClass('fa-angle-right fa-angle-left')
-      $('.section-expand').toggleClass('small-3 small-10');
       $('.activity-title').toggleClass('hide');
 
-    });
+      $('.activity-section-expand').toggleClass('small-9 small-11');
+      $('.activity-section-expand').toggleClass('medium-9 medium-11');
+      $('.activity-section-expand').toggleClass('large-9 large-11');
 
-   
-      
+      $('.index-section-collapse').toggleClass('small-3 small-1');
+      $('.index-section-collapse').toggleClass('medium-3 medium-1');
+      $('.index-section-collapse').toggleClass('large-3 large-1');
+    });
 
    function onMessage(message) {
     // Inconveniently, we don't seem to be able to locate the

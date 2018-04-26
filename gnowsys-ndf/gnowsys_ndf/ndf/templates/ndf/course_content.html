@@ -1,13 +1,166 @@
 <div class="course-content">
+    <button class="accordion-overview">Overview</button>
+    <div class="panel">
+         <div class="about-course  rows">            
+            <div class="medium-3  large-12 columns rows">
+              <div class="left">
+              </div>
+              <div class="left">
+                <h5>Description</h5> <br>
+                  <div class="course-highlight">
+                    <span>
+                      {{group_object.content|default:'No description added yet.'|safe}}  
+                    </span>
+                  </div>
+              </div>
+            </div>
+            
+            <br>
+
+            <div class="medium-3 large-3 columns rows">
+              <div class="left">
+                <i class="icon-wid fa fa-user"></i>
+              </div>
+              <div class="left">
+                <h5>No. of Members</h5>
+                  <div class="course-highlight">
+                    <span>
+                      {{group_object.author_set|length}}  
+                    </span>
+                  </div>
+              </div>
+            </div> 
+            <div class="medium-3  large-3 columns rows">
+              <div class="left">
+                <i class="icon-wid fa fa-list"></i>
+              </div>
+              <div class="left">
+                <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+                  <div class="course-highlight">
+                    <span>
+                      {{group_object.collection_set|length}}
+                    </span>
+                  </div>
+              </div>
+            </div>
+            <br/>
+        </div>
+      </div>
+       
+        {% comment %}
+        {% if show_analytics_notifications %}
+          <div class="medium-3 rows">
+            <div class="left">
+              <i class="icon-wid fa fa-list"></i>
+            </div>
+            <div class="left module_text">
+              <h5>No. of {% firstof group_object.project_config.tab_name 'Lessons' %}</h5>
+              <div class="course-highlight">
+                 <span>{{group_object.collection_set|length}}</span>
+              </div>
+            </div>
+          </div>
+          <br/>
+          <br/>
+        
+          {% if 'Group' not in  group_obj.member_of_names_list %}
+            <div class="medium-3 rows">
+              <div class="left">
+                <i class="icon-wid fa fa-clock-o"></i>
+              </div>
+              <div class="left">
+                <h5>  Course Duration</h5>
+                <div class="course-highlight">
+                  <span>{{weeks_count}} week{{weeks_count|pluralize}}</span>
+                </div>
+              </div>
+            </div>
+            <br/>
+          {% endif %}
+        {% endif %}
+
+      {% if educationallevel_val %}
+        <div class="about-course">
+          <div class="medium-3 rows">
+              <div class="left">
+                <i class="icon-wid fi-results-demographics"></i>
+              </div>
+              <div class="left">
+                <h5>Grade</h5>
+                <div class="course-highlight">
+                   <span> {{educationallevel_val}}</span>
+                </div>
+              </div>
+            </div>
+            <br/>
+
+           
+            
+            <br/>
+            
+        </div>
+       
+      {% endif %}
+
+      {% if educationalsubject_val %}
+          <div class="about-course">
+            <div class="medium-3 rows">
+              <div class="left">
+                <i class="icon-wid fa fa-book"></i>
+              </div>
+              <div class="left">
+                <h5>Subject</h5>
+                <div class="course-highlight">
+                    <span>{{educationalsubject_val}}</span>
+                </div>
+              </div>
+            </div>
+            <br/>
+            <br/>
+          </div>
+      {% endif %}
+
+      <div class="about-course">
+        <div class="medium-3 rows">
+            <div class="left">
+              <i class="icon-wid fa fa-calendar"></i>
+            </div>
+            <div class="left">
+              <h5>Created On</h5>
+              <div class="course-highlight">
+                  <span> {{group_obj.created_at}}</span>
+              </div>
+            </div>
+        </div>
+          <br/>
+          <br/>
+      </div>
+    {% endcomment %}
+
     <div id="tree1">
     </div>
 </div>
 
 <script type="text/javascript">
     iconMapping = {
-        'COMPLETED': 'fill-green-circle',
-        'INPROGRESS': 'fill-orange-circle',
+        'COMPLETED': 'fas fa-eye green',
+        'INPROGRESS': 'fas fa-eye orange',
     }
+
+    var acc = document.getElementsByClassName("accordion-overview");
+    var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    });
+}
 
 
 
@@ -93,7 +246,7 @@
                 }
 
                 else if (node.type == "activity-group"){
-                    url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
+                    url = '/{{group_name}}/course/activity_player/' + node.parent.id + '/' + node.id
                     $li.find('.jqtree-title').html('<a href="'+url+'" id='+node.id +' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>')
                     if(visited_nodes_ids.indexOf(node.id) != -1){
                         if (visited_nodes[node.id] > 1){
