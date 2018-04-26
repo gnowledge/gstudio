@@ -11,7 +11,7 @@
 {% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script> <!-- checked -->
-  <script src="/static/ndf/js/MediaStreamRecorder.js"></script> 
+  <script src="/static/ndf/js/MediaStreamRecorder.js"></script>
   <script src="/static/ndf/js/adapter.js"></script>
 
   {% if user.is_authenticated %}
@@ -43,9 +43,9 @@
 
       <div class="create-discussion">
 
-      <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" onclick="check_user_access_policy($(this))" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
+      <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
         {% if thr_int_type %}
-           <i class="fa fa-comments"></i>  {% if thr_int_type == "None" %} Feedback {% else %}   {{thr_int_type}} {% endif %}
+          <i class="fa fa-comments"></i>  {% if thr_int_type == "None" %} Feedback {% else %}   {{thr_int_type}} {% endif %}
            {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
          <i class="fa fa-comments"></i> {{default_discussion_lbl}}    {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
@@ -76,7 +76,7 @@
           <div clas="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="#" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.contributors|join:', ' }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %} 
+                {{ each_reply.contributors|join:', ' }}{% include 'ndf/rating.html' with if_comments=True nodeid=each_reply.oid %}
               </a>
                 <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
             </div>
@@ -108,14 +108,14 @@
           <div class="discussion-footer">
             <a  data-id='{{ each_reply.oid }}' {% if user_access_priv == "allow" %} class="reply-btn reply_res" onclick='openCKEditor($(this),"{{each_reply.oid}}")'  {% else %} class="user_not_enrolled reply-btn reply_res" {% endif %} data-org-content='{{ each_reply.content }}'>
               <i class="fa fa-reply"></i>
-              {% trans "Reply" %} 
+              {% trans "Reply" %}
             </a>
             {% if request.user.id == each_reply.userid or is_gstaff  or request.user.id in group_object.group_admin %}
               <a class="reply-btn delete_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
               </a>
-               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important"> 
+               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important">
                 <i class="fa fa-pencil-square-o"></i>
                 {% trans "Edit" %} |
               </a>
@@ -210,7 +210,7 @@
 
                 //$("#create-discussion").trigger("click");
               }
-              
+
               else{ alert(data) }
             }//,
 
@@ -306,7 +306,7 @@
                   htmlReply +="<a class='reply-btn delete_res' data-id='" + data[1]+ "'data-userid='"+ data[5] +"' onclick='deleteReply($(this))' style='float:right'><i class='fa fa-trash-o'></i> Delete"
                   htmlReply +="<a class='reply-btn edit_res' data-id='"+ data[1] +"' data-userid='{{each_reply.userid}}' data-userid='"+ data[5] +"' onclick='editreply($(this))' style='float:right;margin-right:10px!important'><i class='fa fa-pencil-square-o'></i> Edit |"
                   }
-          +"</div>"   
+          +"</div>"
         +"</div>"
       +"</div>";
     return htmlReply;
@@ -354,7 +354,7 @@
               $("#orgitdownreps").val("");  // make textarea empty
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
-                
+
                 //sample format of data = [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
                 // add reply text content after #replies-area
                 var parent_margin_level = $(sourceObj).closest("div").attr("class");
@@ -364,8 +364,8 @@
               else  // sub-reply
               {
                 parent_margin_level = $(sourceObj).attr("data-reply-level");
-                child_margin_level = parseInt(parent_margin_level) + 1;          
-                
+                child_margin_level = parseInt(parent_margin_level) + 1;
+
 
                 $(sourceObj).after(createReplyHTML('margin-left:'+((child_margin_level-1)*48)+'px', data,parseInt(parent_margin_level)+1));
 
@@ -373,7 +373,7 @@
               // updating tab-text
               old_count = old_count + 1
               updateDiscussionTabText();
-              
+
             }
             else if( data[0] == "no_content" ){
 
@@ -388,12 +388,12 @@
       alert(" {% trans 'Please provide the reply content.' %}")
     } // --- END of IF-ELSE
                 //  $.ajax({
-                //         url: "{% url 'get_gin_line_template' group_id node.pk %}",                        
+                //         url: "{% url 'get_gin_line_template' group_id node.pk %}",                       
                 //         type: "GET",
                 //         datatype: "html",
-                        
+
                 //       success: function(data) {
-                            
+
                 //             alert(data);
                 //             $(".comment-sections:visible").html(data);
                 //       }
@@ -506,7 +506,7 @@ function editreply(sourceObj){
    if(checkCurrEdit()){
            return false;
      }
-  
+
   var parent_div = sourceObj.parent();
 
     parent_div.append("<a class='reply-btn save_res' onclick='save_reply($(this))' data-id='" + curr_data_id + "' style='float:right;margin-right:10px!important'><i class='fa fa-floppy-o'></i> Save</a>");
@@ -535,8 +535,8 @@ function editreply(sourceObj){
              setCurrNodeEdit(1);
              // $(sourceObj).append(data);
           },
-        }); 
-  
+        });
+
 
 }
 
@@ -567,7 +567,7 @@ function save_reply(sourceObj){
             edit_res = curr_thread.closest('.edit_res');
             reply_res = curr_thread.closest('.reply_res');
             delete_res = curr_thread.closest('.delete_res');
-            
+
             content_thread.show();
             reply_res.show();
             edit_res.show();
@@ -599,7 +599,5 @@ function check_user_access_policy(obj){
   alert("Please login to rate this resource");
     return false;
 }
+
 </script>
-
-
-
