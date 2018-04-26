@@ -475,12 +475,21 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.core.context_processors.media',
-    'django.core.context_processors.request',
+    # 'django.core.context_processors.request',
     # 'django.core.context_processors.csrf',
 )
 
+
+# AUTO LOGOUT CONFIGS:
+
 SESSION_SECURITY_WARN_AFTER = 60*30
 SESSION_SECURITY_EXPIRE_AFTER = 60*2
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_SECURITY_INSECURE = False
+# SESSION_SECURITY_PASSIVE_URLS
+# SESSION_SECURITY_PASSIVE_URL_NAMES
+
+# --- END of AUTO LOGOUT CONFIGS
 
 djcelery.setup_loader()
 # # CELERY_RESULT_BACKEND = "mongodb"

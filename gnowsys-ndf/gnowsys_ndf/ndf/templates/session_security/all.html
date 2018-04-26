@@ -203,7 +203,7 @@ yourlabs.SessionSecurity.prototype = {
     {% include 'session_security/dialog.html' %}
 
     {# Load SessionSecurity javascript 'class', jquery should be loaded - by you - at this point #}
-    <script type="text/javascript" src="{% static 'session_security/script.js' %}"></script>
+    <!-- <script type="text/javascript" src="{% static 'session_security/script.js' %}"></script> -->
     {% csrf_token %}
     {# Bootstrap a SessionSecurity instance as the sessionSecurity global variable #}
     {% localize off %}
