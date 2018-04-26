@@ -35,7 +35,6 @@
        </div>
      </div>
 </div>
-
 {% with group_object.member_of_names_list as group_object_member_of_names_list %}
 <div class="lms_secondary_header">
 <div class="small-10 medium-10 large-10 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff;">
@@ -52,24 +51,26 @@
     {% if not group_object.project_config.resource_name %}{% trans "Resources" %}{% else %}{{group_object.project_config.resource_name}} {% endif %}</a> </li>
     {% if group_object.name != "help"%}
     <li>
-    <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} tabindex="4" title="Upload and share your files such as images, audios, videos, spreadsheets"> <i class="fi-photo "></i>{% if 'Group'  in group_object_member_of_names_list %} {% trans "E-Library" %} {% else %} {% trans "Gallery" %}{% endif %}</a> 
-    </li>
+    <a  href="{% url 'course_gallery' group_id %}" {% if title == 'gallery' or title == "asset_gallery_detail" %} class="selected" {% endif %} tabindex="4" title="Upload and share your files such as images, audios, videos, spreadsheets"> <i class="fi-photo "></i>{% if 'Group'  in group_object_member_of_names_list and group_object.name != "home"%} {% trans "Gallery" %} {% else %} {% trans "E-Library" %}{% endif %}</a> 
 
-    
-    
+    </li>
     <li>
       <a href="{% url 'course_notebook' group_id %}" {% if title == 'notebook' %}class="selected"{% endif %} tabindex="5" title="Create and share notes, read notes shared by all students"><i class="fi-book "></i>{% if not group_object.project_config.blog_name %}{% trans "Blog" %}{% else %}{{group_object.project_config.blog_name}} {% endif %}
       </a>
     </li>
-
+      {% comment %}
      {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
+      }
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
     </li>
     {% endif %}
+  
     <li>
-      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Calendar" %}</a>
     </li>
+    {% endcomment %}
+
     {% endif %}
     {% else %}
     
@@ -84,7 +85,7 @@
       {% if is_gstaff %}<a href="{% url 'unit_detail' groupid %}" title="Edit Structure" style="background-color:#164a7b; border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i>{% endif %}</a>
      </li>
 
-    {% if 'Group' not in group_object_member_of_names_list  or  'base_unit'  in group_object_member_of_names_list  %}
+    {% if 'Author' not in group_object_member_of_names_list  or  'base_unit'  in group_object_member_of_names_list  %}
     <li>  <a href="{% url 'course_raw_material' group_id %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %} tabindex="3" title="Contains useful files such as images, audios, videos etc."><i class="fi-folder "></i> {% trans "Resources" %}</a> </li>
     {% endif %}
     <li>
@@ -94,20 +95,20 @@
       {% if 'Group' in group_object_member_of_names_list and  'base_unit' not in group_object_member_of_names_list %}
         {% trans "Blog" %} 
       {% else %}
-        {% trans "Notebook" %} 
+        {% trans "blog" %} 
       {% endif %}
       </a>
     </li>
+     {% comment %}
      {% if 'Group'  in group_object_member_of_names_list and "base_unit" not in group_object_member_of_names_list and "announced_unit" not in group_object_member_of_names_list %}
     <li>
       <a href="{% url 'curriculum_list' groupid  %}" tabindex="6"> <i class="fa fa-sitemap ">  </i> {% trans "Topic Map" %}</a>
     </li>
     {% endif %}
-
-    
     <li>
-      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+      <a href="{% url 'gtask' group_id  %}"  tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Calendar" %}</a>
     </li>
+    {% endcomment %}
   {% endif %}
 </ul>
 <ul class="nav_menu_1 authoring-tab" style="width:50%; display:inline">
@@ -131,7 +132,7 @@
     	{% endif %}
     </li>
     <li>
-        <a href="https://clix-authoring.mit.edu/#/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
+        <a href="https://interx.metastudio.org/wp-admin/admin.php?page=h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
   {% endif %}
 
@@ -189,7 +190,7 @@
 
               {% endif %}
               <li>
-                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit Metadata" %}</a>
+                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% if 'Author' in group_object_member_of_names_list %} {% trans "Edit Profile" %} {% else %} {% trans "Edit Metadata" %} {% endif %}</a>
               </li>
               <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
               <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>

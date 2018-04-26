@@ -4,7 +4,7 @@
 HOW TO USE
 
 - EXAMPLE:
-    {% include 'ndf/widget_selector.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element=true %}
+    {% include 'ndf/widget_selector1.html' with for='apps_to_set' all_options=all_gapps selected_options=group_gapps oneline_element=true %}
 
     where,
 
@@ -28,7 +28,7 @@ HOW TO USE
 
       where,
       - first arg: should be matching with field specified in the <for>
-        while including widget_selector.html
+        while including widget_selector1.html
       - second arg: optional, id to be assign to this newly created hidden element.
   - If there are 3 inclusions of widget_selector then "getSelValuesHiddenElement()"
     should be called (before save) 3 times with appropriate first args (<for>).
@@ -238,7 +238,7 @@ HOW TO USE
   var oneline_element = "{{oneline_element}}";
 
   // making list of all selected items data
-  
+
   var selected_options = [ {% for each_opt in selected_options %}"{{each_opt|safe}}"{% if not forloop.last %},{% endif %}{% endfor %} ];
   // console.log(selected_options)
 

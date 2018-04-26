@@ -34,7 +34,7 @@ GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'
 GSTUDIO_DEFAULT_GROUP = u'desk'
 GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
-LANGUAGES = (('en', 'English'), ('hi', 'Hindi'), ('te', 'Telugu'))
+LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
 HEADER_LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te', u'\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 GSTUDIO_WORKSPACE_INSTANCE = False
@@ -428,6 +428,9 @@ TEMPLATE_LOADERS = (
     #  'django.template.loaders.eggs.Loader',
 )
 
+##LOGIN WITH MASTODON###
+LOGIN_WITH_MASTODON = False
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -447,6 +450,7 @@ MIDDLEWARE_CLASSES = (
     # gstudio custom middleware(s):
     'gnowsys_ndf.ndf.middleware.SetCookie.UserId',
     'gnowsys_ndf.ndf.middleware.SetData.Author',
+
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
 
@@ -516,8 +520,6 @@ INSTALLED_APPS = (
     'memcache_admin',
     'django_mailbox',
     'djcelery',
-    #'dlkit',
-    #'dlkit_runtime'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -525,6 +527,15 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
+
+###########################
+
+#AUTHENTICATION_BACKENDS = (
+#    'gnowsys_ndf.ndf.oauth_middleware.MyCustomBackend',
+#)
+
+ACCOUNT_ACTIVATION_DAYS = 2  # Two days for activation.
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -736,7 +747,7 @@ GSTUDIO_RESOURCES_AUDIENCE = ["Teachers", "Students", "Teacher educators"]
 
 GSTUDIO_RESOURCES_TEXT_COMPLEXITY = ["Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard"]
 
-GSTUDIO_RESOURCES_LANGUAGES = ["English", "Gujarati", "Hindi", "Manipuri", "Marathi", "Mizo", "Telugu"]
+GSTUDIO_RESOURCES_LANGUAGES = ["Assamese","English", "Gujarati", "Hindi", "Malayalam","Manipuri", "Marathi", "Mizo", "Telugu"]
 
 GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
@@ -1011,6 +1022,10 @@ CACHES = {
     }
 }
 
+#####################MASTODON########################
+if LOGIN_WITH_MASTODON:
+    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.oauth_middleware.test',)
+    AUTHENTICATION_BACKENDS = ('gnowsys_ndf.ndf.middleware.oauth_middleware.MyCustomBackend',)
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
@@ -1031,14 +1046,14 @@ GSTUDIO_ENABLE_USER_DASHBOARD = True
 GSTUDIO_PRIMARY_COURSE_LANGUAGE = u'en'
 
 # --- BUDDY Module configurations ---
-#
 GSTUDIO_BUDDY_LOGIN = False
+# --- End of BUDDY Module ---
+
+# Institute ID, name configs
 GSTUDIO_INSTITUTE_ID = ''
 GSTUDIO_INSTITUTE_ID_SECONDARY = ''
 GSTUDIO_INSTITUTE_NAME = ''
-#
-# --- End of BUDDY Module ---
-
+# --- End of Institute ID, name configs
 
 # # textb
 # import warnings
@@ -1060,6 +1075,33 @@ GSTUDIO_INSTITUTE_NAME = ''
 # USERS_ONLINE__CACHE_USERS
 #
 # --- END of meeting gapp ---
+
+
+GSTUDIO_ELASTIC_SEARCH_PASSWORD = ""
+
+# Elastic Search
+GSTUDIO_DOCUMENT_MAPPING = '/data'
+GSTUDIO_ELASTIC_SEARCH = False
+GSTUDIO_ELASTIC_SEARCH_PROTOCOL = 'http' # we can use http or https protocol
+GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER = ''
+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = ''
+GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS = False
+GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS= False
+# --- End of Elastic Search
+
+GLITE_RCS_REPO_DIRNAME = "glite-rcs-repo"
+GLITE_RCS_REPO_DIR = os.path.join('/data/', RCS_REPO_DIRNAME)
+
+GSTUDIO_ELASTIC_SEARCH_INDEX = {
+ "Filehives": ["Filehive"],
+ "Triples": ["GAttribute", "GRelation"],
+ "Buddies": ["Buddy"],
+ "Benchmarks": ["Benchmark"],
+ "Nodes": ["MetaType", "GSystemType", "RelationType", "AttributeType", "GSystem", "Group", "ToReduceDocs", "Author"],
+ "Counters": ["Counter"]
+}
 
 
 

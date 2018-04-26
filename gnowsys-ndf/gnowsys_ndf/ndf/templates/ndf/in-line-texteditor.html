@@ -43,13 +43,12 @@
 
       <div class="create-discussion">
 
-      <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
+      <div {% if user_access_priv == "allow" %} onclick="createDiscussion()" class="ckeditor-comment  explore-button "{% else %} class="ckeditor-comment explore-button user_not_enrolled" onclick="check_user_access_policy($(this))" {% endif %} id="create-discussion" data-id="{{ node.pk }}"   style="margin-bottom:0;">
         {% if thr_int_type %}
-          <i class="fa fa-comments"></i>  {% if thr_int_type == "None" %} Feedback {% else %}   {{thr_int_type}} {% endif %}     
-          {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
+           <i class="fa fa-comments"></i>  {% if thr_int_type == "None" %} Feedback {% else %}   {{thr_int_type}} {% endif %}
+           {% if all_replies|length > 0 %}({{all_replies|length }}) {% endif %}
         {% else %}
-           <i class="fa fa-comments"></i> {{default_discussion_lbl}}    {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
-        {% endif %}
+         <i class="fa fa-comments"></i> {{default_discussion_lbl}}    {% if all_replies|length > 0 %} ({{all_replies|length }}) {% endif %}
       </div>
     {% endif %}
     </div>
@@ -155,10 +154,11 @@
   var edit_policy = "allow"; // "allow" or "disallow"
   var is_user_authenticated = {{ request.user.is_authenticated|lower }};
   {% if thr_int_type == "None" %}
-    thr_int_type_var = "Feedback"
+   thr_int_type_var = "Feedback"
   {% elif thr_int_type %}
-    thr_int_type_var =  "{{thr_int_type}}"
-   {% else %}
+
+    thr_int_type_var = "{{thr_int_type}}"
+  {% else %}
     thr_int_type_var = "{{default_discussion_lbl}}"
   {% endif %}
 
@@ -196,7 +196,7 @@
                             p.after('<div class="ckeditor-content-comment"><div class="ckeditor-reply-area"></div> <div class="post-btn-div" style="float: right; margin-right: 67px;">');
                                   // '<img width="'+  width + '"src=' + completeURL +  '>' + '</img>'
                                   $('.ckeditor-reply-area').html(data);
-                                  $('.post-btn-div').html('<input type="button" value="Post"  class="explore-button reply-button " onclick="addReply(this)" style="width:34%;">');
+                                  $('.post-btn-div').html('<input type="button" value="Post"  class="explore-button reply-button " onclick="addReply(this)" style="width:10%;">');
 
                             setCurrNodeEdit(1);
 
@@ -594,6 +594,11 @@ function save_reply(sourceObj){
         }
     };
   }, 10000);
+
+function check_user_access_policy(obj){
+  alert("Please login to rate this resource");
+    return false;
+}
 </script>
 
 
