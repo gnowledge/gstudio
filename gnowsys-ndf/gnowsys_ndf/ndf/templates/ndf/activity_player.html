@@ -243,7 +243,7 @@
     </aside>
 <!--  mobile view  -->
     <aside class="right-off-canvas-menu">
-      <ul class="off-canvas-list">
+      <ul class="off-canvas-list" style="margin-left: 90px;">
         <li><label>Navigation</label></li>
         <li><a   {% if prev_lesson_id and lesson_act_prev_id %} href="{% url 'activity_player_detail' group_id prev_lesson_id lesson_act_prev_id %}" {% else %} class = "disabled" {% endif %} ><i class="fa fa-fast-backward header_icon"></i>&nbsp;
                {% trans "Previous Lesson" %}  

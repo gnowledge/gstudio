@@ -93,7 +93,7 @@
 
             <section class="empty-dashboard-message">
               
-                <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+                <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>{% trans "Explore" %}</a>
             </section>
             
           
@@ -112,8 +112,8 @@
           </ul>
         </div>
           <section class="empty-dashboard-message">
-            <p>You are not enrolled in any course!</p>
-              <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  Explore</a>
+            <p>{% trans "You are not enrolled in any course!" %}</p>
+              <a class="button-explore-courses" href="{% url 'explore_courses' %}"> <i class="fa fa-binoculars" aria-hidden="true"></i>  {% trans "Explore" %}</a>
           </section>
           
         
@@ -132,8 +132,8 @@
       </li>
       {% empty %}
       <section class="empty-dashboard-message">
-        <p>You are not enrolled in any course!</p>
-          <a class="button-explore-courses" href="{% url 'explore_courses' %}">Explore</a>
+        <p>{% trans "You are not enrolled in any course!" %}</p>
+          <a class="button-explore-courses" href="{% url 'explore_courses' %}">{% trans "Explore" %}</a>
       </section>
       {% endfor %}
     </ul>
