@@ -31,6 +31,10 @@ q = Q('match',name=dict(query='File',type='phrase'))
 GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 GST_FILE1 = GST_FILE.execute()
 
+q = Q('match',name=dict(query='Page',type='phrase'))
+GST_PAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+GST_PAGE1 = GST_PAGE.execute()
+
 def search_detail(request,group_id,page_no=1):
 
 	search_result = ''
@@ -49,8 +53,10 @@ def search_detail(request,group_id,page_no=1):
 
 	print GST_FILE1.hits[0].id
 
-	q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match',group_set='55ab34ff81fccb4f1d806025'),Q('match',access_policy='public'),~Q('exists',field=selected_field)])
+	q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match',group_set=str(group_id)),Q('match',access_policy='public'),~Q('exists',field=selected_field)],
+		must_not=[Q('match', member_of=GST_PAGE1.hits[0].id)])
 	search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+	search_result = search_result.exclude('terms', name=['thumbnail','jpg','png','svg'])
 
 	if request.GET.get('field_list',None) == "true":
 
