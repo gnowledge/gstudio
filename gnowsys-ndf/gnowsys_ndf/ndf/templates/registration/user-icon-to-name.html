@@ -1,0 +1,346 @@
+{% load i18n %}
+{% block head %}
+  <script src="/static/ndf/bower_components/handlebars/handlebars.js"></script>
+  <script src="/static/ndf/js/gstudio-functions.js"></script>
+  <script src="/static/ndf/js/buddy-icons.js"></script>
+{% endblock head %}
+
+{% block body_content %}
+  <!-- RHS Buddy Panel -->
+  <div class="username_panel" id="sample_buddy_panel">
+        <div class="add_buddy_icon">
+            <a href="#" data-reveal-id="add_buddy_modal" title="Select Username">
+
+              <!-- Add-Buddy-Button -->
+              <svg viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <defs>
+                      <rect id="path-1" x="0" y="0" width="35" height="35" rx="5"></rect>
+                      <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="35" height="35" fill="white">
+                          <use xlink:href="#path-1"></use>
+                      </mask>
+                  </defs>
+                  <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                      <g id="Add-Buddy-Button">
+                          <g>
+                              <use id="Rectangle-5" stroke="#ffc14e" mask="url(#mask-2)" stroke-width="2" xlink:href="#path-1"></use>
+                              <path d="M16.5775,23.0685 C16.4624994,22.9534994 16.405,22.8193341 16.405,22.666 L16.405,18.503 L12.357,18.503 C12.2036659,18.503 12.0695006,18.4455006 11.9545,18.3305 C11.8394994,18.2154994 11.782,18.0813341 11.782,17.928 L11.782,16.157 C11.782,15.9883325 11.8356661,15.8465006 11.943,15.7315 C12.0503339,15.6164994 12.1883325,15.559 12.357,15.559 L16.405,15.559 L16.405,11.534 C16.405,11.3653325 16.4624994,11.2273339 16.5775,11.12 C16.6925006,11.0126661 16.8266659,10.959 16.98,10.959 L18.958,10.959 C19.1266675,10.959 19.2684994,11.0126661 19.3835,11.12 C19.4985006,11.2273339 19.556,11.3653325 19.556,11.534 L19.556,15.559 L23.558,15.559 C23.7266675,15.559 23.8684994,15.6164994 23.9835,15.7315 C24.0985006,15.8465006 24.156,15.9883325 24.156,16.157 L24.156,17.928 C24.156,18.0966675 24.0985006,18.2346661 23.9835,18.342 C23.8684994,18.4493339 23.7266675,18.503 23.558,18.503 L19.556,18.503 L19.556,22.666 C19.556,22.8346675 19.4985006,22.9726661 19.3835,23.08 C19.2684994,23.1873339 19.1266675,23.241 18.958,23.241 L16.98,23.241 C16.8266659,23.241 16.6925006,23.1835006 16.5775,23.0685 Z" id="+" fill="#ffc14e"></path>
+                          </g>
+                      </g>
+                  </g>
+              </svg>
+              <!-- END of Add-Buddy-Button -->
+
+            </a>
+        </div>
+    </div>
+    <!-- END of RHS Buddy Panel -->
+
+
+    <!--Modal for Adding Buddy.-->
+    <div class="reveal-modal add_buddy_modal" id="add_buddy_modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+        <div class="modal_header">
+            <div class="modal_title">{% trans "Select username" %} </div>
+
+            <br>
+                <button type="button" class="text_button close_add_buddy_modal" style="margin-left:818px;">{% trans "Cancel" %}</button>
+                <button type="button" class="blue_round_button add_buddy_submit">{% trans "Add" %}</button>
+            <div class="sample_buddy buddy_icon">
+                <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 100 100" version="1.1">
+                    <g transform="translate(-381.42857,-570.93361)">
+                    </g>
+                </svg>
+            </div>
+
+        </div>
+        <div class="modal_body">
+            <div class="add_buddy_step_1">
+                <div class="step_title">
+                    <span class="step_number">{% trans "Step 1" %} </span>
+                    <span>{% trans "Select your color" %}</span>
+                </div>
+                <div class="step_body">
+
+                </div>
+            </div>
+            <div class="add_buddy_step_2">
+                <div class="step_title">
+                    <span class="step_number">{% trans "Step 2" %}</span>
+                    <span >{% trans "Select your animal/flower/fruit" %}</span>
+                </div>
+                <div class="step_body">
+                </div>
+            </div>
+        </div>
+        <div class="modal_footer">
+            <div class="right">
+                <button type="button" class="text_button close_add_buddy_modal">{% trans "Cancel" %}</button>
+                <button type="button" class="blue_round_button add_buddy_submit">{% trans "Add" %}</button>
+            </div>
+        </div>
+    </div>
+    <!-- END of Modal for Adding Buddy.-->
+
+    
+    <!-- Handle bar templates -->
+    {% verbatim %}
+      
+    <script id="online_buddy_template" type="text/x-handlebars-template">
+        <!-- 
+        // {
+        //   id: buddy.id,
+        //   isActive: buddy.isActive,
+        //   isEditable: buddy.isEditable,
+        //   isDeletable: buddy.isDeletable,
+        //   animalObj: animalsKeyIdMap[buddy.animalId],
+        //   colorObj: colorsKeyIdMap[buddy.colorId]
+        // }
+        //
+        -->
+
+        {{#each onlineBuddies}}
+            {{#if this.isActive}}
+
+            <div class="buddy_icon {{ifInline this.isDeletable 'buddy_deleteable' ''}}" data={{this.id}} title={{this.uname}} data-uname={{this.uname}}>
+            {{else}}
+            <div class="buddy_icon buddy_active {{ifInline this.isDeletable 'buddy_deleteable' ''}}" title={{this.uname}} data={{this.id}} data-uname={{this.uname}}>
+            {{/if}}
+                {{#if this.isDeletable}}
+                    <i class="fa fa-trash-o buddy_delete" data-reveal-id="delete_buddy_modal"></i>
+                {{/if}}
+                {{svgWithColor this.animalObj.svg this.colorObj.code}}
+            </div>
+        {{/each}}
+    </script>
+    <script id="buddy_animal_selector" type="text/x-handlebars-template">
+        {{#each animals}}
+            <div class="buddy_animal" data="{{this.id}}">
+                {{svg this.svg}}
+                <div class="buddy_animal_name">{{this.name}}</div>
+            </div>
+        {{/each}}
+    </script>
+    <script id="buddy_color_selector" type="text/x-handlebars-template">
+        {{#each colors}}
+        <div class="buddy_color_option" data="{{this.id}}">
+            <div class="color_sample" style="background-color: {{this.code}}"></div>
+            <div class="color_name">{{this.color}}</div>
+        </div>
+        {{/each}}
+    </script>
+    {% endverbatim %}
+    <script type="text/javascript">
+        $(function(){
+            $(document).foundation();
+
+            // Handle bar enhancements
+            Handlebars.registerHelper('svg', function(svg) {
+                return new Handlebars.SafeString(svg);
+            });
+
+            Handlebars.registerHelper('ifInline', function(condition, trueCase, falseCase) {
+                let returnVal = condition ? trueCase : falseCase;
+                return new Handlebars.SafeString(returnVal);
+            });
+
+            Handlebars.registerHelper('svgWithColor', function(svg, color) {
+                svg = $(svg).css('fill', color);
+                return new Handlebars.SafeString(svg[0].outerHTML);
+            });
+
+            /**
+             * Array of the online buddies
+             * AnimalId: Integer
+             * ColorId: String
+             * @type {Array}
+             */
+            // var onlineBuddies = [
+            //     {
+            //       id: 1,
+            //       animalId: 1,
+            //       colorId: 1,
+            //       isActive: true,
+            //       isEditable: false,
+            //       isDeletable: true,
+            //     },
+            //     {
+            //       id: 2,
+            //       animalId: 1,
+            //       colorId: 6,
+            //       isActive: false,
+            //       isEditable: false, //Implementation removed.
+            //       isDeletable: true,
+            //     }
+            // ];
+
+            var colorsKeyIdMap = {};
+            $.each(colorsList, function(index, colorObj) {
+                colorsKeyIdMap[colorObj.id] = colorObj;
+            });
+
+            var colorsKeyNameMap = {};
+            $.each(colorsList, function(index, colorObj) {
+                colorsKeyNameMap[colorObj.color] = colorObj;
+            });
+
+            var animalsKeyIdMap = {};
+            $.each(animalList, function(index, animalObj) {
+                animalsKeyIdMap[animalObj.id] = animalObj;
+            });
+
+            var animalsKeyNameMap = {};
+            $.each(animalList, function(index, animalObj) {
+                animalsKeyNameMap[animalObj.name] = animalObj;
+            });
+
+            var colorTemplateSource   = $("#buddy_color_selector").html();
+            var colorTemplate = Handlebars.compile(colorTemplateSource);
+            var context = {colors: colorsList};
+            $('.add_buddy_step_1 .step_body').append(colorTemplate(context));
+
+            // Populating the animals from the list of animals
+            var animalTemplateSource   = $("#buddy_animal_selector").html();
+            var animalTemplate = Handlebars.compile(animalTemplateSource);
+            var context = {animals: animalList};
+            var animalHtml = animalTemplate(context);
+            $('.add_buddy_step_2 .step_body').append(animalHtml);
+
+            // Modal Actions
+            $('.add_buddy_modal').on('click', '.close_add_buddy_modal', function() {
+                $('#add_buddy_modal').foundation('reveal', 'close');
+            });
+
+            var currentSelectedAnimal = {};
+            var currentSelectedColor = {};
+            var currentSelectedBuddy = {};
+            var buddyClickedForDeletion = {};
+            var isEditMode = false;
+
+            /**
+             * Utility function to udpate variables and modal states on selection of color
+             */
+            function selectColor(id) {
+                $('.add_buddy_step_1 .selected').removeClass('selected');
+                $('.sample_buddy svg').css('background-color', '#fff');
+                if (id) {
+                    currentSelectedBuddy.colorId = id;
+                    currentSelectedColor = $.grep(colorsList, function(colorObj){return colorObj.id === id})[0];
+                    if (currentSelectedAnimal.id) {
+                        $('.sample_buddy path').css('fill', currentSelectedColor.code);
+                    } else {
+                        $('.sample_buddy svg').css('background-color', currentSelectedColor.code);
+                    }
+                    $('.add_buddy_step_1').find('[data=' + id + ']').addClass('selected');
+                }
+            }
+
+            /**
+             * Utility function to udpate variables and modal states on selection of animal
+             */
+            function selectAnimal(id) {
+                $('.add_buddy_step_2 .selected').removeClass('selected');
+                if (id) {
+                    currentSelectedBuddy.animalId = id;
+                    currentSelectedAnimal = $.grep(animalList, function(animalObj){return animalObj.id === id})[0];
+                    $('.sample_buddy').empty();
+                    $('.sample_buddy').html(currentSelectedAnimal.svg);
+                    if (currentSelectedColor.id) {
+                        $('.sample_buddy path').css('fill', currentSelectedColor.code);
+                    }
+                    $('.add_buddy_step_2').find('[data=' + id + ']').addClass('selected');
+                }
+                // console.log(currentSelectedBuddy)
+                // console.log(getDuplicateBuddies(currentSelectedBuddy))
+            }
+
+
+            function resetBuddyModal() {
+                isEditMode = false;
+                currentSelectedBuddy = {};
+                currentSelectedAnimal = {};
+                currentSelectedColor = {};
+                selectAnimal();
+                selectColor();
+                $('.sample_buddy svg').empty();
+                $('.add_buddy_submit').html('Add');
+            }
+
+            /**
+             * When a user selects a color we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_1').on('click', '.buddy_color_option', function() {
+                selectColor(parseInt($(this).attr('data')));
+                //removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            /**
+             * When a user selects a animal we update the current* variables.
+             * We also update the sample logo on top right corner.
+             */
+            $('.add_buddy_step_2').on('click', '.buddy_animal', function() {
+                selectAnimal(parseInt($(this).attr('data')));
+                //removeDuplicateSelectedBuddy (currentSelectedBuddy)
+            });
+
+            // Create the buddy logo
+            $('.add_buddy_icon').on('click', function() {
+                // at modal opening time
+                resetBuddyModal()
+            });
+
+            /**
+             * Function to handle on click of the buddy
+             */
+            
+            /**
+             *  Editing the Buddy logo
+             *  On Clicking on any existing buddy modal opens up in the edit mode.
+             *  You can invoke your custom action here to disable the edit of a buddy
+             *  if (check if buddy editable) {
+             *      //true
+             *  } else {
+             *      return false;
+             *  }
+             */
+            $('.buddy_panel').on('click', '.buddy_icon .buddy_edit', function(e) {
+                e.stopPropagation();
+                isEditMode = true;
+                currentSelectedBuddy = onlineBuddiesMap[parseInt($(this).closest('.buddy_icon').attr('data'))];
+                selectAnimal(currentSelectedBuddy.animalId);
+                selectColor(currentSelectedBuddy.colorId);
+                $('.add_buddy_submit').html('Update');
+                $('#add_buddy_modal').foundation('reveal', 'open');
+            });
+
+
+            $('.add_buddy_submit').on('click', function(e) {
+                e.preventDefault();
+                if (!currentSelectedColor.id) {
+                    alert('Please select a valid color.');
+                    return;
+                }
+                if (!currentSelectedAnimal.id) {
+                    alert('Please select a valid animal.');
+                    return;
+                }
+                 var buddyColorName = colorsKeyIdMap[currentSelectedColor.id].color;
+                 var buddyAnimalName = animalsKeyIdMap[currentSelectedAnimal.id].name;
+                $('#add_buddy_modal').foundation('reveal', 'close');
+                $( "#id_username" ).val(buddyColorName+"-"+buddyAnimalName+"-"+"{{site.INSTITUTE_ID}}")
+
+            });
+
+            /**
+             * If you want the buddy panel to slide in on mouse move the trigger
+             * function makeBuddyPanelVisibleOnMouse as shown below
+             */
+            function makeBuddyPanelVisibleOnMouse() {
+                $('.buddy_panel').animate({"right":"-70px"}, "slow").removeClass('visible');
+                $(document).mousemove(triggerAction);
+            }
+
+            //makeBuddyPanelVisibleOnMouse();
+        });
+    </script>
+{% endblock body_content %}
+
