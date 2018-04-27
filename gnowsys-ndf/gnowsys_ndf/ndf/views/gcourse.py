@@ -38,7 +38,7 @@ from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
 from gnowsys_ndf.ndf.views.ajax_views import *
 from gnowsys_ndf.ndf.views.analytics_methods import *
-from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node
+from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node, auto_enroll, add_to_author_set
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
 from gnowsys_ndf.ndf.views.trash import trash_resource 
@@ -62,7 +62,6 @@ blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id('Blog page')
 has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicode('has_banner_pic') })
 
 app = GST_COURSE
-
 
 @get_execution_time
 def course(request, group_id, course_id=None):
@@ -138,7 +137,6 @@ def course(request, group_id, course_id=None):
                             },
                             context_instance=RequestContext(request)
                             )
-
 
 @login_required
 @get_execution_time
@@ -268,7 +266,6 @@ def create_edit(request, group_id, node_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
-
 
 # @login_required
 @get_execution_time
@@ -838,7 +835,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         error_message = "\n CourseCreateEditViewError: " + str(e) + " !!!\n"
         raise Exception(error_message)
 
-
 @login_required
 @get_execution_time
 def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
@@ -1063,10 +1059,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
-
 # Ajax views for setting up Course Structure
-
 @login_required
 @get_execution_time
 def create_course_struct(request, group_id, node_id):
@@ -1595,7 +1588,6 @@ def save_resources(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 
-
 @login_required
 @get_execution_time
 def create_edit_unit(request, group_id):
@@ -1886,10 +1878,6 @@ def enroll_to_course(request, group_id):
     Returns:
      * success (i.e True/False)
     '''
-    def _update_user_counter(userid, group_id):
-        counter_obj = Counter.get_counter_obj(userid, ObjectId(group_id))
-        counter_obj['is_group_member'] = True
-        counter_obj.save()
     def _send_notif(userid, group_obj):
         activ = "Subscription with " + group_obj.name +"."
         mail_content = "'This is to inform you that "+ \
@@ -1897,43 +1885,6 @@ def enroll_to_course(request, group_id):
         user_obj = User.objects.get(id=userid)
         set_notif_val(request, group_obj._id, mail_content, activ, user_obj)
 
-    def add_to_author_set(group_id, add_admin, user_id):
-        group_obj = get_group_name_id(group_id, get_obj=True)
-        if group_obj:
-            try:
-                if add_admin:
-                    if isinstance(user_id, list):
-                        non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
-                        if non_admin_user_ids:
-                            group_obj.group_admin.extend(non_admin_user_ids)
-                            group_obj.group_admin = list(set(group_obj.group_admin))
-                    else:
-                        if user_id not in group_obj.group_admin:
-                            group_obj.group_admin.append(user_id)
-                else:
-                    if isinstance(user_id, list):
-                        non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
-                        if non_member_user_ids:
-                            group_obj.author_set.extend(non_member_user_ids)
-                            group_obj.author_set = list(set(group_obj.author_set))
-                    else:
-                        if user_id not in group_obj.author_set:
-                            group_obj.author_set.append(user_id)
-                group_obj.save()
-
-                if 'Group' not in group_obj.member_of_names_list:
-                    # get new/existing counter document for a user for a given course for the purpose of analytics
-                    if isinstance(user_id, list):
-                        for each_user_id in user_id:
-                            _update_user_counter(each_user_id, group_obj._id)
-                    else:
-                        _update_user_counter(user_id, group_obj._id)
-                response_dict["success"] = True
-
-            except Exception as e:
-                pass
-            return group_obj
-        pass
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
         try:
@@ -1956,9 +1907,9 @@ def enroll_to_course(request, group_id):
                 module_obj = Node.get_node_by_id(group_id)
                 # print "\n Module: ", module_obj.name, " -- ", module_obj.member_of_names_list
                 for each_group_id in module_obj.collection_set:
-                    group_obj = add_to_author_set(each_group_id, add_admin, user_id)
+                    group_obj = add_to_author_set(each_group_id, user_id, add_admin)
             else:
-                group_obj = add_to_author_set(group_id, add_admin, user_id)
+                group_obj = add_to_author_set(group_id, user_id, add_admin)
                 response_dict["member_count"] = len(group_obj.author_set)
 
             try:
@@ -1974,7 +1925,6 @@ def enroll_to_course(request, group_id):
             print "\n ERROR Occurred in Enrollment!! ", er
             pass
         return HttpResponse(json.dumps(response_dict))
-
 
 @login_required
 @get_execution_time
@@ -1997,7 +1947,6 @@ def set_release_date_css(request, group_id):
         response_dict["success"] = False
         response_dict["message"] = "Something went wrong! Please try after some time"
     return HttpResponse(json.dumps(response_dict))
-
 
 @login_required
 @get_execution_time
@@ -2063,6 +2012,7 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
     return render_to_response(template, variable)
 
+@auto_enroll
 @get_execution_time
 def activity_player_detail(request, group_id, lesson_id, activity_id):
 
@@ -2169,15 +2119,6 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
                                 context_instance = RequestContext(request)
     )
 
-
-# def course_resource_detail(request, group_id, course_section, course_sub_section, course_unit, resource_id):
-#     pass
-
-
-# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-# :::::::::::::::::::::::::::::::::COURSE-PLAYER VIEWS::::::::::::::::::::::
-# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 # Following View Not in Use
 @get_execution_time
 def course_dashboard(request, group_id):
@@ -2212,8 +2153,7 @@ def course_dashboard(request, group_id):
         })
     return render_to_response(template, context_variables)
 
-
-
+@get_execution_time
 def _get_current_and_old_display_pics(group_obj):
     banner_pic_obj = None
     old_profile_pics = []
@@ -2233,6 +2173,11 @@ def _get_current_and_old_display_pics(group_obj):
 
     return banner_pic_obj, old_profile_pics
 
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# :::::::::::::::::::::::::::::::::COURSE-PLAYER VIEWS::::::::::::::::::::::
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+# :::::::::::::::::::::::::::::::::TAB VIEWS BEGINS::::::::::::::::::::::
 @get_execution_time
 def course_content(request, group_id):
 
@@ -2503,7 +2448,6 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
                                 context_instance = RequestContext(request)
     )
 
-
 @get_execution_time
 def course_gallery(request, group_id,node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -2640,6 +2584,7 @@ def course_about(request, group_id):
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
 
+# :::::::::::::::::::::::::::::::::TAB VIEWS ENDS::::::::::::::::::::::
 
 @get_execution_time
 def course_gallerymodal(request, group_id, node_id):
@@ -2666,7 +2611,6 @@ def course_gallerymodal(request, group_id, node_id):
         })
     return render_to_response(template, context_variables)
 
-
 @get_execution_time
 def course_note_page(request, group_id):
 
@@ -2692,7 +2636,6 @@ def course_note_page(request, group_id):
 
         })
     return render_to_response(template, context_variables)
-
 
 @login_required
 @get_execution_time
@@ -2725,7 +2668,6 @@ def inline_edit_res(request, group_id):
             context_variables['no_discussion'] = True
             context_variables['node'] = node_obj
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
-
 
 @get_execution_time
 def course_filters(request, group_id):
@@ -2831,8 +2773,11 @@ def course_filters(request, group_id):
     )
 
 
-# @login_required
+# :::::::::::::::::::::::::::::::::REPORT VIEWS BEGINS::::::::::::::::::::::
+
+# @login_required # commented on-purpose for generating user-csvs
 @get_execution_time
+@auto_enroll
 def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
@@ -3326,6 +3271,8 @@ def get_resource_completion_status(request, group_id):
                 result_dict['COMPLETED'].append(each_cr)
     return HttpResponse(json.dumps(result_dict))
 
+# :::::::::::::::::::::::::::::::::REPORT VIEWS ENDS::::::::::::::::::::::
+
 @get_execution_time
 @login_required
 def manage_users(request, group_id):
@@ -3399,7 +3346,6 @@ def assets(request, group_id, asset_id=None,page_no=1):
                                 context_instance = RequestContext(request)
     )
 
-
 @get_execution_time
 def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -3432,7 +3378,6 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
-
 
 @get_execution_time
 def create_edit_course_page(request, group_id, page_id=None,page_type=None):
@@ -3583,6 +3528,7 @@ def save_course_page(request, group_id):
         return HttpResponseRedirect(reverse("view_course_page",
          kwargs={'group_id': group_id, 'page_id': page_obj._id}))
 
+@get_execution_time
 def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")
     node = node_collection.one({'_id': ObjectId(node_id)})
@@ -3593,7 +3539,7 @@ def load_content_data(request, group_id):
       "hide_breadcrumbs": True, 'expand_content':True
     },context_instance=RequestContext(request))
 
-
+@get_execution_time
 def delete_activity_page(request, group_id):
     activity_id_list = request.POST.getlist('delete_files_list[]', '')
     activity_id = request.POST.get('activity_id', '')
@@ -3612,7 +3558,7 @@ def delete_activity_page(request, group_id):
             return HttpResponse('success')
     return HttpResponse('fail')
 
-
+@get_execution_time
 def _get_unit_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
@@ -3684,6 +3630,7 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
             unit_structure.append(lesson_dict)
     return unit_structure
 
+@get_execution_time
 def widget_page_create_edit(request, group_id, node_id=None):
     node_id = request.GET.get('node_id', None)
     detail_url = request.GET.get('detail_url',)
@@ -3820,7 +3767,7 @@ def load_assessment_analytics(request, group_id):
     # print "\nRS: ", result_set
     return HttpResponse(json.dumps(result_set))
 
-
+@get_execution_time
 def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_id, user_data_set):
     succes_update = True
     try:
@@ -3860,48 +3807,6 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
         succes_update = False
         print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
     return succes_update
-
-# def get_lang_node(node_id,lang):
-#     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
-#     for each in rel_value['grel_node']:
-#         if each.language[0] ==  get_language_tuple(lang)[0]:
-#             trans_node = each
-#             return trans_node
-
-# def get_trans_node_list(node_list,lang):
-#     trans_node_list = []
-#     for each in node_list:
-#         each_node = get_lang_node(each,lang)
-#         if each_node :  
-#             # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
-#             trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
-#         else:
-#             node = node_collection.one({"_id":ObjectId(each)})
-#             # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
-#             trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
-#     if trans_node_list:
-#         return trans_node_list
-
-def get_lang_node(node_id,lang):
-    rel_value = get_relation_value(ObjectId(node_id),"translation_of")
-    for each in rel_value['grel_node']:
-        if each.language[0] ==  get_language_tuple(lang)[0]:
-            trans_node = each
-            return trans_node
-
-def get_trans_node_list(node_list,lang):
-    trans_node_list = []
-    for each in node_list:
-        each_node = get_lang_node(each,lang)
-        if each_node :  
-            # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
-            trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "altnames": each_node.altnames, "basenodeid":ObjectId(each)}})
-        else:
-            node = node_collection.one({"_id":ObjectId(each)})
-            # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
-            trans_node_list.append({ObjectId(node._id): {"name": node.name,"altnames": node.altnames, "basenodeid":ObjectId(node._id)}})
-    if trans_node_list:
-        return trans_node_list
 
 @get_execution_time
 def course_quiz_data(request, group_id, all_data=False):
@@ -4040,6 +3945,7 @@ def course_quiz_data(request, group_id, all_data=False):
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
 
+@get_execution_time
 def finish_lesson(request, group_id, node_id):
     response_dict = {'success': False}
     try:
