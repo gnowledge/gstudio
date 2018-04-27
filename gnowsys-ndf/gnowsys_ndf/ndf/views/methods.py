@@ -5866,7 +5866,7 @@ def forbid_private_group(request, group_obj):
     try:
         if group_obj.access_policy == u'PRIVATE' or  group_obj.group_type == u'PRIVATE':
             from gnowsys_ndf.ndf.templatetags.ndf_tags import user_access_policy
-            access_flag = user_access_policy(group_obj, request.user)
+            access_flag = user_access_policy(group_obj._id, request.user)
             if access_flag == "disallow":
                 # print "\naccess_flag: ", access_flag, len(access_flag)
                 raise PermissionDenied()
