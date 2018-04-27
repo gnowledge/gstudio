@@ -135,7 +135,6 @@ def get_site_variables():
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
 	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 	site_var['GSTUDIO_DOC_FOOTER_TEXT'] = GSTUDIO_DOC_FOOTER_TEXT
-	site_var['USERNAME_SELECTION_WIDGET'] = GSTUDIO_USERNAME_SELECTION_WIDGET
 
 	cache.set('site_var', site_var, 60 * 30)
 
