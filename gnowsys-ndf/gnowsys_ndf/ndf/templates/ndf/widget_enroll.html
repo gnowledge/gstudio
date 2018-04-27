@@ -1,6 +1,9 @@
 {% load i18n %}
 {% load simple_filters %}
 {% load ndf_tags %}
+{% get_implicit_enrollment_flag as implicit_enrollment_flag %}
+{% if not implicit_enrollment_flag %}
+
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %} 
 {% if module_enrollment %}
@@ -160,3 +163,4 @@
 
     })
 </script>
+{% endif %}
