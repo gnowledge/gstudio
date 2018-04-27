@@ -334,17 +334,19 @@ h5 {
 .login-home-button {
   border-radius: 5px;
   text-transform: uppercase;
-  margin-left: 70px;
-  padding: 6px 17px;
+  padding: 9px 9px 9px 9px;
+  margin-left: 340px;
   font-family: "OpenSans-Semibold", sans-serif;
-  margin-top: 50px;
-  border: 2px solid #ffc14e;
+  margin-top: 140px;
+  border: 2px solid #713558;
   color: white;
-  background-color: #a75692;
+  background-color: #713558;
 }
 /* line 389, ../../../scss/_clix2017.scss */
 .login-home-button:hover {
   cursor: pointer;
+  background-color: #fff;
+  color: #713558;
 }
 
 /* line 397, ../../../scss/_clix2017.scss */
