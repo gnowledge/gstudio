@@ -6807,3 +6807,9 @@ input.transcript-toggler {
   min-width: 100%;
   margin-left: -15px;
 }
+
+/* line 7002, ../../../scss/_clix2017.scss */
+.content-on-card {
+  color: black;
+  font-size: 14px;
+}
