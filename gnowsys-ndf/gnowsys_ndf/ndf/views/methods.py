@@ -41,7 +41,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.exceptions import PermissionDenied
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS
+from gnowsys_ndf.settings import META_TYPE, GSTUDIO_NROER_GAPPS, GSTUDIO_IMPLICIT_ENROLL
 from gnowsys_ndf.settings import GSTUDIO_DEFAULT_GAPPS_LIST, GSTUDIO_WORKING_GAPPS, BENCHMARK, GSTUDIO_DEFAULT_LANGUAGE
 from gnowsys_ndf.settings import LANGUAGES, OTHER_COMMON_LANGUAGES, GSTUDIO_BUDDY_LOGIN, DEFAULT_DISCUSSION_LABEL
 # from gnowsys_ndf.ndf.models import db, node_collection, triple_collection, counter_collection
@@ -5836,3 +5836,67 @@ def update_unit_in_modules(module_val, unit_id):
                 if unit_id not in each_node_obj.collection_set:
                     each_node_obj.collection_set.append(unit_id)
                     each_node_obj.save(group_id=unit_id)
+
+@get_execution_time
+def add_to_author_set(group_id, user_id, add_admin=False):
+    def _update_user_counter(userid, group_id):
+        counter_obj = Counter.get_counter_obj(userid, ObjectId(group_id))
+        counter_obj['is_group_member'] = True
+        counter_obj.save()
+
+    group_obj = get_group_name_id(group_id, get_obj=True)
+    if group_obj:
+        try:
+            if add_admin:
+                if isinstance(user_id, list):
+                    non_admin_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.group_admin ]
+                    if non_admin_user_ids:
+                        group_obj.group_admin.extend(non_admin_user_ids)
+                        group_obj.group_admin = list(set(group_obj.group_admin))
+                else:
+                    if user_id not in group_obj.group_admin:
+                        group_obj.group_admin.append(user_id)
+            else:
+                if isinstance(user_id, list):
+                    non_member_user_ids = [each_userid for each_userid in user_id if each_userid not in group_obj.author_set ]
+                    if non_member_user_ids:
+                        group_obj.author_set.extend(non_member_user_ids)
+                        group_obj.author_set = list(set(group_obj.author_set))
+                else:
+                    if user_id not in group_obj.author_set:
+                        group_obj.author_set.append(user_id)
+            group_obj.save()
+
+            if 'Group' not in group_obj.member_of_names_list:
+                # get new/existing counter document for a user for a given course for the purpose of analytics
+                if isinstance(user_id, list):
+                    for each_user_id in user_id:
+                        _update_user_counter(each_user_id, group_obj._id)
+                else:
+                    _update_user_counter(user_id, group_obj._id)
+            # print "\n Added to author_set"
+        except Exception as e:
+            pass
+        return group_obj
+    pass
+
+@get_execution_time
+def auto_enroll(f):
+    def wrap(*args,**kwargs):
+
+        ret = f(*args,**kwargs)
+        if GSTUDIO_IMPLICIT_ENROLL:
+            user_id = None
+            request = args[0] if len(args) else None
+            if request:
+                user_id = request.user.id
+            else:
+                user_id = kwargs.get("user_id", None)
+                if not user_id:
+                    user_id = kwargs.get("created_by", None)
+            group_id = kwargs.get("group_id", None)
+
+            if user_id and group_id:
+                add_to_author_set(group_id=group_id, user_id=user_id)
+        return ret
+    return wrap
