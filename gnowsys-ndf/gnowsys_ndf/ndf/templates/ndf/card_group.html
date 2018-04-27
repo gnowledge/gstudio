@@ -49,7 +49,7 @@
         {% else %}
         <div class="unit_title" title="{{node.name}}">{{node.name|truncatechars:45}}</div>
         {% endif %}
-        <div class="node-content" style="color: black; font-size: 14px;">
+        <div class="node-content" style="color: black; font-size: 14px;" title="{{node.content|safe|striptags}}">
             {{node.content|safe|striptags|default_if_none:"No description added yet."|truncatechars:55}}
         </div>
         </div>
