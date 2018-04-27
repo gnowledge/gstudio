@@ -145,6 +145,7 @@
     iconMapping = {
         'COMPLETED': 'fas fa-eye green',
         'INPROGRESS': 'fas fa-eye orange',
+        'DEFAULT': 'fas fa-eye grey',
     }
 
     var acc = document.getElementsByClassName("accordion-overview");
@@ -240,7 +241,9 @@ for (i = 0; i < acc.length; i++) {
                             if (isLessonComplete){
                                     $li.find('.jqtree-title').prepend('<i title="Lesson is In-progress" class="course-status-icon fa '+iconMapping['INPROGRESS']+'"</i> ')
                             }
-                            
+                            else{
+                                $li.find('.jqtree-title').prepend('<i title="Lesson is In-progress" class="course-status-icon fa '+iconMapping['DEFAULT']+'"</i> ')
+                            }
                         }
                     }
                 }
@@ -257,6 +260,11 @@ for (i = 0; i < acc.length; i++) {
                             
                         }
                         $li.find('.jqtree-title').prepend('<i title="'+title_attr+'" class="course-status-icon fa '+iconMapping['COMPLETED']+'"</i>')
+                    }
+                    else{
+                      title_attr = "You have not visited this activity"
+                      $li.find('.jqtree-title').prepend('<i title="'+title_attr+'" class="course-status-icon fa '+iconMapping['DEFAULT']+'"</i>')
+
                     }
                 }
 

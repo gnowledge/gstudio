@@ -43,7 +43,7 @@ body {
 
 h3{
     font-size: 20px;
-    color: $primary-blue;
+    color: $primary-pink;
     font-family: 'OpenSans-Semibold';
 }
 
@@ -5689,8 +5689,8 @@ ul.authoring-tab{
                 text-shadow: 0 1px rgba(255,255,255,0.6);
             }
         >a{
-            background-color: #164a7b;
-            border: 1px solid #164a7b;
+            background-color: $primary-pink;
+            border: 1px solid $primary-pink;
             box-shadow: 0 1px 8px 0 rgba(0,0,0,0.1);
             box-sizing: border-box;
             color: #fff;
@@ -6792,11 +6792,14 @@ input.transcript-toggler{
 }
 
 .green{
-    color: green;
+    color: #00c300;
 }
 
 .orange{
     color: orange;
+}
+.grey{
+    color: grey;
 }
 
 [class*="img-banner-card-"]{
