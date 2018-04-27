@@ -8,7 +8,7 @@ from django.http import HttpRequest
 
 from gnowsys_ndf.ndf.models import Node, GSystemType, Buddy, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
-from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation
+from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation, get_execution_time, auto_enroll
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_FILE_UPLOAD_POINTS
 
 # gst_asset = node_collection.one({'_type': u'GSystemType', 'name': u'Asset'})
@@ -16,6 +16,8 @@ gst_asset_name, gst_asset_id = GSystemType.get_gst_name_id(u'Asset')
 gst_page_name, gst_page_id = GSystemType.get_gst_name_id(u'Page')
 gst_file_name, gst_file_id = GSystemType.get_gst_name_id(u'File')
 
+@auto_enroll
+@get_execution_time
 def create_asset(name,
 				group_id,
 				created_by,
@@ -63,6 +65,8 @@ def create_asset(name,
 	asset_gs_obj.save(group_id=group_id)
 	return asset_gs_obj
 
+@auto_enroll
+@get_execution_time
 def create_assetcontent(asset_id,
 						name,
 						group_name_or_id,
