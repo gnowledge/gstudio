@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http import StreamingHttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
@@ -34,8 +35,17 @@ topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = node_collection.one({'_type': 'GSystemType', 'name': 'theme_item'})
 app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 home_obj = node_collection.one({'_type':'Group','name': unicode('home')})
+GST_FILE = node_collection.one({'_type':'GSystemType', 'name': 'File'})
+GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
 #######################################################################################################################################
 
+@get_execution_time
+class Encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        else:
+            return obj
 @get_execution_time
 def curriculum(request, group_id, app_id=None, app_set_id=None):
 
@@ -227,7 +237,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             _update_curr_hierarchy(curr_hierarchy)
             curr_hierarchy.append({'class': 'create_branch', 'name': 'Add Branch'})
             context_variables.update({'curriculum_structure':json.dumps(curr_hierarchy)})
-    
+            
     if request.method == "POST":
         if curr_id:
             if curr_id:
@@ -238,6 +248,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
                                     name=str(curr_name),
                                     group_set=home_obj._id,content_org=unicode(curr_desc))
                 curriculum_obj.save()
+
                 return HttpResponse(curriculum_obj._id)
         else:
             curr_name = request.POST.get('curr_name', '')
@@ -275,6 +286,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
             topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
             context_variables.update({"topic_nodes" : topic_nodes})
+            
             return render_to_response("ndf/curriculum_hierarchy.html",
                                   context_variables,
                                   context_instance=RequestContext(request))
@@ -1130,4 +1142,234 @@ def get_prerequisite(request, group_id,curriculum_id,topic_id):
   if teaches_rel:
     for each in teaches_rel['grel_node']:
         prerequisite_list.append(each._id)
+      
   return HttpResponse(prerequisite_list)
+
+
+
+#@get_execution_time
+#def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
+  '''
+  Renders the Concept Graph, Collection Graph, Dependency Graph
+  '''
+ # try :
+ #   if request.is_ajax() and request.method == "GET":
+ #     if node_id:
+  #        req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+  #    template = "ndf/graph_"+graph_type+".html"
+   #   variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+    #  return render_to_response(template, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+  #except Exception as e :
+   # print "from "+ graph_type +" Graph, exception",e,"\n\n"
+@get_execution_time
+def adminRenderGraphs(request,group_id,node_id=None,graph_type="prerequisites"):
+  '''
+  Renders the Concept Graph, Collection Graph, Dependency Graph
+  '''
+  try :
+    if request.is_ajax() and request.method == "GET":
+      if node_id:
+          req_node = node_collection.one({'_type':'GSystem','_id':ObjectId(node_id)})
+      template = "ndf/graph_"+graph_type+".html"
+      variable = RequestContext(request, { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+      return render_to_response("ndf/curriculum_hierarchy.html",
+                                  { 'group_id':group_id,'groupid':group_id , 'node':req_node })
+  except Exception as e :
+    print "from "+ graph_type +" Graph, exception",e,"\n\n"
+
+
+@get_execution_time
+def graph_node(request, group_id):
+  subsections = node_collection.one({'_id': ObjectId(request.GET.get("id"))})
+  subsections.get_neighbourhood(subsections.member_of)
+
+  #relation_name changed for coll_relation
+  coll_relation = {'relation_name': 'has_collection', 'inverse_name': 'member_of_collection'}
+
+  prior_relation = {'relation_name': 'has_prerequisite', 'inverse_name': 'is_required_for'}
+
+  def _get_node_info(node_id):
+    node = node_collection.one( {'_id':node_id}  )
+    # mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
+
+    return node.name
+
+  # def _get_username(id_int):
+    # return User.objects.get(id=id_int).username
+
+  # def _get_node_url(node_id):
+
+  #   node_url = '/' + str(group_id)
+  #   node = node_collection.one({'_id':node_id})
+
+  #   if len(node.member_of) > 1:
+  #     if node.mime_type == 'image/jpeg':
+  #       node_url += '/image/image_detail/' + str(node_id)
+  #     elif node.mime_type == 'video':
+  #       node_url += '/video/video_detail/' + str(node_id)
+
+  #   elif len(node.member_of) == 1:
+  #     gapp_name = (node_collection.one({'_id':node.member_of[0]}).name).lower()
+
+  #     if gapp_name == 'forum':
+  #       node_url += '/forum/show/' + str(node_id)
+
+  #     elif gapp_name == 'file':
+  #       node_url += '/image/image_detail/' + str(node_id)
+
+  #     elif gapp_name == 'page':
+  #       node_url += '/page/details/' + str(node_id)
+
+  #     elif gapp_name == 'quiz' or 'quizitem':
+  #       node_url += '/quiz/details/' + str(node_id)
+  #   return node_url
+
+  # page_node_id = str(id(page_node._id))
+  node_metadata ='{"name":"' + subsections.name + '", "_id":"'+ str(subsections._id) +'", "refType":"GSystem" , "type":"division", }, '
+   
+  node_relations = ''
+  exception_items = ["content", "login_required", "attribute_set", "relation_set","description",
+                     "member_of", "status", "comment_enabled", "start_publication",
+                     "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
+                     "created_at", "group_set", "type_of", "content_org", "author_set",
+                     "fs_file_ids", "file_size", "mime_type", "location", "language",
+                     "property_order", "rating", "apps_list", "annotations", "instance of","if_file",
+                     ]
+                                                  
+
+  if subsections:
+        for each in subsections.collection_set:
+            section_dict ={}
+            section = Node.get_node_by_id(each)
+            if section:
+                section_dict['name'] = section.name
+                section_dict['id'] = str(section._id)
+                section_dict['type'] = 'branch'
+                section_dict['children'] = [] 
+                if section.collection_set:
+                    for each_section in section.collection_set:
+                        subsection_dict ={}
+                        subsection = Node.get_node_by_id(each_section)
+                        if subsection:
+                            subsection_dict['children'] = []
+                            subsection_dict['name'] = subsection.name
+                            subsection_dict['type'] = 'division'
+                            subsection_dict['id'] = str(subsection._id)
+                            if "Topic" in subsection.member_of_names_list: 
+                                # subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
+                                
+  # username = User.objects.get(id=page_node.created_by).username
+
+                                i = 1
+                                for key, value in subsection.items():
+                                    if (key in exception_items) or (not value):
+                                        pass
+
+                                    elif isinstance(value, list):
+
+                                        if len(value):
+
+                                            # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+                                            node_metadata +='{"name":"' + key + '", "_id":"'+ str(abs(hash(key+str(subsection._id)))) +'_r" , "type":"division"}, '
+                                            node_relations += '{"type":"'+ key +'", "from":"'+ str(subsection._id) +'", "to": "'+ str(abs(hash(key+str(subsection._id)))) +'_r"},'
+                                            # key_id = str(i)
+                                            key_id = str(abs(hash(key+str(subsection._id))))
+                                        # i += 1
+
+                                    # if key in ("modified_by", "author_set"):
+                                    #   for each in value:
+                                    #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+                                    #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+                                    #     i += 1
+
+                                    # else:
+                                    
+                                            for each in value:
+                                      # print "\n====", key, "------", type(each)
+
+                                                if isinstance(each, ObjectId):
+                                                    node_name = _get_node_info(each)
+                                                    if key == "collection_set":
+                                                        inverse = coll_relation['inverse_name']
+                                                    elif key == "division":
+                                                        inverse = prior_relation['inverse_name']
+                                                    else:
+                                                        inverse = ""
+
+                                                    node_metadata ='{"name":"' + subsection.name + '",  "_id":"'+ str(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1" , "type":"division"},'
+                                                    # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
+                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+                                                    i += 1
+                                        
+                                                  # if "each" is Object of GSystem
+                                                elif isinstance(each, GSystem):
+                                                    node_metadata += '{"name":"' + each.name + '",  "_id":"'+ str(each._id) + '", "refType":"Relation"},'
+                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each._id) +'"},'
+                                                    i += 1 
+                                                else:
+
+                                                    node_metadata += '{"name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
+                                                    i += 1
+
+
+
+
+                                    else:
+                                      # possibly gives GAttribute
+                                        node_metadata +='{"name":"' + key + '", "_id":"'+ str(abs(hash(key+str(subsection._id)))) +'_r", "type":"division"},'
+                                        node_relations += '{"type":"'+ key +'", "from":"'+ str(subsection._id) +'", "to": "'+ str(abs(hash(key+str(subsection._id)))) +'_r"},'
+                                        i += 1    
+      # key_id = str(i)                 
+                                        key_id = str(abs(hash(key+str(subsection._id))))
+
+                                        if isinstance( value, list):
+                                            for each in value:
+                                              node_metadata += '{"name":"' + each + '", "_id":"'+ str(i) +'_n"},'
+                                              node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+                                              i += 1
+
+                                        else:
+                                            node_metadata += '{"name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+                                            node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(subsection._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+
+                                            i += 1
+      
+    # End of if - else
+  # End of for loop
+
+
+  # # getting all the relations of current node
+  # node_rel = page_node.get_possible_relations(page_node.member_of)
+  # # print "\n\n", node_rel
+  # for keyy, vall in node_rel.iteritems():
+
+  #   if vall['subject_or_right_subject_list']:
+
+  #     for eachnode in vall['subject_or_right_subject_list']:
+    # if keyy == "event_organised_by":
+    #   pass
+    #   # node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+    #   # node_relations += '{"type":"'+ keyy +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+
+    #   # node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
+    #   # node_relations += '{"type":"'+ keyy +'", "from":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+    # else:
+
+    #   node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+    #   node_relations += '{"type":"'+ keyy +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+    #   vall = vall.altnames if ( len(vall['altnames'])) else _get_node_info(vall['subject_or_right_subject_list'][0])
+    #   node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
+    #   node_relations += '{"type":"'+ keyy +'", "f**rom":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+    # print "\nkey : ", key, "=====", val
+
+
+  node_metadata = node_metadata[:-1]
+  node_relations = node_relations[:-1]
+
+  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
+  print node_graph_data
+
+
+  return StreamingHttpResponse(node_graph_data)
+# ------ End of processing for graph ------
