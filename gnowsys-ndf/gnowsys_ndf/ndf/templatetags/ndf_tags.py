@@ -2216,6 +2216,9 @@ def user_access_policy(node, user):
       elif user.id in group_node.author_set:
         user_access = True
 
+      elif GSTUDIO_IMPLICIT_ENROLL:
+        user_access = True
+
       else:
         auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
         if auth_obj and auth_obj.agency_type == 'Teacher':
