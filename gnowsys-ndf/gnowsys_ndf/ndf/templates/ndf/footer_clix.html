@@ -1,49 +1,110 @@
 {% load i18n %}
-{% load get_latest_git_hash from simple_filters %}
 {% load ndf_tags %}
+{% block body_content %}
+
+
+<style type="text/css">
+ .footer-clix1{
+    /*color: #eeeeee;*/
+    /*border-top: 1px solid red;*/
+    height: 60px;  /* footer height */
+    padding-top: 500px;
+    display: block;
+    margin-top: 20px; /* space between content and footer */
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    z-index: -1;
+    width: 100%!important;
+}
 
 
 
-
-		<div class="bo-wrap clr4" style="margin-top:100px;">
-		  <div class="bo-footer">
-		    <div class="bo-footer-social">
-		      <a href="http://clix.tiss.edu/about/" target="_blank">About </a>
-		      <a href="http://clix.tiss.edu/contact/" target="_blank">Contact </a>
-		      <a href="http://www.tiss.edu/disclaimer/" target="_blank">Disclaimer </a>
-		    </div>
-		  </div>
-		</div>
-		<div class="bo-wrap clr3">
-		  <div class="bo-footer">
-		    <div class="bo-footer-smap">
-		        <a href="http://tatatrusts.org/" target="_blank">
-		            <img src="/static/ndf/images/tata-trusts-logo.svg" style="height: 14px; width:110px;" />
-		        </a>
-		        <a href="http://www.mit.edu" target="_blank">
-		            <img src="/static/ndf/images/mit-logo.svg" style="height: 35px; width:145px;"/>
-		        </a> 
-		        <a href="http://www.tiss.edu/" target="_blank" >
-		            <img src="/static/ndf/images/logos/tiss-logo-text.svg" style="height: 90px; width:85px;"/>
-		        </a>
-		        <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-		          <img src="/static/ndf/images/logos/tifr.png" style="height: 55px; width:122px;"/>
-		        </a>
-		    </div>
+</style>
 
 
-		    <div class="clearfix"></div>
-		  </div>
-		</div>
-		<div class="bo-wrap clr4">
-		  <div class="bo-footer">
-		    <div class="bo-footer-copyright">
-		      <a href="">Privacy</a>
-		      <a href="">Terms Of Use</a>
-		      {% get_latest_git_hash as git_commit_hash %}
-		      <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" target="_blank">Version</a>
-		    </div>
-		  </div>
-		</div>
+<div class="footer-clix1">
+<hr>
+<div style="background-color:#71355808; margin-top:-20px;">
+    <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
+                {% comment %}
+          <div class="row">
+                <div class="small-2 columns">
+                    <p>Seeded By</p>
+                </div>
+                <div class="small-4 columns">
+                    <p>Founding Partner</p>
+                </div>
+                <div class="small-3 columns" style="margin-left:-36px;">
+                    <p>Technology Partner</p>
+                </div>
+                 </div>
+                {% endcomment %}
+          <div class="row" style="width:100%;">
+                <div class="small-3 columns">
+                    <a href="http://tatatrusts.org/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/Tata Trust Source.svg" style="margin-top:45px;"/>
+                    </a>
+                </div>
+                <div class="small-2 columns">
+                    <a href="http://www.tiss.edu/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/TISS Logo EPS Colour copy.svg"/>
+                    </a>
+                </div>
+                <div class="small-3 columns">
+                    <a href="http://www.mit.edu" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/MIT-logo-with-spelling-print-black-red-design1 copy.svg" style="margin-top:50px;"/>
+                    </a>
+                </div>
+                {% comment %}
+                <div class="small-2 columns">
+                    <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                        <img src="/static/ndf/images/logos/tifr.png"/>
+                    </a>
+                </div>
+                {% endcomment %}
+          </div>
+    </div>
+    <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
+        <ol>
+            <li>
+                <a href="http://clix.tiss.edu/about/" style="font-size: 18px!important" target="_blank">About</a>
+            </li>
+            <li>
+                <a href="#" style="font-size: 18px!important">Credits</a>
+            </li>
+            <li>
+                <a href="http://clix.tiss.edu/contact/" style="font-size: 18px!important" target="_blank">Contact Us</a>
+            </li>
+        </ol>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <hr>
+        <div class="small-2 columns coyright-links">
+            <a href="#" style="font-size: 15px!important">Terms of Use</a>
+               
+        </div>
+        <div class="small-2 columns coyright-links">
+            <a href="#" style="font-size: 15px!important">Privacy Policy</a>
+        </div>
+        <div class="small-8 columns coyright-links">
+            {% comment %}
+                {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
+            {% endcomment %}
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;font-size: 15px!important" target="_blank">Powered by Gstudio</a>
+            <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 360px;margin-bottom:10px;" />
+            </a>
+        </div>
+<br> 
+       </div>
+    </div>
+</div>
 
-
+{% endblock body_content %}
