@@ -378,19 +378,19 @@ h5{
 .login-home-button{
             border-radius: 5px;
             text-transform: uppercase;
-            margin-left: 70px;
-            padding: 6px 17px;
+            padding: 9px 9px 9px 9px;
+            margin-left: 340px;
             font-family: "OpenSans-Semibold", sans-serif;
-            margin-top: 50px;
-            border: 2px solid #ffc14e;
-            color:white;
-          background-color: #a75692;
+            margin-top: 140px;
+            border: 2px solid #713558;
+            color: white;
+            background-color: #713558;
 
             &:hover{
-        cursor:pointer;
-    }
-
-            
+                cursor:pointer;
+                background-color: #fff;
+                color: #713558;
+            }
 }
 
 
@@ -774,6 +774,7 @@ h5{
         }
     }
 }
+
 
 
 
@@ -4081,7 +4082,6 @@ $bp_background_color: #101d29;
     overflow-y: auto;
     z-index:100;
     //margin-top:52px;
-
     .add_buddy_icon {
         height: 50px;
         width: 50px;
@@ -4089,7 +4089,26 @@ $bp_background_color: #101d29;
         cursor: pointer;
     }
 }
-
+.username_panel {
+    //position: fixed;
+    right: 0px;
+    top: 0px;
+    width: 70px;
+    height: auto;
+    padding: 10px;
+    //background-color: $bp_background_color;
+    background-color: rgba(16, 29, 41, 0.64);
+    overflow-y: auto;
+    z-index:100;
+    //margin-top:52px;
+    margin-left: 120px;
+    .add_buddy_icon {
+        height: 50px;
+        width: 50px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+}
 .buddy_icon {
     border-radius: 4px;
     overflow: hidden;
@@ -4734,10 +4753,12 @@ $unit-card-lines-to-show: 3;
         letter-spacing: 0.6px;
     }
     .unit_header{
-    height: 120px !important;
+    //height: 120px !important;
     .unit_banner{
         height: 105px !important;
         border-radius: 4px;
+        margin-top: 31%;
+        padding-top: 14px;
     }
     }
     .unit-title-container {
@@ -5293,42 +5314,42 @@ $module-card-lines-to-show: 3;
 
 .lms_page{
     .lms_banner{
-        width:100%;
-        height:150px;
-        //background-image: url('/static/ndf/images/maths-cover.png');
-        background-size:100% 100%;
-        position:relative;
-        //opacity:0.9;
+            width:100%;
+            height:150px;
+            //background-image: url('/static/ndf/images/maths-cover.png');
+            background-size:100% 100%;
+            position:relative;
+            //opacity:0.9;
 
-        &:before {
-            content: ' ';
-            background-color: rgba(0,0,0,.1);
-            opacity: .5;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            // z-index: 10;
-            box-shadow: inset 0 0 40px rgba(0,0,0,.2);
+            &:before {
+                content: ' ';
+                background-color: rgba(0,0,0,.1);
+                opacity: .5;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                // z-index: 10;
+                box-shadow: inset 0 0 40px rgba(0,0,0,.2);
 
-            a{
+                a{
+                    cursor: pointer;
+                }
+            }
+
+            .div-height{
+                //width:100%!important;
+                height:150px!important;
+                background-size:100% 100%;
+                position:absolute!important; 
+
+            }
+
+            .enroll_unit>a{
                 cursor: pointer;
             }
-        }
-
-        .div-height{
-            //width:100%!important;
-            height:150px!important;
-            background-size:100% 100%;
-            position:absolute!important; 
-
-        }
-
-        .enroll_unit>a{
-            cursor: pointer;
-        }
     
         .lms_heading {
             color: #fff;
@@ -5337,20 +5358,53 @@ $module-card-lines-to-show: 3;
 
 
             .unit_name {
-                font-size: 36px;
-                font-family: OpenSans-Semibold;
-                display: block;
-                margin-top: 90px;
-                margin-left: 40px;
-                border-radius: 8px 0px 0px 8px;
-                transition: border-radius .2s;
-                text-shadow: 3px 2px #164a7b;
+                position: relative;
+                font-size: 30px;
+                font-weight: bold;
+                padding: 5px 14px 6px 25px;
+                margin: 80px 10px 10px 8px;
+                color: #fff;
+                background-color: #6f08598c;
+                text-shadow: 0px 1px 2px #6f0859;
+                box-shadow: 0px 2px 4px #6f0859;
+                border-radius: 6px;
             }
 
-            .right-margin{
+
+            //ribbon structure 
+
+                    /*The ribbon ends*/
+                    .unit_name:before {
+                        content: ' ';
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        right: -2px;
+                        top: 0px;
+                        border-color: transparent #fff transparent transparent;
+                        /*Same color as the container which is the body in this case*/
+                    }
+
+                    /*The after pseudo element will negatve the bottom part of the ribbon completing the effect*/
+                    .unit_name:after {
+                        content: ' ';
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        left: 0px;
+                        top: 100%;
+                        border-width: 5px 10px;
+                        border-style: solid;
+                        border-color: #713558 #713558 transparent transparent;
+                    }
+
+                    
+        }
+
+//
+        .right-margin{
                     margin-right: 46px;
             }
-        }
     }
 }
 
@@ -6013,6 +6067,90 @@ ul.authoring-tab{
     width:100%;
     height:100%;
     display:none;
+}
+
+.nav-legal{
+            margin-left:-400px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            @media screen and (min-width: 968px) and (max-width: 1400px){
+                    margin-left:-200px;
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+            }
+
+            @media screen and (max-width: 967px){
+                ol {
+                    list-style-type: none;
+                    li {
+                        &>a{
+                            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+                            border-bottom: none;
+                            color: #777;
+                            text-decoration: none !important;
+                            &:hover {
+                            color:#777;
+                            border-bottom: 3px solid hsla(316, 88%, 42%, 1);
+                        }
+                        }
+                    }
+
+
+                }
+
+            }
+}
+
+.coyright-links{
+    &>a{
+        transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
+        &>p{
+            transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
+            border-bottom: none;
+            color: #777;
+            text-decoration: none !important;
+            &:hover {
+                color:hsla(316, 88%, 42%, 1);
+            }
+        }
+    }
 }
 /* use :target to look for a link to the overlay then we find are mask */
 #overlay:target, #overlay:target + #mask{
@@ -6998,4 +7136,9 @@ font-size:100%; color: #713558;
 .activity-player-controls{
     min-width:100%;
     margin-left: -15px;
+}
+
+.content-on-card{
+    color: black;
+    font-size: 14px;
 }

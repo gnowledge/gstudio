@@ -9,7 +9,7 @@
 <style type="text/css">
 
 </style>
-<div class="unit_card-{{node.pk}}" style="position: relative; height:305px;">
+<div class="unit_card-{{node.pk}}" style="position: relative;">
     {% if not no_url and not prevent_click %}
         {% if first_arg and second_arg and third_arg %}
             <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}">
@@ -49,6 +49,9 @@
         {% else %}
         <div class="unit_title" title="{{node.name}}">{{node.name|truncatechars:45}}</div>
         {% endif %}
+        <div class="node-content content-on-card" style="" title="{{node.content|safe|striptags}}">
+            {{node.content|safe|striptags|default_if_none:"No description added yet."|truncatechars:55}}
+        </div>
         </div>
 
     <div class="unit_actions">
