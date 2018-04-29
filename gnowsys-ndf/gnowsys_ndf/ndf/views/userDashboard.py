@@ -549,6 +549,8 @@ def group_dashboard(request, group_id):
         context_instance=RequestContext(request)
     )
 
+@get_execution_time
+@login_required
 def user_profile(request, group_id):
     from django.contrib.auth.models import User
 
@@ -607,6 +609,8 @@ def user_profile(request, group_id):
 				context_instance=RequestContext(request)
 		)
 
+@get_execution_time
+@login_required
 def user_data_profile(request, group_id):
 	user = {}
 	auth_node = node_collection.one({"_id":ObjectId(group_id)})
@@ -616,6 +620,7 @@ def user_data_profile(request, group_id):
 	user['node'] = auth_node
 	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
 
+@get_execution_time
 def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
@@ -675,7 +680,8 @@ def upload_prof_pic(request, group_id):
         else:
             return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
-
+@get_execution_time
+@login_required
 def my_courses(request, group_id):
 
     if str(request.user) == 'AnonymousUser':
@@ -704,6 +710,7 @@ def my_courses(request, group_id):
         )
 
 @get_execution_time
+@login_required
 def my_desk(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -765,6 +772,8 @@ def my_desk(request, group_id):
                 context_instance=RequestContext(request)
         )
 
+@get_execution_time
+@login_required
 def my_groups(request, group_id,page_no=1):
 
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -806,7 +815,8 @@ def my_groups(request, group_id,page_no=1):
                 context_instance=RequestContext(request)
         )
 
-
+@get_execution_time
+@login_required
 def my_dashboard(request, group_id):
 
     user_id = eval(group_id)
@@ -847,7 +857,8 @@ def my_dashboard(request, group_id):
                 context_instance=RequestContext(request)
         )
 
-
+@get_execution_time
+@login_required
 def my_performance(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -886,6 +897,8 @@ def my_performance(request, group_id):
                 context_instance=RequestContext(request)
         )
 
+@get_execution_time
+@login_required
 def save_profile(request, user_id):
     from django.contrib.auth.models import User
 
