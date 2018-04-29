@@ -158,13 +158,12 @@
   </ul>
 
     {% endcomment %}
-    </br>
 
   {% if title == "my desk" %}
   <div class="small-12 columns group_sections_content">
     {% get_agency_type_of_group node.pk as agency_type %}
     {% if agency_type != "Student" %}
-      <div class="row" style="margin-left: 10px !important ">
+      <div class="small-12 columns" style="margin-left: 15px;">
         <h3> My Workspace</h3>
       </div>
       <div class="small-12 columns lms_explore_back_unit">
@@ -177,11 +176,11 @@
       <hr/>
     {% endif %}
 
-    <div class="row" style="margin-left: 10px !important ">
+    <div class="small-12 columns" style="margin-left: 15px;">
       <h3 >Enrolled Courses</h3>
     </div>
     <div class="small-12 columns lms_explore_back_unit">
-      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5">
         {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
             {% include "ndf/card_group.html" with node=each_obj url_name="course_content" first_arg=each_obj.name no_enroll=True %}
@@ -198,13 +197,13 @@
   {% endif %}  
 
 {% if title == "my performance" %}
+  <br/>
   <div class="small-12 columns group_sections_content">
-
     <div class="small-12 columns lms_explore_back_unit">
-      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5">
         {% for each_obj in units_cur %}
         <li class="card-image-wrapper">
-          {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
+          {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk no_prior_node_name=False %}
         </li>
         {% empty %}
         <section class="empty-dashboard-message">
