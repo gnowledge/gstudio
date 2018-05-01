@@ -45,7 +45,12 @@
 
       <a href="{% url 'course_content' group_name %}" {% if title == 'course content' or title == 'unit_authoring' %}class="selected"{% endif %} tabindex="2" title="List of all the lessons"><i class="fi-list-thumbnails"></i> 
       {% if not group_object.project_config.tab_name %}{% trans "Lessons" %}{% else %}{{group_object.project_config.tab_name}} {% endif %}</a>
-      {% if is_gstaff and request.author.agency_type != 'Teacher' %}<a href="{% url 'unit_detail' group_name %}" title="Edit Structure" style="background-color:#6f0859; border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i>{% endif %}</a>
+
+      {% if is_gstaff %}
+
+      {% if request.author.agency_type != 'Teacher' or "Author" in group_object_member_of_names_list %}
+
+      <a href="{% url 'unit_detail' group_name %}" title="Edit Structure" style="background-color:#6f0859; border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i></a>{% endif %}{% endif %}
     </li>
 
     <li>  <a href="{% url 'course_raw_material' group_name %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %} tabindex="3" title="Contains useful files such as images, audios, videos etc."><i class="fi-folder "></i> 
@@ -132,8 +137,7 @@
                 <i class="icon-widget fi-widget"></i>
             </span>
             <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-      {% if request.author.agency_type != 'Teacher' or group_object.agency_type == 'School' %}
-              
+            {% if request.author.agency_type != 'Teacher' or "Author" in group_object_member_of_names_list or group_object.agency_type == 'School' %}
 
               <li>
                   <a href="{% url 'unit_detail' group_name %}" class="fi-pencil"> {% trans "Edit Structure" %} </a>
@@ -149,7 +153,6 @@
               </li>
               {% endif %}
  
-
              <li>
                   <a href="{% url 'unit_edit' group_name group_object.pk %}" class="fi-pencil"> {% trans "Edit Metadata" %}</a>
               </li>
@@ -166,7 +169,7 @@
               </div>
               {% endif %}
       {% endif %}
-
+              {% if "Author" not in group_object_member_of_names_list %}
               <li>
                   <a data-reveal-id="manage_users_modal" href="{% url 'manage_users' group_id %}"  class="fi-torsos"> {% trans "Manage Users" %}</a>
                   <div id="manage_users_modal" class="reveal-modal large" data-reveal style="position:absolute;">
@@ -176,6 +179,7 @@
                       <a class="close-reveal-modal">&#215;</a>
                   </div>
               </li>
+              {% endif %}
  
               {% get_lessons group_object as lessons_list %}
               {% include 'ndf/epub_export_widget.html' with exp_collection=lessons_list %}
