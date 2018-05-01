@@ -106,3 +106,45 @@ class esearch:
             es.index(index=index, doc_type=document_type.lower(), id=document["id"], body=document)
         
 
+    @staticmethod
+    def es_filters(query_dict):
+        i=-1
+        strconcat=""
+        endstring=""
+        temp_dict={}
+        lists = []
+
+        for each in list(query_dict):
+            for temp in each.values():
+                for a in temp:
+                    for key,value in a.items():
+                        if isinstance(value, dict):
+
+                            if value["$in"]:
+                                key = list(key)
+                                key[13]='__'
+                                t="".join(key)
+                                temp_dict[t]=value["$in"][0]
+                                lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
+                            elif value["$or"]:
+                                key = list(key)
+                                key[13]='__'
+                                t="".join(key)
+                                temp_dict[t]=value["$or"][0]
+                                lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
+                        elif isinstance(value, tuple):
+                            temp_dict["language"]= value[1]
+                            #strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
+                            strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
+                            lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
+                        else:
+                            if key != "source":
+                                key = list(key)
+                                key[13]='__'
+                                t="".join(key)
+                                temp_dict[t]=value
+                                lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")  
+                            else:
+                                temp_dict[key]=value
+                                lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
+        return lists
