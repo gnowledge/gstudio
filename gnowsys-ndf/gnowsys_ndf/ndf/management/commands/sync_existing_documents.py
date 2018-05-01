@@ -16,6 +16,11 @@ from gnowsys_ndf.settings import GSTUDIO_DEFAULT_LICENSE, GSTUDIO_DEFAULT_LANGUA
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value, get_attribute_value
 
+##############################################
+from gnowsys_ndf.ndf.middleware.oauth_middleware import test
+from gnowsys_ndf.ndf.models import *
+##############################################
+
 
 class Command(BaseCommand):
 
@@ -979,3 +984,9 @@ class Command(BaseCommand):
         {'$set': {'member_of': [page_gst._id], 'type_of': [wiki_page_gst._id]}} ,upsert=False, multi=True)
       if activity_gs_mem_update_res['updatedExisting']: # and res['nModified']:
           print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."
+
+####Add 'access_token' field to existing auth objects##############
+    author_object = node_collection.find({'_type':'Author'})
+    if author_object:
+        author_object=node_collection.collection.update({'_type':'Author','access_token':{'$exists':False}},{'$set':{'access_token':None}},upsert=False, multi=True)
+    

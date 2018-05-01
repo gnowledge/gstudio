@@ -20,6 +20,8 @@ from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
 
+
+
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
 ###################################################
@@ -93,12 +95,37 @@ def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
+    is_video = request.GET.get('is_video', "")
+
+    group_name, group_id = get_group_name_id('home')
+
+
+    group_count = node_collection.find({"_type":"Group"}).count()
+
+    author_count = node_collection.find({"_type":"Author"}).count()
+
+    GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
+    GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+
+    files_count = node_collection.find({
+                                    'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
+                                    'group_set': {'$all': [group_id]},
+                                    }).sort("last_update", -1).count()
+
+    discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
+    discussion_count = node_collection.find({"member_of":ObjectId(discussion._id)}).count()
+    
+
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
                                 {
                                     "group_id": "home", 'groupid':"home",
-                                    'landing_page': 'landing_page'
+                                    'landing_page': 'landing_page',
+                                    'group_count':group_count,
+                                    'author_count':author_count,
+                                    'files_count':files_count,
+                                    'discussion_count':discussion_count
                                 },
                                 context_instance=RequestContext(request)
                             )
@@ -195,3 +222,5 @@ def help_page_view(request,page_name):
                                         },
                                         context_instance=RequestContext(request)
                                     )
+
+

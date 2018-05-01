@@ -5,7 +5,7 @@
 	Provide method applyFilter() in your template with following signature:
 	applyFilter(filtersObjArr)
 	where,
-	filtersObjArr -- is array containing all selected filters.
+	filtersObjArr is array containing all selected filters.
 		- Each of the filter is contained in following format of JS Object:
 			{
 				"selFieldValue": <selFieldValue>,
@@ -127,7 +127,7 @@
 					<div class="filter-body">
 						<div class="filter-button" id="filter_button">
 							<i class="fi-filter small" aria-hidden="true"></i>
-							<span>Add Filter</span>
+							<span>{% trans "Add Filter" %}</span>
 						</div>
 						<select name="filter-field-name">
 							<option value="initial-select"> -- {% trans 'Select' %} -- </option>
@@ -144,7 +144,13 @@
 									{% endcomment %}
 									{% firstof val.altnames key %}
 								</option>
+
 							{% endfor %}
+							<option value='tags'
+								data-primary-type='tags'
+								data-gstudio-type='tags' data-name-field='tags'>
+								{% trans 'Tags' %}
+							</option>
 
 						</select>
 						<select name="filter-field-value"
