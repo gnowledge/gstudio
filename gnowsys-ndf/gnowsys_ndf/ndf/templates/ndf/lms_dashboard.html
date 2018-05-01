@@ -180,7 +180,7 @@
       <h3 >Enrolled Courses</h3>
     </div>
     <div class="small-12 columns lms_explore_back_unit">
-      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5">
+      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
         {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
             {% include "ndf/card_group.html" with node=each_obj url_name="course_content" first_arg=each_obj.name no_enroll=True %}
@@ -200,7 +200,7 @@
   <br/>
   <div class="small-12 columns group_sections_content">
     <div class="small-12 columns lms_explore_back_unit">
-      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-5">
+      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
         {% for each_obj in units_cur %}
         <li class="card-image-wrapper">
           {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk no_prior_node_name=False %}
