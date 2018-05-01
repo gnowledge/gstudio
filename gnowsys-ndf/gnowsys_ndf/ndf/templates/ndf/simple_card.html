@@ -54,6 +54,8 @@
       {% convert_list_to_dict resource.attribute_set as attr_set_dict %}
       {% get_relation_value resource.id 'has_thumbnail' as grel_dict %}
     {% endif %}
+    {% get_member_of_list resource.member_of as member_of %}
+
     {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.fs_file_ids.1 %}
         <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" />
     {% elif grel_dict.grel_node.if_file.thumbnail.relurl and  'video' or "File" in resource.if_file.mime_type %}
@@ -68,7 +70,7 @@
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or '55ab34ff81fccb4f1d806001' in resource.member_of or '55ab34ff81fccb4f1d805fff' in resource.member_of or '588f3ff6472d4a16e3f521e2' in resource.member_of %}
+    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or "File" in member_of or 'Page' in member_of or 'Jsmol' in member_of %}
       {% if resource.collection_set  %}
         <i class="collection"></i>
       {% elif attr_set_dict.educationaluse %}
@@ -83,8 +85,8 @@
       {% else  %}
         <i class="{{resource.member_of_names_list.0|lower }}"></i>
       {% endif %}
-    {% elif "Group" in resource.member_of_names_list or '55ab34ff81fccb4f1d806003' in resource.member_of or has_logo == True or has_prof_pic == True %}
-      {% if "Course" in resource.member_of_names_list or '5a743f85a1f755027838007e' in resource.member_of or has_logo == True %}
+    {% elif "Group" in resource.member_of_names_list or "Group" in member_of or has_logo == True or has_prof_pic == True %}
+      {% if "Course" in resource.member_of_names_list or 'Course' in member_of or has_logo == True %}
         {% if GSTUDIO_ELASTIC_SEARCH != True %}
         {% get_relation_value resource.pk 'has_logo' as grel_dict %}
         {% else %}
