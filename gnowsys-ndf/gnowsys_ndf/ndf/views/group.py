@@ -2065,6 +2065,7 @@ def group_dashboard(request, group_id=None):
     # Default landing_page template name should be defined in local_settings.py
     # which can be used for `alternate_template`
     alternate_template = None 
+    allow_to_join=[]
 
     selected = request.GET.get('selected','')
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -2582,16 +2583,24 @@ def cross_publish(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     gstaff_access = check_is_gstaff(group_obj._id,request.user)
     if request.method == "GET":
-        query = {'_type': 'Group', 'status': u'PUBLISHED',
-
+        query = {
                 '$or': [
-                            {'access_policy': u"PUBLIC"},
-                            {'$and': [
-                                    {'access_policy': u"PRIVATE"},
-                                    {'created_by': request.user.id}
-                                ]
-                            }
-                        ],
+                        {
+                            '_type': 'Group', 'status': u'PUBLISHED',
+
+                            '$or': [
+                                    {'access_policy': u"PUBLIC"},
+                                    {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': request.user.id}
+                                        ]
+                                    }
+                            ],
+                        },
+                        {
+                            '_type': 'Author', 'created_by': request.user.id
+                        }
+                ]
                 }
         if group_obj.name != "desk":
             query.update({'name': {'$ne': "home"}})

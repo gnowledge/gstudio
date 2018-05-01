@@ -269,7 +269,7 @@ factory_relation_types = [
     },
 
     {'has_thumbnail': {
-            'subject_type': ['Page', 'File','Jsmol'],
+            'subject_type': ['Page', 'File','Jsmol','interactive_page'],
             'object_type': ['File'],
             'inverse_name': 'thumbnail_of',
             'meta_type': 'factory_types',
