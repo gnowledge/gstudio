@@ -431,6 +431,8 @@ TEMPLATE_LOADERS = (
 ##LOGIN WITH MASTODON###
 LOGIN_WITH_MASTODON = False
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -1024,7 +1026,7 @@ CACHES = {
 
 #####################MASTODON########################
 if LOGIN_WITH_MASTODON:
-    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.oauth_middleware.test',)
+    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.middleware.oauth_middleware.mastodon_login',)
     AUTHENTICATION_BACKENDS = ('gnowsys_ndf.ndf.middleware.oauth_middleware.CustomBackendAuthenticationForDjango',)
 
 # Captcha settings

@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.core.urlresolvers import reverse
 
 ###############Mastodon OAUTH Dependancy##########
@@ -9,12 +9,16 @@ from mastodon import Mastodon
 from django.template.response import TemplateResponse
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
+from django.shortcuts import render,redirect,render_to_response
+from django.contrib import messages
+from django.template import Context,Template,RequestContext,loader
+from django .template import loader
 ########################################
 
 
 class mastodon_login(object):
     def moauth(self,request):
-       
+        message = False
         if request.method == 'POST':
                
             form = mform(request.POST)
@@ -23,7 +27,6 @@ class mastodon_login(object):
             Username = request.POST.get('username')
             Password = request.POST.get('password')
            
-            
             ###CHECKING CLIENT CREDENTIALS USING MASTODON API##########
             mastodon_var = mastodon.Mastodon(
                
@@ -54,7 +57,8 @@ class mastodon_login(object):
             name = Username
             email = Username
             password = Password
-                       
+            
+            error_status = False           
             if access_token:
                
                 ###check whether given email is present in user table or not####
@@ -140,10 +144,14 @@ class mastodon_login(object):
                                 HttpResponse("Error2")
                 return HttpResponseRedirect( reverse('landing_page') )  
                  
-            else:
-
-                return HttpResponseRedirect(reverse('login') ) 
+            else:  
+                
+                error_msg_flag = "You entered wrong credentials"
+                template = loader.get_template('registration/login.html')
+                context = {'error_msg_flag':error_msg_flag} 
             
+                return render(request,'registration/login.html',context)
+                 
         else:
           
             return HttpResponse("Invalid Credentials.")

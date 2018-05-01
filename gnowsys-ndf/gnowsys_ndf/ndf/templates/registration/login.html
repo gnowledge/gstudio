@@ -21,13 +21,15 @@ position: relative !important;
 {% block body_content %} 
 {% url 'auth_password_reset' as auth_pwd_reset_url %}
 {% url 'registration_register' as register_url %}
-
-
+<!-- <script>
+	alert('{{error_msg_flag}}');
+</script> -->
 <div class="row" style="margin: 1.2rem 0;">
 	<div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
 		<div class="row">
 			<div class="small-8 medium-8 large-8  end text-center">
 				<h2 class="text-center">{% trans "Log In" %}</h2>
+				<center><b>{{error_msg_flag}}</b></center>
 			</div>
 		</div>
 
