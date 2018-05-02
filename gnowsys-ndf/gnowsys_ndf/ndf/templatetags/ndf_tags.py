@@ -4249,3 +4249,14 @@ def get_profile_full_name(user_obj):
 @register.assignment_tag
 def get_implicit_enrollment_flag():
 	return GSTUDIO_IMPLICIT_ENROLL
+
+@get_execution_time
+@register.assignment_tag
+def get_name_by_node_id(node_id):
+    if isinstance(node_id, list) and len(node_id):
+        node_id = node_id[-1]
+    node = Node.get_node_by_id(node_id)
+    if node:
+        return node.name
+    else:
+        return None
