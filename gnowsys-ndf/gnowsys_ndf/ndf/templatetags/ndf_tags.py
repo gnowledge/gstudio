@@ -4274,5 +4274,17 @@ def convert_date_string_to_date(your_timestamp):
 def cal_length(string):
 	return len(str(string))
 
+@get_execution_time
+@register.assignment_tag
+def get_member_of_list(node_ids):
 
-
+	from gnowsys_ndf.ndf.models.gsystem_type import GSystemType
+	temp_list =[]
+	for each in node_ids:
+		node_obj = node_collection.find_one({"_id":ObjectId(each)})
+		if node_obj:
+			temp_list.append(node_obj.name)
+	if node_obj:
+		return temp_list
+	else:
+		return None

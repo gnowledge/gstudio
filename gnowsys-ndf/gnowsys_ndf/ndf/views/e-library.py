@@ -105,56 +105,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 			query_dict = get_filter_querydict(selfilters)
 
 		#query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
-		i=-1
-		strconcat=""
-		endstring=""
-		temp_dict={}
-		lists = []
-
-		for each in list(query_dict):
-			for temp in each.values():
-				for a in temp:
-					for key,value in a.items():
-						if isinstance(value, dict): 
-							
-							if value["$in"]:
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								
-								temp_dict[t]=value["$in"][0]
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-								#Q('match',name=dict(query="e-book", type="phrase"))
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
-							elif value["$or"]:
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								
-								temp_dict[t]=value["$or"][0]
-								#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
-						elif isinstance(value, tuple):
-							temp_dict["language"]= value[1]	
-							#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
-							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
-							lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
-						else:
-							if key != "source":
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								temp_dict[t]=value
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
-							else:
-								temp_dict[key]=value
-								#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-								#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
-								lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
+		lists = esearch.es_filters(query_dict)
 
 		#files = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -450,58 +401,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 			#query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
 			detail_urlname = "file_detail"
-			i=-1
-			strconcat=""
-			endstring=""
-			temp_dict={}
-			lists = []
-
-			for each in list(query_dict):
-				for temp in each.values():
-					for a in temp:
-						for key,value in a.items():
-							if isinstance(value, dict): 
-								
-								if value["$in"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									
-									temp_dict[t]=value["$in"][0]
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-									#Q('match',name=dict(query="e-book", type="phrase"))
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
-								elif value["$or"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									
-									temp_dict[t]=value["$or"][0]
-									#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
-							elif isinstance(value, tuple):
-								temp_dict["language"]= value[1]	
-								#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
-								strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
-								lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
-							else:
-								if key != "source":
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									temp_dict[t]=value
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
-								else:
-									temp_dict[key]=value
-									#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
-									lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
-
-			
+			lists = esearch.es_filters(query_dict)
 			#if filetype != "all":
 				
 
