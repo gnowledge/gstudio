@@ -4726,7 +4726,7 @@ $unit-card-line-height: 1.4;
 $unit-card-lines-to-show: 3;
 
 [class*="unit_card-"]{
-    width: 235px !important;
+    width: 240px !important;
     // height: 300px; commented as info of number of lesson and etc was not passed currently
     color: #000;
     padding: 15px;
@@ -4739,7 +4739,7 @@ $unit-card-lines-to-show: 3;
     display:flex; justify-content: flex-end; flex-direction: column;
 
     &:hover {
-        box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
+        box-shadow: 0px 0px 5px 1px rgba(113, 53, 87, 0.47);
     }
 
     .unit_status {
@@ -4757,7 +4757,7 @@ $unit-card-lines-to-show: 3;
     .unit_banner{
         height: 105px !important;
         border-radius: 4px;
-        margin-top: 31%;
+        //margin-top: 31%;
         padding-top: 14px;
     }
     }
@@ -4766,9 +4766,9 @@ $unit-card-lines-to-show: 3;
         .unit_title {
             display: table-cell;
             font-size: 17px;
-            font-family: Open Sans Bold;
-            font-weight: 500;
-            letter-spacing: 0.6px;
+            //font-family: Open Sans Bold;
+            font-weight: 600;
+            letter-spacing: 0.4px;
             margin: 0px 0px 12px;
             //width: 200px;
             overflow: hidden;
@@ -4776,6 +4776,8 @@ $unit-card-lines-to-show: 3;
             text-overflow: ellipsis;
             vertical-align: middle;
             color: #333333;
+            line-height: 1.5em;
+            padding-top: 3px;
         }
     }
     .unit_desc {
@@ -5728,7 +5730,7 @@ ul.authoring-tab{
 .lms_explore_back_unit{
     background-color: #fff;
     //margin-top: 10.5%;
-    margin-left: 30px; 
+    margin-left: 20px; 
 }
 
 .empty-dashboard-message {
@@ -7141,4 +7143,24 @@ font-size:100%; color: #713558;
 .content-on-card{
     color: black;
     font-size: 14px;
+    line-height: 1.2em;
+    overflow: hidden;
+    padding-top: 4px;
+}
+
+.card-legend{
+    width: auto;
+    top: -1.15em;
+    position: absolute;
+    display: inline-block;
+    color: $primary-pink;
+    font-family: OpenSans-Bold;
+    right: 1em;
+    padding: 0.1em 0.3em;
+    text-transform: uppercase;
+    font-size: 12px;
+    border-radius: 4px;
+    background-color: white;
+    letter-spacing: 0.4px;
+    border: 1px solid $primary-pink;
 }
