@@ -22,9 +22,7 @@
             {% elif grel_banner %}
             <img src="{{MEDIA_URL}}{{grel_banner.grel_node.if_file.original.relurl}}" class="img-height"/>
           {% else %}
-              {% if "Author" in group_object.member_of_names_list %}
-                  <i class="fi-torso style2 text-center"></i>
-              {% elif node.if_file.mid.relurl %}
+              {% if node.if_file.mid.relurl %}
                    <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" alt="Profile picture for this group." class="img-height">
               {% elif "announced_unit" in  group_object.member_of_names_list or  "draft_unit" in  group_object.member_of_names_list %}
                     <img src="/static/ndf/images/course_backbround-2.png" alt="Profile picture for this group." class="img-height">
