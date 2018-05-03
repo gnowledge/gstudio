@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelatio
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value,get_file_obj
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id,get_filter_querydict
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_IMAGE = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
@@ -29,7 +29,8 @@ file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 from gnowsys_ndf.ndf.models import GSystemType
 announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "announced_unit"})
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
-
+import urllib
+from gnowsys_ndf.ndf.gstudio_es.es import *
 
 
 @get_execution_time
@@ -55,65 +56,93 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    search_workspace = request.GET.get("search_workspace",None)
-    search_text = request.GET.get("search_text",None)
-    search_text = str(search_text)
-    print group_id
+    selfilters = urllib.unquote(request.POST.get('filters', ''))
+    filter_query_dict = []
+    if selfilters:
+        selfilters = json.loads(selfilters)
+        filter_query_dict = get_filter_querydict(selfilters)
+
+    search_workspace = request.POST.get("search_workspace",None)
+    search_text = request.POST.get("search_text",None)
+
     if search_workspace != "default" and search_workspace != None and search_text:
         group_name, group_id = get_group_name_id(search_workspace)
 
+    if GSTUDIO_ELASTIC_SEARCH == "False":
+        lists = esearch.es_filters(filter_query_dict)
 
-    if image_id is None:
-        image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
-        if image_ins:
-            image_id = str(image_ins._id)
+        if image_id is None:
+            q = Q('match',name=dict(query='Image',type='phrase'))
+            image_ins = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+            image_ins = image_ins.execute()
 
-    all_workspaces = node_collection.find(
-                    {'_type':'Group','member_of':
-                        {'$nin': [ announced_unit_gst._id,gst_base_unit_id]
-                    }
-                    }).sort('last_update', -1)
-    all_workspaces_count = all_workspaces.count()
+            if image_ins:
+                print str(image_ins.hits[0].id)
+                image_id = str(image_ins.hits[0].id)
 
-    # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
-    files_cur = node_collection.find({  '$and':[{'group_set': {'$all': [ObjectId(group_id)]}},{'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] }],
-                                        '_type': {'$in': ["GSystem"]},
-                                        'member_of': file_gst._id,
-                                        #'group_set': {'$all': [ObjectId(group_id)]},
-                                        
-                                        'if_file.mime_type': {'$regex': 'image'},
-                                        'status' : { '$ne': u"DELETED" },
-                                        # 'created_by': {'$in': gstaff_users},
-                            # '$or': [
-                                    # {
-                                    # },
-                                    # {
-                                    #     '$or': [
-                                    #             {'access_policy': u"PUBLIC"},
-                                    #             {
-                                    #                 '$and': [
-                                    #                         {'access_policy': u"PRIVATE"},
-                                    #                         {'created_by': request.user.id}
-                                    #                     ]
-                                    #             }
-                                    #         ],
-                                    # }
-                                    # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
-                                # ]
-                        },
-                        {
-                            'name': 1,
-                            '_id': 1,
-                            'fs_file_ids': 1,
-                            'member_of': 1,
-                            'mime_type': 1,
-                            'if_file':1
-                        }).sort("last_update", -1)
-    # print "file count\n\n\n",files_cur.count()
 
-    print files_cur.count()
-    if files_cur.count() !=0:
-        has_files = False 
+    else:
+        if image_id is None:
+            image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
+            if image_ins:
+                image_id = str(image_ins._id)
+
+        all_workspaces = node_collection.find(
+                        {'_type':'Group','member_of':
+                            {'$nin': [ announced_unit_gst._id,gst_base_unit_id]
+                        }
+                        }).sort('last_update', -1)
+        all_workspaces_count = all_workspaces.count()
+        if filter_query_dict:
+            if search_text:
+                filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+                filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
+            else:
+                filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+
+        else:
+            if search_text:
+                filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+                filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
+            else:
+                filter_query_dict = [{'group_set': {'$all': [ObjectId(group_id)]}}]
+        # img_col = node_collection.find({'_type': 'File', 'member_of': {'$all': [ObjectId(image_id)]}, 'group_set': ObjectId(group_id)}).sort("last_update", -1)
+        files_cur = node_collection.find({  '$and':filter_query_dict,
+                                            '_type': {'$in': ["GSystem"]},
+                                            'member_of': file_gst._id,
+                                            #'group_set': {'$all': [ObjectId(group_id)]},
+                                            'if_file.mime_type': {'$regex': 'image'},
+                                            'status' : { '$ne': u"DELETED" },
+                                            # 'created_by': {'$in': gstaff_users},
+                                # '$or': [
+                                        # {
+                                        # },
+                                        # {
+                                        #     '$or': [
+                                        #             {'access_policy': u"PUBLIC"},
+                                        #             {
+                                        #                 '$and': [
+                                        #                         {'access_policy': u"PRIVATE"},
+                                        #                         {'created_by': request.user.id}
+                                        #                     ]
+                                        #             }
+                                        #         ],
+                                        # }
+                                        # {    'collection_set': {'$exists': "true", '$not': {'$size': 0} }}
+                                    # ]
+                            },
+                            {
+                                'name': 1,
+                                '_id': 1,
+                                'fs_file_ids': 1,
+                                'member_of': 1,
+                                'mime_type': 1,
+                                'if_file':1
+                            }).sort("last_update", -1)
+        # print "file count\n\n\n",files_cur.count()
+
+        if files_cur.count() !=0:
+            has_files = False
 
     # image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
     template = "ndf/ImageDashboard.html"

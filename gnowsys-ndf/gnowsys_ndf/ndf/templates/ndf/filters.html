@@ -363,7 +363,7 @@
 		return filtersObjAndOrArr;
 	}
 
-	function updateFilterUrl(url)
+	function updateFilterUrl(url,url_in_addressbar)
 	{
 		var filters = getFiltersObjsInAndOrFormat();
 		// alert(filters);
@@ -374,8 +374,13 @@
 
 			url = url + 'filter?selfilters=' + filters;
 		}
-
-		window.location.href = url;
+		if (url_in_addressbar == "True"){
+			window.location.href = url;
+		}
+		else{
+			return filters;
+		}
+		return url
 	}
 
 	function getQueryVariable(variable)

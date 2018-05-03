@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
-{% block title %} video Gallery {% endblock %}
+
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
 {% comment %}
@@ -187,7 +187,26 @@ $("#btnUploadCancel").click(function() {
                     </div>
 {% endcomment %}
   <br> <br>
- <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+  <form id = "search_form"  name="video_search_form" method="POST" >
+  <div class="large-11 small-10 columns">
+      {% get_filters_data "File" "home" as filter_dict %}
+      {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    {% csrf_token %}
+    <select id="show_all_workspace">
+    <option value="default">--- Select Workspace ---</option>
+                {% for each_workspace in all_workspaces %}
+                <option value="{{ each_workspace.pk }}">
+                  {{ each_workspace.name }}
+                </option>
+                {% endfor %}
+    </select>
+    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+  </div>
+  <button type="submit" class="tiny button" value="" id="search_button" class="checked">
+  <i class="fi-magnifying-glass"></i>
+  </button>
+  </form>
+ <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in files_cur %}
     
     <li class="card-image-wrapper">
@@ -203,4 +222,5 @@ $("#btnUploadCancel").click(function() {
     </li>
     {% endfor %}
   </ul>   
+{% include  "ndf/ImageAudioVideoFilterSearch.html" with filters="video"%}
 {% endblock %}

@@ -65,11 +65,29 @@
 
     <div id="audios-container"></div>
     {% endcomment %}
-     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
     <h4>Select Audio: </h4>
+    <form id = "search_form"  name="audio_search_form" method="POST" >
+    <div class="large-11 small-10 columns">
+        {% get_filters_data "File" "home" as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+      {% csrf_token %}
+      <select id="show_all_workspace">
+      <option value="default">--- Select Workspace ---</option>
+                  {% for each_workspace in all_workspaces %}
+                  <option value="{{ each_workspace.pk }}">
+                    {{ each_workspace.name }}
+                  </option>
+                  {% endfor %}
+      </select>
+      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+    </div>
+    <button type="submit" class="tiny button" value="" id="search_button" class="checked">
+    <i class="fi-magnifying-glass"></i>
+    </button>
+    </form>
+    <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-3" > 
     <div class="row">
     {% for each in audioCollection %}
-
         <div class="audio_tile">
           <div class="audio_preview">
             <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
@@ -78,6 +96,7 @@
         </div>
     {% endfor %}
     </div>
+  </ul>
 <!--
      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
      <li class="card-audio-wrapper">
@@ -86,7 +105,7 @@
     </li>
   </ul>
  -->   
-
+{% include  "ndf/ImageAudioVideoFilterSearch.html" with filters="audio"%}
 {% comment %}
     <script>
 

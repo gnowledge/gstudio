@@ -145,7 +145,7 @@ margin-top:5px;
 {% block script %}
 // <script type="text/javascript">
   
-function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}"); } }
+function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}","True"); } }
 
 var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
 for (var i = pageAnchors.length - 1; i >= 0; i--) {
