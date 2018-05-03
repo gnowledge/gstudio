@@ -32,9 +32,6 @@
                 	<img src="/static/ndf/images/landing_pg_slides/clix-logo-i2c-site.svg">
                 	<span>{% trans "LogIn" %}</span>
                 </div>
-                {% if USERNAME_SELECTION_WIDGET %}
-        			{% include "registration/user-icon-to-name.html"  %}
-            	{% endif %}
             </div>
 			<br/>
 			{% if form.errors %}
@@ -53,9 +50,14 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="small-12 columns end">
-						{{ form.username }}
-					</div>
+                    <div class="small-10 columns">
+                        {{ form.username }}
+                    </div>
+                    {% if USERNAME_SELECTION_WIDGET %}
+                    <div class="small-2 columns">
+                    {% include "registration/user-icon-to-name.html"  %}
+                    </div>
+                    {% endif %}
 				</div>
 
 				<!-- Password -->
