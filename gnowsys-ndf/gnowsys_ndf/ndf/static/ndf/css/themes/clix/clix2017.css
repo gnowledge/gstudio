@@ -4468,7 +4468,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
 [class*="unit_card-"] .unit-title-container .unit_title {
   display: table-cell;
   font-size: 17px;
-  font-weight: 600;
+  font-family: Open Sans Bold;
   letter-spacing: 0.4px;
   margin: 0px 0px 12px;
   overflow: hidden;
