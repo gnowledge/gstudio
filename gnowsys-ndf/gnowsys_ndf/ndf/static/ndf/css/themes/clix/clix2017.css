@@ -6980,3 +6980,11 @@ input.transcript-toggler {
 .theme-color {
   color: #713558;
 }
+
+/* line 7173, ../../../scss/_clix2017.scss */
+.add_uname_icon {
+  margin-top: -14px;
+  margin-left: -15px;
+  font-size: 52px;
+  cursor: pointer;
+}
