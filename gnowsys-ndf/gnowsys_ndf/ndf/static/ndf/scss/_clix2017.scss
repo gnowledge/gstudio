@@ -4,7 +4,7 @@ $primary-blue : #164A7B;
 $secondry-blue : #74b3dc;
 $tertiary-blue : #719dc7;
 //$primary-theme-color : #a3238e;
-$white: #FFFFFF;
+$complimentary-color: #FFFFFF;
 
 
 /*Orange color variables*/
@@ -59,7 +59,7 @@ h5{
 
 
 .overlay-head{
-    background-color: $white;
+    background-color: $complimentary-color;
     height: 60px;
     margin-bottom:20px;
 }
@@ -123,7 +123,7 @@ h5{
       }
     }
     p {
-      color: $white;
+      color: $complimentary-color;
      //font-size: 26px;
       @media screen and (max-width: 450px) {
        //font-size: 18px;
@@ -229,7 +229,7 @@ h5{
       /*display: inline-block;
       padding: 6px 12px;
       background: #B0108D;
-      color: $white;
+      color: $complimentary-color;
       font-weight: 600;
       font-family: 'ubuntu-bold';
       text-transform: uppercase;*/
@@ -259,7 +259,7 @@ h5{
     }
 
     .login-page-form {
-        background-color: $white;
+        background-color: $complimentary-color;
         border-radius: 10px;
         padding: 10px 40px;
         opacity: 0.95;
@@ -383,12 +383,12 @@ h5{
             font-family: "OpenSans-Semibold", sans-serif;
             margin-top: 140px;
             border: 2px solid $primary-theme-color;
-            color: white;
+            color: $complimentary-color;
             background-color: $primary-theme-color;
 
             &:hover{
                 cursor:pointer;
-                background-color: $white;
+                background-color: $complimentary-color;
                 color: $primary-theme-color;
             }
 }
@@ -416,7 +416,7 @@ h5{
         .close-dropdown, .side-bar-button {
             position: absolute;
             left: 15px;
-            color: $white;
+            color: $complimentary-color;
             // //font-size: 35px;
             font-weight: 100;
         }
@@ -424,7 +424,7 @@ h5{
     }
     li.toggle-topbar {
         i {
-            color: $white;
+            color: $complimentary-color;
             display: inline-block;
             vertical-align: bottom;
         }
@@ -565,14 +565,14 @@ h5{
         .close-dropdown, .side-bar-button {
             position: absolute;
             left: 15px;
-            color: $white;
+            color: $complimentary-color;
             font-weight: 100;
         }
 
     }
     li.toggle-topbar {
         i {
-            color: $white;
+            color: $complimentary-color;
             display: inline-block;
             vertical-align: bottom;
         }
@@ -602,18 +602,18 @@ h5{
                         //border-left-color: $secondary-orange;
                         //color: $primary-orange;
                         color:#6f0859;
-                        background-color: white;
+                        background-color: $complimentary-color;
                         //color: $header-link-hover-color;
 
                     }
 
                         color:#6f0859;
-                        background-color: white;
+                        background-color: $complimentary-color;
                 
                 }
 
                 input{
-                    color: $white;
+                    color: $complimentary-color;
                     background: #6f0859;
                     font-family: OpenSans-Regular;
                     font-size: 15px;
@@ -621,7 +621,7 @@ h5{
                     
 
                     &:hover{
-                        color: $white;
+                        color: $complimentary-color;
                         border-left: 4px solid $secondary-orange;
                         background: #6f0859;
                     }
@@ -635,18 +635,18 @@ h5{
                     }
 
                 &.active{
-                    color:$white;
+                    color:$complimentary-color;
                     &:hover{
                         color:#6f0859;
-                        background-color: white;
+                        background-color: $complimentary-color;
                     }
                 }
                 &.active {
                     &>a {
-                        color: $white;
+                        color: $complimentary-color;
                         &:hover{
                         color:#6f0859;
-                        background-color: white;
+                        background-color: $complimentary-color;
                         }
                         
                     }
@@ -682,14 +682,14 @@ h5{
             ul.left li>a {
                 padding: 0px 20px;
                     &.active{
-                    color:$white;
+                    color:$complimentary-color;
                     font-size: 17px;
                     font-family: OpenSans-Bold;
                     border-bottom: 3px solid $secondary-orange;
                     &:hover{
                         &:hover{
                         color:#6f0859;
-                        background-color: white;
+                        background-color: $complimentary-color;
                         }
                     }
                 }
@@ -710,7 +710,7 @@ h5{
                         a:not(.button) {
                             //color: $header-link-active-color;
                             //color: $primary-orange;
-                            color: $white;
+                            color: $complimentary-color;
                             font-family: OpenSans-Bold;
                             font-size: 18px;
                             //border-bottom: 3px solid $secondary-orange;
@@ -732,7 +732,7 @@ h5{
                 &.active:not(.has-form) {
                     a:not(.button):hover {
                         background: transparent;
-                        color: $white;
+                        color: $complimentary-color;
                     }
                 }
             }
@@ -742,7 +742,7 @@ h5{
                     height: 52px;
                     width: 52px;
                     vertical-align: top;
-                    background: $white;
+                    background: $complimentary-color;
                     margin-right: 15px;
                 }
             }
@@ -751,7 +751,7 @@ h5{
                 li:not(.has-form) {
                     &> a:not(.button) {
                         border-left-width: 2px;
-                        color: white;
+                        color: $complimentary-color;
                         background: #6f0859;
 
                     }
@@ -814,7 +814,7 @@ h5{
 
     &.badge-blue {
         background-color: $secondry-blue;
-        color: $white;
+        color: $complimentary-color;
     }
 }
 
@@ -858,7 +858,7 @@ h5{
     background: url(/static/ndf/images/group-tile.png) no-repeat;
     background-size: 100% 100%;
     padding: 20px 26px;
-    color: $white;
+    color: $complimentary-color;
     margin-bottom: 30px;
     cursor: pointer;
     box-shadow: 0px 0px 9px rgba(0,0,0,0.4);
@@ -906,7 +906,7 @@ ul.horizontal_tabs_gstudio {
                 z-index: 10;
                 position: cursor;
                 margin: 0px;
-                background: $white;
+                background: $complimentary-color;
                 box-shadow: 0px 1px 6px 1px #ccc;
 
                 li {
@@ -945,7 +945,7 @@ ul.horizontal_tabs_gstudio {
         height: 45px;
         padding-bottom: 5px;
         background: transparent;
-        color: $white;
+        color: $complimentary-color;
         width:100%;
         
         /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#49667a+0,49667a+100&0+0,0.5+100 */
@@ -975,13 +975,13 @@ ul.horizontal_tabs_gstudio {
     }
     .group_sections_content {
         min-height: 400px;
-        background-color: $white;
+        background-color: $complimentary-color;
         margin-bottom: 100px;
         margin-top:-1px;
         border:1px solid #80808014;
     }
     .top-bar-secondions_content{
-        background-color:$white;
+        background-color:$complimentary-color;
     }
 
     .course_actions>span{
@@ -989,7 +989,7 @@ ul.horizontal_tabs_gstudio {
               background: rgb(46, 63, 81);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
-              color: $white;
+              color: $complimentary-color;
               font-size: 12px;
               margin: 0px 10px 0px 0px;
               cursor: pointer;
@@ -1002,7 +1002,7 @@ ul.horizontal_tabs_gstudio {
               background: rgba(0, 0, 0, 0.6);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
-              color: $white;
+              color: $complimentary-color;
               font-size: 12px;
               margin: 0px 10px 0px 0px;
               cursor: pointer;
@@ -1513,9 +1513,9 @@ input[type="button"] {
 
 /*  Buttons custom css */
 .button-hollow-white {    background: inherit;
-    border: 2px solid $white;
+    border: 2px solid $complimentary-color;
     border-radius: 5px;
-    color: $white;
+    color: $complimentary-color;
     font-weight: 600;
     letter-spacing: 0.9px;
     padding: 3px 10px;
@@ -1536,7 +1536,7 @@ input[type="button"] {
     padding-bottom: 14px;
 
     &:hover{
-        color: white;
+        color: $complimentary-color;
         background-color: #6f0859;
 
     }
@@ -1547,7 +1547,7 @@ input[type="button"] {
         //font-weight: 600;
         font-family: Open Sans Bold;
         &:hover{
-            color: white;
+            color: $complimentary-color;
             background-color: #6f0859;
         }
 
@@ -1586,7 +1586,7 @@ input[type="button"] {
     cursor: pointer;
     &:hover{
         background-color:#6f0859;
-        color: white;
+        color: $complimentary-color;
     }
 }
 
@@ -1594,7 +1594,7 @@ input[type="button"] {
     background: #a2238d;
     height: 37px;
     text-align: center;
-    color: $white;
+    color: $complimentary-color;
     font-size: 19px;
     border: 2px solid rgba(43, 51, 63, 0.42);
     border-radius: 5px;
@@ -1619,7 +1619,7 @@ input[type="button"] {
     margin-top: 10px;
     &:hover{
         background-color:#6f0859;
-        color: white;
+        color: $complimentary-color;
     }
 }
 
@@ -1663,7 +1663,7 @@ input[type="button"] {
 
 .disab-button{
     margin-right: 10px;
-    background-color: $white;
+    background-color: $complimentary-color;
     text-transform: none;
     font-size: 14px;
 }
@@ -1688,13 +1688,13 @@ input[type="button"] {
     color: #cc7769;
     border-color: #cc7769;
     float: right;
-    background: $white;
+    background: $complimentary-color;
     margin-right: 5px;
     margin-top: 5px;
 }
 
 .blue-white-button {
-    color: $white;
+    color: $complimentary-color;
     background: $primary-blue;
     border-radius: 4px;
     padding: 5px;
@@ -1799,7 +1799,7 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .curriculum_creator {
-    background: $white;
+    background: $complimentary-color;
     box-shadow: 0px 2px 6px #000;
     margin: 20px auto;
     padding: 0px 0px;
@@ -1810,7 +1810,7 @@ ul.jqtree-tree .jqtree-toggler {
 .curriculum_creator_header {
     width: 100%;
     height: 60px;
-    background: $white;
+    background: $complimentary-color;
     padding: 5px 15px;
     box-shadow: 1px 0px 13px #000;
 
@@ -1845,7 +1845,7 @@ ul.jqtree-tree .jqtree-toggler {
 .curriculum_list{
     width: 100%;
     height: 60px;
-    background: $white;
+    background: $complimentary-color;
     padding: 17px 81px;
     box-shadow: 0px 1px 4px #004;
     color: #2b78e4;
@@ -1876,7 +1876,7 @@ ul.jqtree-tree .jqtree-toggler {
     -ms-flex-pack: justify !important;
     -webkit-box-pack: justify !important;
     box-shadow: 0px 3px 6px #000;
-    background-color: $white;
+    background-color: $complimentary-color;
     .title-curriculum{
             font-family: inherit !important;
             font-weight: bold !important;
@@ -1917,7 +1917,7 @@ ul.jqtree-tree .jqtree-toggler {
     -ms-flex-direction: column !important;
     -webkit-box-orient: vertical !important;
     -webkit-box-direction: normal !important;
-    background: $white;
+    background: $complimentary-color;
     box-shadow: 0px 2px 6px #000;
         
     .curriculum_content{
@@ -2004,7 +2004,7 @@ ul.jqtree-tree .jqtree-toggler {
   .heading {
     // //font-size: 2em;
     a {
-       color: $white;
+       color: $complimentary-color;
     }
   }
 
@@ -2046,7 +2046,7 @@ ul.jqtree-tree .jqtree-toggler {
     }
     &.active {
       background-color: #908F8F;
-      color: $white;
+      color: $complimentary-color;
     }
   }
 }
@@ -2056,7 +2056,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 /* abput and modules */
 .about-course {
-  background-color: $white;;
+  background-color: $complimentary-color;;
   padding: 10px 23px ;
   > h5 {
     text-transform: uppercase;
@@ -2164,7 +2164,7 @@ ul.jqtree-tree .jqtree-toggler {
         text-transform: uppercase;
 
         &.active {
-          background-color: $white;
+          background-color: $complimentary-color;
           border: 1px solid #CCC;
           border-bottom: 0px;
         }
@@ -2205,7 +2205,7 @@ ul.jqtree-tree .jqtree-toggler {
       top: -35px;
       //right: 5px;
       color: #000000;
-      background: $white;
+      background: $complimentary-color;
       margin-left: 22px;
     }
   }
@@ -2510,7 +2510,7 @@ ul.jqtree-tree .jqtree-toggler {
           }
 
           &.active {
-            background-color: $white;
+            background-color: $complimentary-color;
             border: 1px solid #CCC;
             border-bottom: 0px;
             a {
@@ -2542,7 +2542,7 @@ ul.jqtree-tree .jqtree-toggler {
         }
         .note {
           padding: 5px 15px;
-          background: $white;
+          background: $complimentary-color;
           cursor: pointer;
           color: #000;
 
@@ -2601,20 +2601,20 @@ ul.jqtree-tree .jqtree-toggler {
       // display: none;
       //color: #000000;
       margin-left: 15px;
-      background-color: $white;
+      background-color: $complimentary-color;
       //padding-bottom: 30px;
       .group_sections_content{
         margin-top:5px;
       }
 
       >div{
-        background-color: $white;
+        background-color: $complimentary-color;
       }
 
       .note-toolbar {
         padding: 1.8em 1.2em 0em;
         margin: 0em;
-        background-color: $white;
+        background-color: $complimentary-color;
 
         .note-creator {
           font-weight:bold;
@@ -2642,7 +2642,7 @@ ul.jqtree-tree .jqtree-toggler {
       }
       .note-content {
         padding: 2em 2em 1em;
-        background: $white;
+        background: $complimentary-color;
         margin: 0em;
         .note-header {
 
@@ -2702,7 +2702,7 @@ ul.jqtree-tree .jqtree-toggler {
   font-weight: bolder;
   padding: 0px 7px;
   /*font-family: Arial, sans-serif;*/
-  color: white;
+  color: $complimentary-color;
   text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   border: 1px solid;
   border-radius: 18px;
@@ -2755,14 +2755,14 @@ ul.jqtree-tree .jqtree-toggler {
 .course_creator_header {
     width: 100%;
     height: 70px;
-    background: $white;
+    background: $complimentary-color;
     padding: 5px 15px;
     box-shadow: 1px 0px 0px #000;
 
     .unit_editor{
    width: 100%;
    height: 320px;
-   background: $white;
+   background: $complimentary-color;
    padding: 5px 15px;
    box-shadow: 1px 0px 0px #000;
  
@@ -2863,7 +2863,7 @@ ul.jqtree-tree .jqtree-toggler {
               background: rgba(0, 0, 0, 0.6);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
-              color: $white;
+              color: $complimentary-color;
               font-size: 12px;
               margin: 0px 10px 0px 0px;
               cursor: pointer;
@@ -2876,7 +2876,7 @@ ul.jqtree-tree .jqtree-toggler {
               background: rgba(0, 0, 0, 0.6);
               border: 1px solid rgba(255, 255, 255, 0.7);
               padding: 1px 8px;
-              color: $white;
+              color: $complimentary-color;
               font-size: 12px;
               margin: 0px 10px 0px 0px;
               cursor: pointer;
@@ -2889,7 +2889,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 
 .create_unit {
-    background: $white;
+    background: $complimentary-color;
     box-shadow: 0px 2px 3px #000;
     margin: 10px auto;
     padding: 10px;
@@ -2897,7 +2897,7 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .button-hollow-black{
-    background: $white;
+    background: $complimentary-color;
     border: 2px solid $primary-blue;
     border-radius: 5px;
     color: $primary-blue;
@@ -2915,7 +2915,7 @@ ul.jqtree-tree .jqtree-toggler {
 
 
 .course_creator {
-    background: $white;
+    background: $complimentary-color;
     box-shadow: 0px 2px 6px #000;
     margin: 0px auto;
     padding: 0px 0px;
@@ -2946,7 +2946,7 @@ ul.jqtree-tree .jqtree-toggler {
         .course_tree {
             @include transition-prop(all);
             width: 100%;
-            background-color: $white;
+            background-color: $complimentary-color;
             max-height: 100%;
             overflow-y: auto;
             height: 100vh;
@@ -3063,7 +3063,7 @@ ul.jqtree-tree .jqtree-toggler {
             height: inherit;
             max-height: 100%;
             overflow-y: auto;
-            background: $white;
+            background: $complimentary-color;
 
             .editor-header{
                 height: 55px;
@@ -3089,7 +3089,7 @@ ul.jqtree-tree .jqtree-toggler {
             }
             .editor-tool {
                 .editor_actions {
-                    background-color: $white;
+                    background-color: $complimentary-color;
                     border-bottom: 1px solid #ccc;
                     height: 55px;
                     ul {
@@ -3176,7 +3176,7 @@ ul.jqtree-tree .jqtree-toggler {
                                         right: -20px;
                                         margin: 0px 10px;
                                         z-index: 100;
-                                        background: $white;
+                                        background: $complimentary-color;
                                         color: #999999;
                                         border-radius: 3px;
 
@@ -3226,7 +3226,7 @@ ul.jqtree-tree .jqtree-toggler {
                 width: 77%;
                 opacity: 1;
                 max-width: 100%;
-                background: $white;
+                background: $complimentary-color;
                 
                 overflow-x: hidden;
                 //display: inline-block;
@@ -3339,7 +3339,7 @@ ul.jqtree-tree .jqtree-toggler {
     }
 
     .dropdown_content {
-        background-color: $white;
+        background-color: $complimentary-color;
         border-radius: 10px;
         display: none;
         position: absolute;
@@ -3498,7 +3498,7 @@ ul.jqtree-tree .jqtree-toggler {
             margin-left: 17px;
             &:hover{
                 color: #720f5e;
-                background-color: $white;
+                background-color: $complimentary-color;
             }
 
 
@@ -3524,7 +3524,7 @@ ul.jqtree-tree .jqtree-toggler {
         }
         .discussion-title-username{
             //background-color: #3e3e3e;
-            color: $white !important;
+            color: $complimentary-color !important;
             height: 2em;
             padding-right: 10px;
             padding-left: 10px;
@@ -3625,7 +3625,7 @@ ul.jqtree-tree .jqtree-toggler {
     margin-bottom: inherit;
     padding: 0.25rem 0.5rem 0.25rem;
     font-size: 0.6875rem;
-    background-color: $white;
+    background-color: $complimentary-color;
     color: #ce7869;
     border: 1px solid;
     border-radius: 6px;
@@ -3640,7 +3640,7 @@ ul.jqtree-tree .jqtree-toggler {
 .asset-tags-container{
     width: 100%;
     height: 50px;
-    background: $white;
+    background: $complimentary-color;
     padding: 5px 15px;
     margin-bottom: 65px;
     
@@ -3669,7 +3669,7 @@ ul.jqtree-tree .jqtree-toggler {
         display: inline-block;
         &:hover{
             background-color:#6f0859;
-            color: white;
+            color: $complimentary-color;
         }
 
     }
@@ -3678,7 +3678,7 @@ ul.jqtree-tree .jqtree-toggler {
 .tags-container {
     width: 100%;
     height: 50px;
-    background: $white;
+    background: $complimentary-color;
     padding: 5px 15px;
     box-shadow: 1px 0px 0px #000;
     margin-bottom: 65px;
@@ -3775,14 +3775,14 @@ $activity-border-color: #e0e0e0;
 $activity-header-height: 35px;;
 $activity-header-icon-block-width: 75px;
 body {
-    background-color: $white;
+    background-color: $complimentary-color;
 }
 
 /*
     Styling for the Secondary header 2
 */
 $ah_2_icon_color: $primary-theme-color;
-$ah_2_background_color: $white;
+$ah_2_background_color: $complimentary-color;
 $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 .activity_player_header {
     background-color: $ah_2_background_color;
@@ -3798,7 +3798,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         z-index : 99;
 
         &:not(:last-child) {
-            border-right: 1px solid $white;
+            border-right: 1px solid $complimentary-color;
         }
         
         &:hover {
@@ -3902,7 +3902,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         &:hover{
             //border-bottom: 2px solid $ah_2_icon_color;
             //background-color:$ah_2_icon_color;
-            //color:$white;
+            //color:$complimentary-color;
         }
     }
 
@@ -3913,7 +3913,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         text-align: center;
         &:hover{
             //background-color:$ah_2_icon_color;
-            //color:$white;
+            //color:$complimentary-color;
         }
     }
     .header_text_sm_block{
@@ -3936,7 +3936,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         &:hover{
             border-bottom: 2px solid $ah_2_icon_color;
             //background-color:$ah_2_icon_color;
-            //color:$white;
+            //color:$complimentary-color;
         }
     }
 
@@ -3977,7 +3977,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
             &:hover{
                 border-bottom: 2px solid $ah_2_icon_color;
                 //background-color:$ah_2_icon_color;
-                //color:$white;
+                //color:$complimentary-color;
             }
             &:active{
                 border-bottom: 2px solid $ah_2_icon_color;
@@ -4118,7 +4118,7 @@ $bp_background_color: #101d29;
     svg {
         height: 50px;
         width: 50px;
-        background-color: $white;
+        background-color: $complimentary-color;
     }
 
     &.buddy_inactive:before {
@@ -4194,7 +4194,7 @@ $bp_background_color: #101d29;
         .step_title {
             font-size: 20px;
             font-weight: 400;
-            color: $white;
+            color: $complimentary-color;
             letter-spacing: 0.9px;
             margin: 10px 0px;
 
@@ -4250,7 +4250,7 @@ $bp_background_color: #101d29;
             }
 
             .buddy_animal_name {
-                color: $white;
+                color: $complimentary-color;
                 text-align: center;
                 text-transform: capitalize;
                 letter-spacing: 1px;
@@ -4282,11 +4282,11 @@ $bp_background_color: #101d29;
 /*
     Common css that can be kept at a single place.
 */
-$primary-button-color: $white;
+$primary-button-color: $complimentary-color;
 $primary-button-background-color: #00a9ee;
 .blue_round_button {
     background-color: #00a9ee;
-    color: $white;
+    color: $complimentary-color;
     border-radius: 4px;
     padding: 3px 10px;
     font-size: 16px;
@@ -4294,7 +4294,7 @@ $primary-button-background-color: #00a9ee;
     line-height: 25px;
 }
 .text_button {
-    background-color: $white;
+    background-color: $complimentary-color;
     color: #949494;
     border-radius: 4px;
     padding: 3px 10px;
@@ -4304,7 +4304,7 @@ $primary-button-background-color: #00a9ee;
 }
 
 .edit_button{
-    background-color: $white;
+    background-color: $complimentary-color;
     color:#717171;
     border-radius: 4px;
     font-size: 16px;
@@ -4320,7 +4320,7 @@ $primary-button-background-color: #00a9ee;
 }
 
 $nav_menu_1_color: #ce7869;
-$nav_menu_1_bg_color: $white;
+$nav_menu_1_bg_color: $complimentary-color;
 $nav_menu_1_tab_border: #ffc14e;
 ul.nav_menu_1 {
     margin-bottom: 0px;
@@ -4388,7 +4388,7 @@ ul.nav_menu_1 {
                 -webkit-box-align: stretch;
                 align-items: stretch;
                 overflow-x: hidden;
-                color: $white;
+                color: $complimentary-color;
                 font-weight: 300;
 
                 .first-strip{
@@ -4408,7 +4408,7 @@ ul.nav_menu_1 {
             .course_tree {
                 @include transition-prop(all);
                 width: 100%;
-                background-color: $white;
+                background-color: $complimentary-color;
                 //max-height: 100%;
                 overflow-y: auto;
                 //height: 100vh;
@@ -4519,7 +4519,7 @@ ul.nav_menu_1 {
             height: inherit;
             max-height: 100%;
             overflow-y: auto;
-            background:$white;
+            background:$complimentary-color;
 
             .editor-header{
                 height: 100px;
@@ -4544,7 +4544,7 @@ ul.nav_menu_1 {
             }
             .editor-tool {
                 .editor_actions {
-                    background-color: $white;
+                    background-color: $complimentary-color;
                     border-bottom: 1px solid #ccc;
                     height: 55px;
                     ul {
@@ -4575,7 +4575,7 @@ ul.nav_menu_1 {
 }
 
 .course_editor_section{
-    background:$white;
+    background:$complimentary-color;
     min-height: 100vh;
     min-width:910px;
     margin-bottom:10px;
@@ -4811,7 +4811,7 @@ $unit-card-lines-to-show: 3;
                 background: #a2238d;
                 height: 37px;
                 text-align: center;
-                color: $white;
+                color: $complimentary-color;
                 font-size: 19px;
                 border: 2px solid rgba(43, 51, 63, 0.42);
                 border-radius: 5px;
@@ -4820,7 +4820,7 @@ $unit-card-lines-to-show: 3;
                 margin-left: 14px !important;
                 letter-spacing: 0.4px;
                 &:hover{
-                    background-color: $white;
+                    background-color: $complimentary-color;
                     color: #912a7d;
                     font-weight: 600;
                 }
@@ -4831,7 +4831,7 @@ $unit-card-lines-to-show: 3;
 
 
 .unit-card-analytics-points{
-    background: $white;
+    background: $complimentary-color;
     color: #a2238d;
     font-size: 16px;
     border-radius: 20px;
@@ -4869,10 +4869,10 @@ $unit-card-lines-to-show: 3;
 /**
     Status styles added for the unit styles.
  */
-$inProgressColor: $white;
+$inProgressColor: $complimentary-color;
 $inProgressBgColor: #fd9e29;
 
-$inCompleteColor: $white;
+$inCompleteColor: $complimentary-color;
 $inCompleteBgColor: #fd9e29;
 
 .in-progress-status {
@@ -4922,7 +4922,7 @@ $inCompleteBgColor: #fd9e29;
     }
     .course_actions>span{
        //margin-right: 5px;
-       background: $white;
+       background: $complimentary-color;
        border: 1px solid rgba(255, 255, 255, 0.7);
        padding: 1px 8px;
        color: rgb(46, 63, 81);
@@ -4942,7 +4942,7 @@ $inCompleteBgColor: #fd9e29;
        background: rgba(0, 0, 0, 0.6);
        border: 1px solid rgba(255, 255, 255, 0.7);
        padding: 1px 8px;
-       color: $white;
+       color: $complimentary-color;
        font-size: 12px;
        margin: 0px 10px 0px 0px;
        cursor: pointer;
@@ -4980,7 +4980,7 @@ $inCompleteBgColor: #fd9e29;
 .panel {
     padding: 0 18px;
     display: none;
-    background-color: white;
+    background-color: $complimentary-color;
     overflow: hidden;
 }
 
@@ -5015,7 +5015,7 @@ $inCompleteBgColor: #fd9e29;
       .activity-slide {
         padding: 1em;
         height: inherit;
-        background: $white;
+        background: $complimentary-color;
         position: relative;
 
         .view-related-content {
@@ -5089,7 +5089,7 @@ $inCompleteBgColor: #fd9e29;
         color: #222222;
 
         >i {
-            color: $white;
+            color: $complimentary-color;
             font-size: 40px;
             position: absolute;
             left: 8px;
@@ -5186,7 +5186,7 @@ $module-card-lines-to-show: 3;
                left: 0; 
                width: 100%; 
                //color: #ffedda !important;
-               color: $white !important;
+               color: $complimentary-color !important;
                //text-shadow: 2px 2px #a61680;
                text-shadow: 2px 0px 8px black;
 
@@ -5271,7 +5271,7 @@ $module-card-lines-to-show: 3;
                 background: rgb(162, 35, 141);
                 height: 37px;
                 text-align: center;
-                color: $white;
+                color: $complimentary-color;
                 width: 172px;
                 font-size: 19px;
                 border: 2px solid rgba(43, 51, 63, 0.42);
@@ -5282,7 +5282,7 @@ $module-card-lines-to-show: 3;
 
                 &:hover {
                     box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
-                    background: $white;
+                    background: $complimentary-color;
                     color: rgb(162, 35, 141);
                 }
             }
@@ -5351,7 +5351,7 @@ $module-card-lines-to-show: 3;
             }
     
         .lms_heading {
-            color: $white;
+            color: $complimentary-color;
             display: inline-block;
             vertical-align: top;
 
@@ -5362,7 +5362,7 @@ $module-card-lines-to-show: 3;
                 font-weight: bold;
                 padding: 5px 14px 6px 25px;
                 margin: 80px 10px 10px 8px;
-                color: $white;
+                color: $complimentary-color;
                 background-color: #6f08598c;
                 text-shadow: 0px 1px 2px #6f0859;
                 box-shadow: 0px 2px 4px #6f0859;
@@ -5417,7 +5417,7 @@ $module-card-lines-to-show: 3;
 .lms_secondary_header{
     width: 100%;
     position: relative;
-    color: $white;
+    color: $complimentary-color;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     .course_actions{
@@ -5427,7 +5427,7 @@ $module-card-lines-to-show: 3;
           background: rgb(46, 63, 81);
           border: 1px solid rgba(255, 255, 255, 0.7);
           padding: 1px 8px;
-          color: $white;
+          color: $complimentary-color;
           font-size: 23px;
           cursor: pointer;
           border-radius: 3px;
@@ -5445,7 +5445,7 @@ $module-card-lines-to-show: 3;
                   background: rgb(46, 63, 81);
                   border: 1px solid rgba(255, 255, 255, 0.7);
                   padding: 1px 8px;
-                  color: $white;
+                  color: $complimentary-color;
                   font-size: 23px;
                   cursor: pointer;
                   border-radius: 3px;
@@ -5460,7 +5460,7 @@ $module-card-lines-to-show: 3;
 }
 
 $nav_menu_1_color: #6f0859;
-$nav_menu_1_bg_color: $white;
+$nav_menu_1_bg_color: $complimentary-color;
 $nav_menu_1_tab_border: #a2238d;
 ul.nav_menu_1 {
     margin-bottom: 0px;
@@ -5511,7 +5511,7 @@ ul.authoring-tab{
                         display: inline-block;
                         letter-spacing: 0.8px;
                         border-bottom: 3px solid transparent;
-                        color:$white !important;
+                        color: $complimentary-color !important;
                         &.selected, &:hover{
                             border-bottom: 3px solid $nav_menu_1_tab_border;
                         }
@@ -5533,7 +5533,7 @@ ul.authoring-tab{
 
 
 .course-content {
-    background: $white;
+    background: $complimentary-color;
     margin: 20px auto;
     padding: 20px 0px;
     margin-top: 0px;
@@ -5541,7 +5541,7 @@ ul.authoring-tab{
     ul.jqtree-tree {
         .course-tree-node {
             &.jqtree-selected .jqtree-element{
-                background: $white;
+                background: $complimentary-color;
             }
             &>div{
                 height: 35px;
@@ -5605,7 +5605,7 @@ ul.authoring-tab{
   top: -1.15em;
   position: absolute;
   display: inline-block;
-  color: $white;
+  color: $complimentary-color;
   right: 1em;
   padding: 0.3em 0.5em;
   font-family:OpenSans-Bold;
@@ -5621,7 +5621,7 @@ ul.authoring-tab{
   top: -1.15em;
   position: absolute;
   display: inline-block;
-  color: $white;
+  color: $complimentary-color;
   font-family:OpenSans-Bold;
   right: 1em;
   padding: 0.3em 0.5em;
@@ -5638,7 +5638,7 @@ ul.authoring-tab{
   top: -1.15em;
   position: absolute;
   display: inline-block;
-  color: $white;
+  color: $complimentary-color;
   font-family:OpenSans-Bold;
   right: 1em;
   padding: 0.3em 0.5em;
@@ -5655,7 +5655,7 @@ ul.authoring-tab{
   top: -1.15em;
   position: absolute;
   display: inline-block;
-  color: $white;
+  color: $complimentary-color;
   font-family:OpenSans-Bold;
   right: 1em;
   padding: 0.3em 0.5em;
@@ -5691,7 +5691,7 @@ ul.authoring-tab{
 .lms_explore_head{
     width: 100%;
     height: 45px;
-    background-color:$white;
+    background-color:$complimentary-color;
     color: $primary-theme-color;
     margin-top:-30px;
     >p{
@@ -5707,7 +5707,7 @@ ul.authoring-tab{
 .lms_explore_head_unit{
     width: 100%;
     height: 50px;
-    background-color:$white;
+    background-color:$complimentary-color;
     color: $primary-theme-color;
     >p{
         margin-left: 81px;
@@ -5721,11 +5721,11 @@ ul.authoring-tab{
 }
 
 .lms_explore_back{
-    background-color: $white;
+    background-color: $complimentary-color;
 }
 
 .lms_explore_back_unit{
-    background-color: $white;
+    background-color: $complimentary-color;
     //margin-top: 10.5%;
     margin-left: 20px; 
 }
@@ -5746,7 +5746,7 @@ ul.authoring-tab{
             border: 1px solid $primary-theme-color;
             box-shadow: 0 1px 8px 0 rgba(0,0,0,0.1);
             box-sizing: border-box;
-            color: $white;
+            color: $complimentary-color;
             font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
             display: inline-block;
             letter-spacing: 1px;
@@ -5799,7 +5799,7 @@ ul.authoring-tab{
                 height: 100px;
                 border-radius: 5px;
                 overflow: hidden;
-                background-color: $white;
+                background-color: $complimentary-color;
 
                 svg {
 
@@ -5812,7 +5812,7 @@ ul.authoring-tab{
                 }
             }
             .banner_heading {
-                color: $white;
+                color: $complimentary-color;
                 display: inline-block;
                 vertical-align: top;
 
@@ -5858,13 +5858,13 @@ ul.authoring-tab{
     float: right;
     margin: 5px 5px 10px 0px;
     border: 1px solid #713557;
-    background: $white;
+    background: $complimentary-color;
     font-size: 18px;
     color: #713557;
     &:hover {
         background-color: #713557;
         border-color: #713557;
-        color: $white;
+        color: $complimentary-color;
     }
 }
 
@@ -5874,7 +5874,7 @@ ul.authoring-tab{
     float: right;
     margin: 5px 5px 8px 0px;
     border: 1px solid #6153AE;
-    background: $white;
+    background: $complimentary-color;
     font-size: 23px;
     color: #6153AE;
 }
@@ -5887,13 +5887,13 @@ ul.authoring-tab{
     border-radius: 5px;
     float: right;
     border: 1px solid #713557;
-    background: $white;
+    background: $complimentary-color;
     font-size: 18px;
     color: #713557;
     &:hover {
         background-color: #713557;
         border-color: #713557;
-        color: $white;
+        color: $complimentary-color;
     }
     i{
         margin-right: 5px;
@@ -5906,13 +5906,13 @@ ul.authoring-tab{
     border-radius: 5px;
     float: right;
     border: 1px solid #713557;
-    background: $white;
+    background: $complimentary-color;
     font-size: 18px;
     color: #713557;
     &:hover {
         background-color: #713557;
         border-color: #713557;
-        color: $white;
+        color: $complimentary-color;
     }
     i{
         margin-right: 5px;
@@ -6162,7 +6162,7 @@ ul.authoring-tab{
     top: -20px;
     right: -16px;
     background: rgba(0, 0, 0, 0.5);
-    color: white;
+    color: $complimentary-color;
     height: 40px;
     width: 40px;
     line-height: 40px;
@@ -6245,7 +6245,7 @@ ul.authoring-tab{
         padding: 40px 29px 28px;
         background: $primary-theme-color;
         border-radius: 0 0 5px 5px;
-        color: $white;
+        color: $complimentary-color;
         cursor: pointer;
         font-size: .75rem;
         padding-top:7px !important;
@@ -6292,7 +6292,7 @@ input.transcript-toggler{
     // background: $primary-orange;
     // border: 1px solid rgba(255, 255, 255, 0.7);
     // padding: 5px 8px;
-    // color: $white;
+    // color: $complimentary-color;
     // font-size: 20px;
     // margin: 0px 10px 0px 0px;
     // cursor: pointer;
@@ -6304,13 +6304,13 @@ input.transcript-toggler{
     // &:hover {
     //     opacity: 1;
     //     background: #008100;
-    //     color: $white;
+    //     color: $complimentary-color;
     //     font-weight:bold;
     // }
     background: rgb(162, 35, 141);
     height: 50px;
     text-align: center;
-    color: $white;
+    color: $complimentary-color;
     /* font-weight: bold; */
     width: 172px;
     font-size: 28px;
@@ -6320,7 +6320,7 @@ input.transcript-toggler{
     margin-top: 2px !important;
     letter-spacing: 0.4px;
     &:hover {
-         background: $white;
+         background: $complimentary-color;
          color: rgb(162, 35, 141);
     }
 
@@ -6336,14 +6336,14 @@ input.transcript-toggler{
 }
 
 .status-btn{
-    background-color: $white;
+    background-color: $complimentary-color;
     margin-right: auto;
     padding-bottom: 0px;
     text-transform: none;
     .disabled{
         background-color: #008cba;
         border-color: #007095;
-        color: white;
+        color: $complimentary-color;
         cursor: default;
         opacity: 0.7;
         box-shadow: none; 
@@ -6504,7 +6504,7 @@ input.transcript-toggler{
     margin-left: 17px;
     &:hover{
         color: #720f5e;
-        background-color: $white;
+        background-color: $complimentary-color;
     }
 }
 
@@ -6531,7 +6531,7 @@ input.transcript-toggler{
 }
 
 .white-text{
-    color: white;   
+    color: $complimentary-color;   
 }
 
 .quiz-player{
@@ -6576,7 +6576,7 @@ input.transcript-toggler{
 
 }
 .scard {
-    background:$white;
+    background:$complimentary-color;
     border:1px solid #AAA;
     border-bottom:3px solid #BBB;
     padding:0px;
@@ -6600,7 +6600,7 @@ input.transcript-toggler{
     margin:5px;
     left:0px;
     right:0px;
-    background:$white;
+    background:$complimentary-color;
     padding:25px 0px 5px 0px;
     border-bottom:5px solid #CCC;
     font-size:20px;
@@ -6713,7 +6713,7 @@ input.transcript-toggler{
     color: #6f0859;
     font-weight: 400;
     cursor: pointer;
-    background-color: $white;
+    background-color: $complimentary-color;
     border: 2px solid #6f0859;
     border-radius: 5px !important;
     display: inline-block;
@@ -6723,7 +6723,7 @@ input.transcript-toggler{
         &:hover{
             border-radius: 10px;
             background-color: #6f0859;
-            color: $white;
+            color: $complimentary-color;
         }
     }
     a{
@@ -6738,7 +6738,7 @@ input.transcript-toggler{
         background-color: #6f0859;
 
             a{
-                color: white;
+                color: $complimentary-color;
                 &:hover{
                     color: #6f0859;
                 }
@@ -6783,7 +6783,7 @@ input.transcript-toggler{
 
 .polaroid {
   width: 330px;
-  background-color: white;
+  background-color: $complimentary-color;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   margin-bottom: 25px;
   margin-top: 25px;
@@ -6827,7 +6827,7 @@ input.transcript-toggler{
     border-radius: 5px;
     font-family: "OpenSans-Semibold", sans-serif;
     background-color: #6a0054;
-    color: $white !important;
+    color: $complimentary-color !important;
     border: 2px solid #6a0054;
 }
 
@@ -6837,7 +6837,7 @@ input.transcript-toggler{
     border-radius: 5px;
     font-family: "OpenSans-Semibold", sans-serif;
     background: #4b4852;
-    color: $white !important;
+    color: $complimentary-color !important;
     border: 2px solid #4b4852;
 }
 
@@ -6880,7 +6880,7 @@ input.transcript-toggler{
     transition: all .1s ease;
     margin-right:1px;
     &:hover{
-        background-color: $white;
+        background-color: $complimentary-color;
         color: #333333;
     }
 
@@ -6895,7 +6895,7 @@ input.transcript-toggler{
         transition: all .1s ease;
         margin-right:1px;
         &:hover{
-            background-color: $white;
+            background-color: $complimentary-color;
             color: #333333;
         }
     }
@@ -6915,10 +6915,10 @@ input.transcript-toggler{
     align-items: center;
     border: .2rem solid #912a7d;
     background-color: #912a7d;
-    color: $white;
+    color: $complimentary-color;
     transition: all .1s ease;
     &:hover{
-        background-color: $white;
+        background-color: $complimentary-color;
         color: #912a7d;
     }
 
@@ -6968,7 +6968,7 @@ input.transcript-toggler{
     align-items: center;
     border: .2rem solid #912a7d;
     background-color: #912a7d;
-    color: $white;
+    color: $complimentary-color;
     transition: all .1s ease;
     padding: 0px 7px 0px 7px;
     //margin-top: 10px;
@@ -6976,7 +6976,7 @@ input.transcript-toggler{
     width: 62px;
     margin-right: -15px;
     &:hover{
-        background-color: $white;
+        background-color: $complimentary-color;
         color: #912a7d;
     }
 
@@ -6986,10 +6986,10 @@ input.transcript-toggler{
     background-color: #713557;
     padding: 1px 5px 1px 5px;
     border-radius: 3px;
-    color: $white;
+    color: $complimentary-color;
     font-size: 15px;
     &:hover{
-        background-color: $white;
+        background-color: $complimentary-color;
         color: #912a7d;
     }
 
@@ -7027,7 +7027,7 @@ input.transcript-toggler{
     margin-right:1px;
     width: auto !important;
     &:hover{
-        background-color: $white;
+        background-color: $complimentary-color;
         color: #333333;
     }
 }
@@ -7150,14 +7150,14 @@ font-size:100%; color: $primary-theme-color;
     top: -1.15em;
     position: absolute;
     display: inline-block;
-    color: $primary-theme-color;
+    color: $complimentary-color;
     font-family: OpenSans-Bold;
     right: 1em;
     padding: 0.1em 0.3em;
     text-transform: uppercase;
     font-size: 12px;
     border-radius: 4px;
-    background-color: white;
+    background-color: $primary-theme-color;
     letter-spacing: 0.4px;
     border: 1px solid $primary-theme-color;
 }

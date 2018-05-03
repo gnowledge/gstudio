@@ -20,9 +20,11 @@
         {% endif %}
     {% endif %}
         {% if not no_prior_node_name %}
-        {% get_name_by_node_id node.prior_node as prior_node_name %}
+            {% get_name_by_node_id node.prior_node as prior_node_name %}
             {% if prior_node_name %}
                 <div class="card-legend">{{prior_node_name}}</div>
+            {% elif "Author" in node.member_of_names_list %}
+                <div class="card-legend">{% trans "My Workspace" %}</div>
             {% endif %}
         {% endif %}
         <div class="unit_header" >
@@ -67,7 +69,7 @@
                 Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
             </div>
             <div class="small-4 columns">
-                <a href="#" class="view-progress-report unit-card-analytics right" onclick="    show_my_performance($(this))" data-node-id = "{{node.pk}}" >View </a>
+                <a href="#" class="view-progress-report unit-card-analytics right" onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" >View </a>
             </div>
             </div>
         </div>
