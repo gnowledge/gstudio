@@ -16,7 +16,8 @@
     </ul>
   </div>
   <br/>
-  <hr/>
+  {% if units_cur.count > 0 %}
+  <hr/>  
     <div class="lms_explore_head_unit ">
         <p class="left"> Units </p>
     </div>
@@ -29,5 +30,5 @@
         {% endfor %}
         </ul>
       </div>
-    
+    {% endif %}
 </div>

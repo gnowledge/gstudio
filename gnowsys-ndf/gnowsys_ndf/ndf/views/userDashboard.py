@@ -51,6 +51,7 @@ gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+gst_author_name, gst_author_id = GSystemType.get_gst_name_id('Author')
 
 
 #######################################################################################################################################
@@ -757,8 +758,21 @@ def my_desk(request, group_id):
                     {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
                 },
                 'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'agency_type': {'$ne': unicode("School")},
                 'author_set': request.user.id}).sort('last_update', -1)
-
+    
+    my_workspaces = node_collection.find(
+                {'member_of': { '$in' :  [gst_author_id,gst_group._id]},
+                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                '$or': [
+                        {'agency_type': {'$eq': unicode("School")}}, 
+                        {'_type': unicode ("Author"),
+                         'created_by' : request.user.id,
+                        } 
+                    ],
+                }).sort('last_update', -1)
+    
+        
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -766,8 +780,9 @@ def my_desk(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
-                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists
+                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists,
                     # 'modules_cur': my_modules_cur
+                    'workspaces_cur' : my_workspaces,
                 },
                 context_instance=RequestContext(request)
         )
