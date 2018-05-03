@@ -28,7 +28,7 @@
         </div>
         <div class="card_section">
             <span class="card_label">
-                <i class="fa fa-book"></i>
+                <i class="fa fa-book theme-color"></i>
                 {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
@@ -41,7 +41,7 @@
             -->
             {% endcomment %}
             <span class="card_label">
-                <i class="fa fa-certificate"></i>
+                <i class="fa fa-certificate theme-color"></i>
                {% trans "Class / Grade" %} : {% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}
             </span class="card_label">
             <p class="ellipsis"></p>
