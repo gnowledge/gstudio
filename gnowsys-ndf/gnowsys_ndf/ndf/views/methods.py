@@ -5886,15 +5886,18 @@ def auto_enroll(f):
 
         ret = f(*args,**kwargs)
         if GSTUDIO_IMPLICIT_ENROLL:
+            group_id = kwargs.get("group_id", None)
             user_id = None
             request = args[0] if len(args) else None
             if request:
-                user_id = request.user.id
+                user_id = [request.user.id]
+                if GSTUDIO_BUDDY_LOGIN:
+                    user_id += Buddy.get_buddy_userids_list_within_datetime(request.user.id,
+                                         datetime.now())
             else:
                 user_id = kwargs.get("user_id", None)
                 if not user_id:
                     user_id = kwargs.get("created_by", None)
-            group_id = kwargs.get("group_id", None)
 
             if user_id and group_id:
                 add_to_author_set(group_id=group_id, user_id=user_id)
