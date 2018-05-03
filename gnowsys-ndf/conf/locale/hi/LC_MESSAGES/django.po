@@ -2814,9 +2814,9 @@ msgstr "विषय अवलोकन"
 msgid "File Statistics"
 msgstr "फाईल सांख्यिकी"
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:301
+#: gnowsys_ndf/ndf/templates/ndf/file.html:297
 msgid "Homogeneous collections of resources"
-msgstr ""
+msgstr "संसाधनों के एकरूप संग्रह, डेस्क में फाइल अपलोड करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:319
 msgid "this file is already uploaded please choose different file"
@@ -2894,7 +2894,6 @@ msgid "Filter Resources"
 msgstr "संसाधन"
 
 #: gnowsys_ndf/ndf/templates/ndf/filters.html:130
-#, fuzzy
 msgid "Add Filter"
 msgstr "फ़िल्टर लगाएँ"
 
