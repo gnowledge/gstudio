@@ -4426,7 +4426,7 @@ ul.nav_menu_1 > li > a.selected, ul.nav_menu_1 > li > a:hover {
  */
 /* line 4725, ../../../scss/_clix2017.scss */
 [class*="unit_card-"] {
-  width: 240px !important;
+  width: 250px !important;
   color: #000;
   padding: 15px;
   margin: 10px;
