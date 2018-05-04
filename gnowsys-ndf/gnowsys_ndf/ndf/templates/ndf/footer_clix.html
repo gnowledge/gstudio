@@ -50,12 +50,12 @@
                 </div>
                 <div class="small-2 columns">
                     <a href="http://www.tiss.edu/" target="_blank">
-                        <img src="/static/ndf/images/footer-svg/tiss.svg"/>
+                        <img src="/static/ndf/images/footer-svg/tiss.svg" style="margin-left:-60px;" />
                     </a>
                 </div>
                 <div class="small-3 columns">
                     <a href="http://www.mit.edu" target="_blank">
-                        <img src="/static/ndf/images/footer-svg/mit.svg" style="margin-top:50px;"/>
+                        <img src="/static/ndf/images/footer-svg/mit.svg" style="margin-top:50px; margin-left:-60px;"/>
                     </a>
                 </div>
                 {% comment %}
@@ -70,13 +70,13 @@
     <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
         <ol>
             <li>
-                <a href="{% url 'site_about' %}" style="font-size: 18px!important" target="_blank">About</a>
+                <a href="{% url 'site_about' %}" style="font-size: 15px!important; margin-left:96px;" target="_blank">About</a>
             </li>
             <li>
-                <a href="{% url 'site_credits' %}" style="font-size: 18px!important">Credits</a>
+                <a href="{% url 'site_credits' %}" style="font-size: 15px!important; margin-left:90px;">Credits</a>
             </li>
             <li>
-                <a href="{% url 'site_contact' %}" style="font-size: 18px!important" target="_blank">Contact Us</a>
+                <a href="{% url 'site_contact' %}" style="font-size: 15px!important; margin-left:64px;" target="_blank">Contact Us</a>
             </li>
         </ol>
     </div>
@@ -88,20 +88,26 @@
     <br>
     <div class="row">
         <hr>
+        <div class="small-4 columns coyright-links">
+            <p style="font-size: 9px">"Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license"</p>
+        </div>
+            <div class="small-1 columns coyright-links">
+                <img src="/static/ndf/images/Cc-by-sa_(1).svg" style="margin-left:-30px;" />
+            </div>
         <div class="small-2 columns coyright-links">
-            <a href="{% url 'site_termsofuse' %}" style="font-size: 15px!important">Terms of Use</a>
+            <a href="{% url 'site_termsofuse' %}" style="font-size: 13px!important">Terms of Use</a>
                
         </div>
         <div class="small-2 columns coyright-links">
-            <a href="{% url 'site_privacypolicy' %}" style="font-size: 15px!important">Privacy Policy</a>
+            <a href="{% url 'site_privacypolicy' %}" style="font-size: 13px!important">Privacy Policy</a>
         </div>
-        <div class="small-8 columns coyright-links">
+        <div class="small-3 columns coyright-links">
             {% comment %}
                 {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
             {% endcomment %}
-              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;font-size: 15px!important" target="_blank">Powered by Gstudio</a>
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="font-size: 13px!important;margin-left:97px;" target="_blank">Powered by Gstudio</a>
             <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 360px;margin-bottom:10px;" />
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 136px;margin-bottom:10px;" />
             </a>
         </div>
 <br> 
