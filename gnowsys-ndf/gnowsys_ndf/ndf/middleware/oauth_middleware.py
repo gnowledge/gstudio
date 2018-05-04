@@ -2,13 +2,14 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 ###############Mastodon OAUTH Dependancy##########
-from gnowsys_ndf.ndf.forms import mform
 import mastodon
 from django.contrib.auth import authenticate, login
 from mastodon import Mastodon
-from django.template.response import TemplateResponse
+from django.template.response import TemplateResponse,loader
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.contrib import messages
 ########################################
 
 
@@ -17,7 +18,7 @@ class mastodon_login(object):
        
         if request.method == 'POST':
                
-            form = mform(request.POST)
+            #form = mform(request.POST)
 
             ###GET username and password from user#####
             Username = request.POST.get('username')
@@ -141,8 +142,10 @@ class mastodon_login(object):
                 return HttpResponseRedirect( reverse('landing_page') )  
                  
             else:
-
-                return HttpResponseRedirect(reverse('login') ) 
+                error_msg_flag = "You entered wrong credentials"
+                template = loader.get_template('registration/login.html')
+                context = {'error_msg_flag':error_msg_flag} 
+                return render(request,'registration/login.html',context)
             
         else:
           

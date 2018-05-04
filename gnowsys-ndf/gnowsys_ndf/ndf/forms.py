@@ -58,8 +58,3 @@ class UserChangeform(PasswordChangeForm):
 class UserResetform(SetPasswordForm):
     new_password1 = PasswordField(label="New password")
 
-
-class mform(forms.Form):
-    Username = forms.CharField(label='username', max_length=100)
-    Password = forms.CharField(label='password', max_length=100,widget=forms.PasswordInput)
-
