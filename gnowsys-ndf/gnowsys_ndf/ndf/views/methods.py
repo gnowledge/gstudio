@@ -5889,7 +5889,7 @@ def auto_enroll(f):
             group_id = kwargs.get("group_id", None)
             user_id = None
             request = args[0] if len(args) else None
-            if request:
+            if request and isinstance(request, WSGIRequest):
                 user_id = [request.user.id]
                 if GSTUDIO_BUDDY_LOGIN:
                     user_id += Buddy.get_buddy_userids_list_within_datetime(request.user.id,
