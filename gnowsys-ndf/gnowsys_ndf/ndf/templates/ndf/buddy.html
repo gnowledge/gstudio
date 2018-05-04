@@ -681,10 +681,12 @@
               $.ajax({
                 url: "/" + '{{group_id}}' + "/course/course_analytics/" + clickedBuddyUserId,
                 type: "GET",
+                data: {"data_unit_id": "{{group_id}}"},
                 dataType: "html",
                 global: false,
                 success: function(data){
                   $.unblockUI();
+                  $('#progress_report_content').html('<H3>Loading...</H3>');
                   $('#progress_report_content').removeClass('hide');
                   $('#progress_report_content').html(data);
                 },
