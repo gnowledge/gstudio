@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.views.filehive import write_files
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups,check_is_gstaff
 
 #######################################################################################################################################
 
@@ -761,16 +761,21 @@ def my_desk(request, group_id):
                 'agency_type': {'$ne': unicode("School")},
                 'author_set': request.user.id}).sort('last_update', -1)
     
-    my_workspaces = node_collection.find(
-                {'member_of': { '$in' :  [gst_author_id,gst_group._id]},
-                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
-                '$or': [
+    query =  {'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST } }
+    
+    
+    if auth_obj.agency_type == "Teacher":
+        query.update({'member_of': { '$in' :  [gst_author_id,gst_group._id]},
+                     '$or': [
                         {'agency_type': {'$eq': unicode("School")}}, 
                         {'_type': unicode ("Author"),
                          'created_by' : request.user.id,
                         } 
-                    ],
-                }).sort('last_update', -1)
+                    ],    
+                })
+    else:
+        query.update({'agency_type': {'$eq': unicode("School")}})
+    my_workspaces = node_collection.find(query).sort('last_update', -1)
     
         
     # my_modules_cur.rewind()

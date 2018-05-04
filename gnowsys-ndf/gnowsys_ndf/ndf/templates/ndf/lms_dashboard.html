@@ -184,7 +184,6 @@
   </div>
   <hr/>
   {% get_agency_type_of_group node.pk as agency_type %}
-    {% if agency_type != "Student" %}
       <div class="small-12 columns" style="margin-left: 15px;">
         <h3> My Workspace{{workspaces_cur.count|pluralize}}</h3>
       </div>
@@ -197,7 +196,6 @@
           {% endfor %}
         </ul>
       </div>
-    {% endif %}
   {% endif %}  
 
 {% if title == "my performance" %}
