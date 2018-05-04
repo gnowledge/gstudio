@@ -34,17 +34,12 @@
 
 	<div class="small-9 medium-9 large-10 columns" style="border-left: 2px solid #713558;">
 		<div class="small-12 columns">
-			<div class="small-9 columns" style="margin-left: -14px;">
-				<h4 class="mcard-title"> {% firstof node.altnames node.name %}</h4><br/>
-				<label  style="margin-left: auto;">{% trans "Description: " %}</label> <div class="module-desc">{{node.content|default:'No description added yet.'|safe}}
-			</div>
-			<u><a class="show-more hide">Show more</a></u>
-			</div>
-
-	        <div class="small-3 columns">
+			<div class="small-9 columns" style="margin-left: -14px; width: 90%">
+				<h4 class="mcard-title"> {% firstof node.altnames node.name %}</h4>
+					<div class="small-3 columns">
 				<div>
 				{% if is_gstaff   %}
-					<span data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="orange-button right" data-options="align:left">
+					<span  style="margin-top: -30px;margin-right:-900px!important" data-dropdown="course-settings-drop" aria-controls="course-settings-drop" aria-expanded="false" class="orange-button right" data-options="align:left">
 	                    {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
 		            </span>
 		            <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1" >
@@ -86,6 +81,14 @@
 				{% endif %}
 		        </div>
 		    </div>
+				<br/>
+				<br/>
+				<label  style="margin-left: auto;">{% trans "Description: " %}</label> <div class="module-desc">{{node.content|default:'No description added yet.'|safe}}
+			</div>
+			<u><a class="show-more hide">Show more</a></u>
+			</div>
+
+	        
 		</div>
 		<div class="small-12 columns">
 	        <div class="unit_under_mod_lbl">
