@@ -68,13 +68,13 @@
     <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
         <ol>
             <li>
-                <a href="http://clix.tiss.edu/about/" style="font-size: 18px!important" target="_blank">About</a>
+                <a href="{% url 'site_about' %}" style="font-size: 18px!important" target="_blank">About</a>
             </li>
             <li>
-                <a href="#" style="font-size: 18px!important">Credits</a>
+                <a href="{% url 'site_credits' %}" style="font-size: 18px!important">Credits</a>
             </li>
             <li>
-                <a href="http://clix.tiss.edu/contact/" style="font-size: 18px!important" target="_blank">Contact Us</a>
+                <a href="{% url 'site_contact' %}" style="font-size: 18px!important" target="_blank">Contact Us</a>
             </li>
         </ol>
     </div>
@@ -87,11 +87,11 @@
     <div class="row">
         <hr>
         <div class="small-2 columns coyright-links">
-            <a href="#" style="font-size: 15px!important">Terms of Use</a>
+            <a href="{% url 'site_termsofuse' %}" style="font-size: 15px!important">Terms of Use</a>
                
         </div>
         <div class="small-2 columns coyright-links">
-            <a href="#" style="font-size: 15px!important">Privacy Policy</a>
+            <a href="{% url 'site_privacypolicy' %}" style="font-size: 15px!important">Privacy Policy</a>
         </div>
         <div class="small-8 columns coyright-links">
             {% comment %}
