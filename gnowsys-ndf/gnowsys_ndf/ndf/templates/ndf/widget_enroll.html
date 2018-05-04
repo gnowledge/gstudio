@@ -1,6 +1,9 @@
 {% load i18n %}
 {% load simple_filters %}
 {% load ndf_tags %}
+{% get_implicit_enrollment_flag as implicit_enrollment_flag %}
+{% if not implicit_enrollment_flag %}
+
 {% get_gstudio_workspace_instance as is_workspace %}
 {% get_group_object groupid as group_object %} 
 {% if module_enrollment %}
@@ -16,7 +19,6 @@
       "{% else %}"  value="Enroll &#xf234;"  title="Enroll your Buddies "
     "{% endif %}"
   "{%  endif %}" />
-
 <div id="enrollBuddiesModal-{{group_object.pk}}" class="reveal-modal medium radius" data-reveal data-alert>
     <h4 id="enrollBuddiesModalLabel">{% firstof group_object.altnames group_object.name %}
  {% if 'Group' in group_object.member_of_names_list %} {% if is_workspace %} {% trans "Enrollment Status:" %}  {% else %} {% trans "Enrollment Status:" %} {% endif %} {% endif %}  </h4><br/>
@@ -60,8 +62,6 @@
 
     <p class="close-reveal-modal">&#215;</p>
 </div>
-
-
 <script type="text/javascript">
   function enroll_user(user_id, this_group_id, module_enrollment_flag){
     module_enrollment = module_enrollment_flag.trim()
@@ -163,3 +163,4 @@
 
     })
 </script>
+{% endif %}

@@ -59,6 +59,7 @@
   </style>
 
 </head>
+
 <body>
 
     {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student' %}
@@ -89,9 +90,8 @@
 
 </body>
 
-<footer>
     {% if not no_footer %}
         {% include 'ndf/footer_clix.html' %}
     {% endif %}
-</footer>
+
 </html>

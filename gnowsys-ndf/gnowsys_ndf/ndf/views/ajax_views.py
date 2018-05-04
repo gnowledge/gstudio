@@ -6759,7 +6759,6 @@ def add_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
-
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
   context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
@@ -6781,7 +6780,6 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
   # selected_topic_list =  request.POST.getlist("coll_arr[]", '')

@@ -2217,9 +2217,12 @@ def user_access_policy(node, user):
         user_access = True
 
       else:
-        auth_obj = node_collection.one({'_type': 'Author', 'created_by': user.id})
-        if auth_obj and auth_obj.agency_type == 'Teacher':
-          user_access = True
+        auth_obj = Author.get_author_by_userid(user.id)
+        if auth_obj:
+          if auth_obj.agency_type == 'Teacher':
+            user_access = True
+          elif auth_obj.agency_type == 'Student' and GSTUDIO_IMPLICIT_ENROLL:
+            user_access = True
 
     if user_access:
       return "allow"
@@ -4241,3 +4244,19 @@ def get_profile_full_name(user_obj):
 	else:
 		full_name = "Username: " + user_obj.username  + ", ID: " + str(user_obj.pk)
 	return full_name
+
+@get_execution_time
+@register.assignment_tag
+def get_implicit_enrollment_flag():
+	return GSTUDIO_IMPLICIT_ENROLL
+
+@get_execution_time
+@register.assignment_tag
+def get_name_by_node_id(node_id):
+    if isinstance(node_id, list) and len(node_id):
+        node_id = node_id[-1]
+    node = Node.get_node_by_id(node_id)
+    if node:
+        return node.name
+    else:
+        return None
