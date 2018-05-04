@@ -6,24 +6,33 @@
 
 
 <style type="text/css">
-    .footer {
-   position: fixed;
-   left: 0;
-   bottom: 0;
-   width: 100%;
-   background-color:#f9f9f9;
-   color: #713558;
-   text-align: center;
+    html, body {
+  height: 100%;
+  margin: 0;
 }
-
-
+.content {
+  padding: 20px;
+  min-height: 100%;
+  margin: 0 auto -50px;
+}
+.footer,
+.push {
+  height: 50px;
+}
 
 </style>
 
-<h2>Fixed/Sticky Footer Example</h2>
-<p>The footer is placed at the bottom of the page.</p>
+<div class="content">
+  <h1>Sticky Footer with Negative Margin 1</h1>
+  <p><button id="add">Add Content</button></p>
+  <div class="push"></div>
+</div>
 
-<div class="footer">
+<footer class="footer">
+  
+<div class="" style="margin-top:-19px;">
+<hr>
+<div style="background-color:#71355808; margin-top:-20px;">
     <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
                 {% comment %}
           <div class="row">
@@ -41,17 +50,17 @@
           <div class="row" style="width:100%;">
                 <div class="small-3 columns">
                     <a href="http://tatatrusts.org/" target="_blank">
-                        <img src="/static/ndf/images/footer-svg/Tata Trust Source.svg" style="margin-top:45px;"/>
+                        <img src="/static/ndf/images/footer-svg/tata_trusts.svg" style="margin-top:45px;"/>
                     </a>
                 </div>
                 <div class="small-2 columns">
                     <a href="http://www.tiss.edu/" target="_blank">
-                        <img src="/static/ndf/images/footer-svg/TISS Logo EPS Colour copy.svg"/>
+                        <img src="/static/ndf/images/footer-svg/tiss.svg"/>
                     </a>
                 </div>
                 <div class="small-3 columns">
                     <a href="http://www.mit.edu" target="_blank">
-                        <img src="/static/ndf/images/footer-svg/MIT-logo-with-spelling-print-black-red-design1 copy.svg" style="margin-top:50px;"/>
+                        <img src="/static/ndf/images/footer-svg/mit.svg" style="margin-top:50px;"/>
                     </a>
                 </div>
                 {% comment %}
@@ -66,35 +75,51 @@
     <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
         <ol>
             <li>
-                <a href="http://clix.tiss.edu/about/" target="_blank">About</a>
+                <a href="{% url 'site_about' %}" style="font-size: 18px!important" target="_blank">About</a>
             </li>
             <li>
-                <a href="#">Credits</a>
+                <a href="{% url 'site_credits' %}" style="font-size: 18px!important">Credits</a>
             </li>
             <li>
-                <a href="http://clix.tiss.edu/contact/" target="_blank">Contact Us</a>
+                <a href="{% url 'site_contact' %}" style="font-size: 18px!important" target="_blank">Contact Us</a>
             </li>
         </ol>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
     <div class="row">
         <hr>
-        <div class="small-3 columns coyright-links">
-            <a href="#"><p>Terms of Use</p></a>
+        <div class="small-2 columns coyright-links">
+            <a href="{% url 'site_termsofuse' %}" style="font-size: 15px!important">Terms of Use</a>
                
         </div>
-        <div class="small-3 columns coyright-links">
-            <a href="#"><p>Privacy Policy</p></a>
+        <div class="small-2 columns coyright-links">
+            <a href="{% url 'site_privacypolicy' %}" style="font-size: 15px!important">Privacy Policy</a>
         </div>
-        <div class="small-6 columns coyright-links">
+        <div class="small-8 columns coyright-links">
             {% comment %}
                 {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
             {% endcomment %}
-              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;" target="_blank">Powered by Gstudio</a>
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;font-size: 15px!important" target="_blank">Powered by Gstudio</a>
             <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 330px;margin-bottom:10px;" />
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 360px;margin-bottom:10px;" />
             </a>
         </div>
+<br> 
+       </div>
     </div>
 </div>
+</footer>
+
+
+<script type="text/javascript">
+    $("#add").on("click", function() {
+  $("<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>").insertBefore(".push");
+});
+</script>
 
 {% endblock body_content %}
