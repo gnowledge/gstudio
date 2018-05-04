@@ -25,14 +25,24 @@ $header-link-active-color: #50c2fa;
     -webkit-transition: $prop1 1s ease, $prop2 1s ease;
 }
 
-
-html {
-    height: 100%;
+   html, body {
+  height: 100%;
+  margin: 0;
 }
+.content {
+  padding: 20px;
+  min-height: 100%;
+  margin: 0 auto -50px;
+}
+.footer,
+.push {
+  height: 50px;
+}
+
 body {
    //ackground: linear-gradient(135deg, #e5a426, #ae208c);
     background: #eefaff;
-    height: 100%;
+    min-height: 100%;
     margin: 0;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -6132,6 +6142,7 @@ ul.authoring-tab{
 }
 
 .coyright-links{
+    margin-top: -12px;
     &>a{
         transition: link-color 0.15s ease-in-out 0s,border 0.15s ease-in-out 0s;
             border-bottom: none;
