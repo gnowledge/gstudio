@@ -36,7 +36,7 @@ from gnowsys_ndf.ndf.views.forum import *
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.views.filehive import write_files
 from gnowsys_ndf.notification import models as notification
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups,check_is_gstaff
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
 
 #######################################################################################################################################
 
