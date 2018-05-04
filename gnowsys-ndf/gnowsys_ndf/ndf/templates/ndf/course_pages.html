@@ -104,6 +104,7 @@
     </div>
 
 
+
 {% else %}
     
         <div class="activity-sheet-actions">
@@ -133,7 +134,6 @@
                    {% include "ndf/asset_card.html" with url_name="view_course_page" each_asset=each first_arg=group_id second_arg=each.pk  no_asset=True if_activities=True %} 
             {% endfor %}
         </div>
-
 
 
 {% endif %}
