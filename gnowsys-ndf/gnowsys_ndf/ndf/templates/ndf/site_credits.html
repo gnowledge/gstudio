@@ -1,3 +1,9 @@
+{% extends "ndf/gbase.html" %}
+{% load i18n %}
+{% load cache %}
+{% block title %} {% trans "CLIx - About" %} {% endblock %}
+{% block body_content %}
+<div class="site-pages">
 <h2>Welcome to the CLIx Platform</h2>
 <br />
 The CLIxPlatform is a Next Generation Digital Learning Platform powered by gstudio (a Node Description Framework (NDF) based knowledge representation software architecture). It integrates OpenAssessments for assessment questions and various other learning tools, available open source and/or developed as open source tools by CLIx. &nbsp;The platform is a result of collaborative &nbsp;work between technology teams at Tata Institute of Social Sciences, Mumbai, India; Homi Bhabha Centre for Science Education, TIFR, Mumbai, India; and, Massachussets Institute of Technology, Cambrige, USA.<br />
@@ -33,3 +39,7 @@ The CLIxPlatform is a Next Generation Digital Learning Platform powered by gstud
 For further details visit:&nbsp;https://clix.tiss.edu/portfolio-item/technology-team/<br />
 <br />
 &nbsp;
+
+</div>
+
+{% endblock %}

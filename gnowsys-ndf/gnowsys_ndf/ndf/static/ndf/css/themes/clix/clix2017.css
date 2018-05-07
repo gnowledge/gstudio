@@ -7006,3 +7006,9 @@ input.transcript-toggler {
   font-size: 52px;
   cursor: pointer;
 }
+
+/* line 7191, ../../../scss/_clix2017.scss */
+.site-pages {
+  padding-left: 200px;
+  padding-right: 100px;
+}
