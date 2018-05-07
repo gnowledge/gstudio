@@ -101,8 +101,7 @@ def validate_data_dump(dump, md5, *args):
     from checksumdir import dirhash
     md5hash = dirhash(dump, 'md5')
     if md5 != md5hash:
-        print "\n MD5 NOT matching."
-        print "\nargs: ", args
+        # print "\nargs: ", args
         if args and len(args) == 4:
             proceed_without_validation = args[1]
         else:
@@ -627,7 +626,7 @@ def call_group_import(rcs_repo_path, req_log_file_path, data_restore_path, non_g
     rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
     # Following sequence is IMPORTANT
-    # restore_filehive_objects(rcs_filehives_path)
+    restore_filehive_objects(rcs_filehives_path)
     restore_node_objects(rcs_nodes_path, non_grp_root_node)
     restore_triple_objects(rcs_triples_path)
 
@@ -789,6 +788,18 @@ def restore_node(filepath, non_grp_root_node=None, data_restore_path=None, req_l
                     node_obj.content = node_json['content']
                     node_changed = True
                     log_file.write("\n New content :\n\t "+ str(node_obj.content))
+
+                if node_obj.name != node_json['name'] and node_json['name']:
+                    log_file.write("\n Old name :\n\t "+ str(node_obj.name))
+                    node_obj.name = unicode(node_json['name'])
+                    node_changed = True
+                    log_file.write("\n New name :\n\t "+ str(node_obj.name))
+
+                if node_obj.altnames != node_json['altnames'] and node_json['altnames']:
+                    log_file.write("\n Old altnames :\n\t "+ str(node_obj.altnames))
+                    node_obj.altnames = unicode(node_json['altnames'])
+                    node_changed = True
+                    log_file.write("\n New altnames :\n\t "+ str(node_obj.altnames))
 
                 log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
                 log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
