@@ -186,7 +186,50 @@ $("#btnUploadCancel").click(function() {
                         </form>
                     </div>
 {% endcomment %}
-  <br> <br>
+  <h4>Select Video:</h4>
+  {% if GSTUDIO_ELASTIC_SEARCH %}
+  <form id = "search_form"  name="video_search_form" method="POST" >
+  <div class="row columns">
+      {% get_filters_data "File" "home" as filter_dict %}
+      {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    {% csrf_token %}
+    <div class="columns small-5 large-4">
+    <select id="show_all_workspace">
+    <option value="default">--- Select Workspace ---</option>
+                {% for each_workspace in all_workspaces %}
+                <option value="{{ each_workspace.id }}">
+                  {{ each_workspace.name }}
+                </option>
+                {% endfor %}
+    </select>
+    </div>
+    <div class="columns small-5 large-4">
+    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+    </div>
+    <div class="columns small-5 large-4">
+  <button type="submit" class="tiny button" value="" id="search_button" class="checked">
+  <i class="fi-magnifying-glass"></i>
+  </button>
+  </div>
+  </div>
+  </form>
+ <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+    {% for each in files_cur %}
+
+    <li class="card-image-wrapper">
+            <img  class="gallery-image" style="" data-image-id="{{each.id}}"
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
+              "{% endif %}"
+              data-thumbnail-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
+            <figcaption style="cursor:pointer">{{each.name|truncatechars:15}}</figcaption>
+
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
   <form id = "search_form"  name="video_search_form" method="POST" >
   <div class="large-11 small-10 columns">
       {% get_filters_data "File" "home" as filter_dict %}
@@ -208,9 +251,9 @@ $("#btnUploadCancel").click(function() {
   </form>
  <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in files_cur %}
-    
+
     <li class="card-image-wrapper">
-            <img  class="gallery-image" style="" data-image-id="{{each.pk}}" 
+            <img  class="gallery-image" style="" data-image-id="{{each.pk}}"
               "{% if 'svg' in each.if_file.mime_type   %}"
               src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
               "{% else %}"
@@ -222,5 +265,6 @@ $("#btnUploadCancel").click(function() {
     </li>
     {% endfor %}
   </ul>   
+  {% endif %}
 {% include  "ndf/ImageAudioVideoFilterSearch.html" with filters="video"%}
 {% endblock %}

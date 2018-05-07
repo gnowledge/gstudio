@@ -26,6 +26,15 @@ announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "annou
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 import urllib
 from gnowsys_ndf.ndf.gstudio_es.es import *
+if GSTUDIO_ELASTIC_SEARCH:
+    q = Q('match',name=dict(query='File',type='phrase'))
+    file_gst = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+
+    q = Q('match',name=dict(query='announced_unit',type='phrase'))
+    announced_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+
+    q = Q('match',name=dict(query='base_unit',type='phrase'))
+    base_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
 
 @get_execution_time
 def videoDashboard(request, group_id):
@@ -57,29 +66,48 @@ def videoDashboard(request, group_id):
 
     if search_workspace != "default" and search_workspace != None and search_text:
         group_name, group_id = get_group_name_id(search_workspace)
+    template = "ndf/videoDashboard.html"
+    if GSTUDIO_ELASTIC_SEARCH:
+        if filter_query_dict:
+            filter_query_dict = esearch.es_filters(filter_query_dict)
 
+        q = Q('bool',must=[Q('match',type='group'),~Q('match',name='trash'),~Q('match',name='warehouse')],should=[~Q('match',member_of=announced_unit.hits[0].id),~Q('match',member_of=base_unit.hits[0].id),Q('match',author_set=request.user.id),Q('match',group_admin=request.user.id)],minimum_should_match=2)
+        all_workspaces=Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+        all_workspaces_count = all_workspaces.count()
+        strconcat1 = ""
+        for value in filter_query_dict:
+            strconcat1 = strconcat1+'eval(str("'+ value +'")),'
 
-    all_workspaces = node_collection.find(
+        if search_text:
+            q = eval("Q('bool', must=[Q('match', type='gsystem'),~Q('match', status='deleted'),Q('match', member_of=file_gst.hits[0].id),Q('match', if_file__mime_type='video'),Q('match', group_set=str(group_id)), Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"])")
+        else:
+            q = eval("Q('bool', must=[Q('match', type='gsystem'),~Q('match', status='deleted'),Q('match', member_of=file_gst.hits[0].id),Q('match', if_file__mime_type='video'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"])")
+        files_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+        files_cur_count = files_cur.count()
+        variable = RequestContext(request, {'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces[0:all_workspaces_count],'files_cur': files_cur[0:files_cur_count],'groupid':group_id,'group_id':group_id })        
+
+    else:
+        all_workspaces = node_collection.find(
                 {'_type':'Group','member_of':
                     {'$nin': [ announced_unit_gst._id,gst_base_unit_id]
                 }
                 }).sort('last_update', -1)
-    all_workspaces_count = all_workspaces.count()
-    if filter_query_dict:
-        if search_text:
-            filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
-            filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
-        else:
-            filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+        all_workspaces_count = all_workspaces.count()
+        if filter_query_dict:
+            if search_text:
+                filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+                filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
+            else:
+                filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
 
-    else:
-        if search_text:
-            filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
-            filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
         else:
-            filter_query_dict = [{'group_set': {'$all': [ObjectId(group_id)]}}]
+                if search_text:
+                    filter_query_dict.append({'group_set': {'$all': [ObjectId(group_id)]}})
+                    filter_query_dict.append({'$or':[{'content':{'$regex' : search_text, '$options' : 'i'}},{'name':{'$regex' : search_text, '$options' : 'i'}},{'altnames':{'$regex' : search_text, '$options' : 'i'}},{'tags':{'$regex' : search_text, '$options' : 'i'}}] })
+                else:
+                    filter_query_dict = [{'group_set': {'$all': [ObjectId(group_id)]}}]
 
-    files_cur = node_collection.find({
+        files_cur = node_collection.find({
                                         '$and':filter_query_dict,
                                         '_type': {'$in': ["GSystem"]},
                                         'member_of': file_gst._id,
@@ -113,8 +141,8 @@ def videoDashboard(request, group_id):
                             'mime_type': 1,
                             'if_file':1
                         }).sort("last_update", -1)
-    template = "ndf/videoDashboard.html"
-    variable = RequestContext(request, {'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces,'group_id':group_id,'groupid':group_id,'files_cur':files_cur})
+        template = "ndf/videoDashboard.html"
+        variable = RequestContext(request, {'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces,'group_id':group_id,'groupid':group_id,'files_cur':files_cur})
     return render_to_response(template, variable)
 @get_execution_time
 def getvideoThumbnail(request, group_id, _id):

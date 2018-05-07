@@ -66,6 +66,45 @@
     <div id="audios-container"></div>
     {% endcomment %}
     <h4>Select Audio: </h4>
+    {% if GSTUDIO_ELASTIC_SEARCH %}
+    <form id = "search_form"  name="audio_search_form" method="POST" >
+    <div class="row columns">
+        {% get_filters_data "File" "home" as filter_dict %}
+        {% include "ndf/filters.html" with filter_dict=filter_dict %}
+      {% csrf_token %}
+      <div class="columns small-5 large-4">
+      <select id="show_all_workspace">
+      <option value="default">--- Select Workspace ---</option>
+                  {% for each_workspace in all_workspaces %}
+                  <option value="{{ each_workspace.id }}">
+                    {{ each_workspace.name }}
+                  </option>
+                  {% endfor %}
+      </select>
+      </div>
+      <div class="columns small-5 large-4">
+      <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+      </div>
+      <div class="columns small-5 large-4">
+      <button type="submit" class="tiny button" value="" id="search_button" class="checked">
+      <i class="fi-magnifying-glass"></i>
+      </button>
+      </div>
+      </div>
+    </form>
+    <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-3" > 
+    <div class="row">
+    {% for each in audioCollection %}
+        <div class="audio_tile">
+          <div class="audio_preview">
+            <audio  controls loop  src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" > </audio>
+            <figcaption title="{{each.name}}" class="audio-caption" data-audio-id="{{each.id}}" src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" data-audio-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}">{{each.name|truncatechars:15}}</figcaption>
+          </div>
+        </div>
+    {% endfor %}
+    </div>
+   </ul>
+    {% else %}
     <form id = "search_form"  name="audio_search_form" method="POST" >
     <div class="large-11 small-10 columns">
         {% get_filters_data "File" "home" as filter_dict %}
@@ -97,6 +136,7 @@
     {% endfor %}
     </div>
   </ul>
+  {% endif %}
 <!--
      <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3" >
      <li class="card-audio-wrapper">

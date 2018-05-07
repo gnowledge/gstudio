@@ -31,7 +31,15 @@ announced_unit_gst = node_collection.one({'_type': "GSystemType", 'name': "annou
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 import urllib
 from gnowsys_ndf.ndf.gstudio_es.es import *
+if GSTUDIO_ELASTIC_SEARCH:
+    q = Q('match',name=dict(query='File',type='phrase'))
+    file_gst = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
 
+    q = Q('match',name=dict(query='announced_unit',type='phrase'))
+    announced_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+
+    q = Q('match',name=dict(query='base_unit',type='phrase'))
+    base_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
 
 @get_execution_time
 def imageDashboard(request, group_id, image_id=None,page_no=1):
@@ -65,23 +73,38 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     search_workspace = request.POST.get("search_workspace",None)
     search_text = request.POST.get("search_text",None)
 
-    if search_workspace != "default" and search_workspace != None and search_text:
+    if search_workspace != "default" and search_workspace != None:
         group_name, group_id = get_group_name_id(search_workspace)
 
-    if GSTUDIO_ELASTIC_SEARCH == "False":
-        lists = esearch.es_filters(filter_query_dict)
+    template = "ndf/ImageDashboard.html"
+    already_uploaded=request.GET.getlist('var',"")
+    if GSTUDIO_ELASTIC_SEARCH:
+        if filter_query_dict:
+            filter_query_dict = esearch.es_filters(filter_query_dict)
 
         if image_id is None:
             q = Q('match',name=dict(query='Image',type='phrase'))
-            image_ins = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-            image_ins = image_ins.execute()
+            image_ins = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
 
             if image_ins:
-                print str(image_ins.hits[0].id)
                 image_id = str(image_ins.hits[0].id)
+        q = Q('bool',must=[Q('match',type='group')],should=[~Q('match',member_of=announced_unit.hits[0].id),~Q('match',member_of=base_unit.hits[0].id)],minimum_should_match=1)
+        all_workspaces=Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+        all_workspaces_count = all_workspaces.count()
+        strconcat1 = ""
+        for value in filter_query_dict:
+            strconcat1 = strconcat1+'eval(str("'+ value +'")),'
 
+        if search_text:
+            q = eval("Q('bool', must=[Q('match', type='gsystem'),~Q('match', status='deleted'),Q('match', member_of=file_gst.hits[0].id),Q('match', if_file__mime_type='image'),Q('match', group_set=str(group_id)), Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"])")
+        else:
+            q = eval("Q('bool', must=[Q('match', type='gsystem'),~Q('match', status='deleted'),Q('match', member_of=file_gst.hits[0].id),Q('match', if_file__mime_type='image'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"])")
+        files_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+        files_cur_count = files_cur.count()
 
+        variable = RequestContext(request, {'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces[0:all_workspaces_count],'imageCollection': files_cur[0:files_cur_count],'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
     else:
+        #print "mongo running"
         if image_id is None:
             image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
             if image_ins:
@@ -140,14 +163,12 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
                                 'if_file':1
                             }).sort("last_update", -1)
         # print "file count\n\n\n",files_cur.count()
-
+        variable = RequestContext(request, {'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces,'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
         if files_cur.count() !=0:
             has_files = False
 
     # image_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
-    template = "ndf/ImageDashboard.html"
-    already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'all_workspaces_count':all_workspaces_count,'all_workspaces':all_workspaces,'imageCollection': files_cur,'already_uploaded':already_uploaded,'groupid':group_id,'group_id':group_id })
+
     return render_to_response(template, variable)
 
 @get_execution_time
