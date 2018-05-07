@@ -2777,7 +2777,6 @@ def course_filters(request, group_id):
 
 # @login_required # commented on-purpose for generating user-csvs
 @get_execution_time
-@auto_enroll
 def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
