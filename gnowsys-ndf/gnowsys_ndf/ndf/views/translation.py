@@ -37,12 +37,12 @@ def all_translations(request, group_id, node_id):
                               {
                                 'group_id': Group.get_group_name_id(group_id)[1],
                                 'groupid': Group.get_group_name_id(group_id)[1],
+                                'title': 'Translation',
                                 'nodes': all_translation_nodes,
                                 'node': node_obj,
                                 'source_node_id': node_id,
                                 'card_url_name': 'show_translation',
-                                'supported_languages': supported_languages
-                               },
+                                'supported_languages': supported_languages                               },
                               context_instance=RequestContext(request))
 
 
@@ -129,6 +129,11 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
                                         'group_id': group_id,
                                         'node_id': node_id,
                                         'lang': lang,
+                                        }),
+                                'cancel_url':reverse('show_translation', kwargs={
+                                        'group_id': group_id,
+                                        'node_id': node_id,
+                                        'lang': lang,
                                         })
                                },
                               context_instance=RequestContext(request))
@@ -184,12 +189,12 @@ def get_trans_node_list(node_list,lang):
     for each in node_list:
         each_node = get_lang_node(each,lang)
         if each_node :  
-            # trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
-            trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
+            trans_node_list.append({ObjectId(each_node._id): {"name":(each_node.altnames or each_node.name),"basenodeid":ObjectId(each)}})
+            # trans_node_list.append({ObjectId(each_node._id): {"name": each_node.name, "basenodeid":ObjectId(each)}})
         else:
             node = node_collection.one({"_id":ObjectId(each)})
-            # trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
-            trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
+            trans_node_list.append({ObjectId(node._id): {"name":(node.altnames or node.name),"basenodeid":ObjectId(node._id)}})
+            # trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
 
@@ -312,7 +317,6 @@ def get_unit_hierarchy(unit_group_obj,lang="en"):
                 for each_act in lesson.collection_set:
                     activity_dict ={}
                     activity = Node.get_node_by_id(each_act)
-                    trans_act = get_lang_node(activity._id,lang)
                     if activity:
                         trans_act = get_lang_node(activity._id,lang)
                         if trans_act:

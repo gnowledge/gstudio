@@ -6,37 +6,99 @@ from bson.json_util import dumps
 ''' -- imports from installed packages -- '''
 try:
     from bson import ObjectId
-except ImportError:  # old pymongo
+except ImportError:
     from pymongo.objectid import ObjectId
 
+from bson import json_util
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse
 from django.contrib.auth.admin import User
-# from django.shortcuts import render_to_response
-# from django.template import RequestContext
-# from django.contrib.auth.decorators import login_required
-# from django.core.urlresolvers import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, GSystem , Group  #, Node, GSystem  #, Triple
+from gnowsys_ndf.ndf.models import db_utils, query_utils
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.models import node_collection,triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
+from gnowsys_ndf.ndf.views.filehive import write_files
 
 
-gst_api_fields_dict = { "_id": 1, "name": 1, "altnames": 1, "language": 1, "content": 1, "if_file": 1, "tags": 1, "location": 1, "created_by": 1, "modified_by": 1, "contributors": 1, "legal": 1, "rating": 1, "created_at": 1, "last_update": 1, "collection_set": 1, "post_node": 1, "prior_node": 1, "access_policy": 1, "status": 1, "group_set": 1, "member_of": 1, "type_of": 1,
-    # "relation_set": 1, "attribute_set": 1, 
-}
+with open('gnowsys_ndf/gstudio_configs/api.json') as api_configs_json:
+    api_configs = json.load(api_configs_json)
 
-api_name_model_name_dict = {
-    'workspace': 'group_set',
-    'resource_type': 'member_of'
-}
+with open('gnowsys_ndf/gstudio_configs/verbose.json') as field_verbose_json:
+    field_verbose_configs = json.load(field_verbose_json)
+
+
+gst_api_fields_dict = {k: 1 for k in api_configs['fields']}
+
+api_name_model_name_dict = {v: k for v, k in field_verbose_configs.iteritems()}
+
+
+# TODO: write decorator for making JSON result OPEN API or JSON api compliance
+@csrf_exempt
+def db_schema(request, collection_name='', field_name='', field_value=''):
+    '''
+    GET /api/v2/schema
+    {"Filehives": ["Filehive"], "Triples": ["GAttribute", "GRelation"], "Buddies": ["Buddy"], "Benchmarks": ["Benchmark"], "Nodes": ["MetaType", "GSystemType", "RelationType", "AttributeType", "GSystem", "Group", "ToReduceDocs", "Author"], "Counters": ["Counter"]}
+
+    GET /api/v2/schema/Filehive
+    ["_type", "first_uploader", "if_image_dimensions", "relurl", "first_parent", "uploaded_at", "filename", "length", "if_image_size_name", "md5", "mime_type"]
+
+    # following URL will list all possible md5:
+    GET /api/v2/schema/Filehive/md5/
+    
+    # following url will return matching document:
+    GET /api/v2/schema/Filehive/md5/2bb048c86ae0aa3d0c496e00d128638bc3576f9dfe4f5aa15dc0a68088bea1c4
+    '''
+    # TODO: change logical sequence of `if` checking statements:
+    if collection_name:
+        # TODO: check for validity of collection_name.
+        # get all class names and cache them. Use this list for validation.
+        get_parameters_dict = query_dict = request.GET.dict()
+        # print "get_parameters_dict: ", get_parameters_dict
+
+        if field_value:
+            query_dict.update({field_name: field_value})
+            query_cur = query_utils.get_documents(collection_name, **query_dict)
+            # print query_cur.count()
+            # json_response = json.dumps(query_cur, cls=NodeJSONEncoder)
+            json_response = json.dumps(list(query_cur), cls=NodeJSONEncoder)
+            # print json_response
+
+        elif field_name:
+            # TODO: check for validity of field.
+            # get all possible values from DB for provided field
+            all_unique_field_values = query_utils.get_unique_values(collection_name, field_name)
+            # print all_unique_field_values
+            json_response = json.dumps(all_unique_field_values, cls=NodeJSONEncoder)
+        else:
+            json_response = json.dumps(db_utils.get_model_structure(collection_name).keys())
+
+    else:  # if no collection_name then return DB schema
+        json_response = json.dumps(db_utils.get_collection_hierarchy())
+
+    return StreamingHttpResponse(json_response)
+
+
+@csrf_exempt
+def api_create_gs(request, gst_name="Page"):
+    # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@CIET-Mix.csv" -F "content=hey, this is sample content" -F "name=Test the FAB" -F "tags=check, 1, 2, aa" -F 'user_name=administrator'  -F 'workspace=warehouse' http://172.17.0.2:8000/api/v2/create/File
+
+    # print gst_name
+    # print "===================:: ", request.POST
+    # print "===================:: ", request.POST.dict()
+    # print "===================:: ", request.FILES
+    
+    write_files(request, group_id=request.POST.get('workspace'), unique_gs_per_file=False, kwargs=request.POST.dict())
+    return HttpResponse(1)
 
 
 def api_get_gs_nodes(request):
 
     get_parameters_dict = request.GET.dict()
+
     if not get_parameters_dict:
         aggregated_dict = gst_api_fields_dict.copy()
         aggregated_dict.update(api_name_model_name_dict)
@@ -47,7 +109,7 @@ def api_get_gs_nodes(request):
                                     'Attributes': node_collection.find({'_type': 'AttributeType'}).distinct('name'),
                                     'Relations': node_collection.find({'_type': 'RelationType'}).distinct('name')
                                 }
-        return HttpResponse(json.dumps(query_parameters_dict), content_type='application/json')
+        return HttpResponse(json.dumps(query_parameters_dict, indent=4), content_type='application/json')
 
 
     # GET: api/v1/<group_id>/<files>/<nroer_team>/
@@ -167,10 +229,10 @@ def api_get_gs_nodes(request):
 
             python_cur_list_append(each_gs)
 
-        json_result = json.dumps(python_cur_list, cls=NodeJSONEncoder)
+        json_result = json.dumps(python_cur_list, cls=NodeJSONEncoder, sort_keys=True, indent=4)
 
     else:
-        json_result = dumps(all_resources)
+        json_result = dumps(all_resources, sort_keys=True, indent=4)
 
     return HttpResponse(json_result, content_type='application/json')
 
@@ -191,7 +253,9 @@ def gst_attributes(gst_name_or_id):
 
 
 def api_get_field_values(request, field_name):
-
+    '''
+    GET /api/v2/tags
+    '''
     field_name = api_name_model_name_dict.get(field_name, field_name)
     gsystem_structure_dict = GSystem.structure
     gsystem_keys = gsystem_structure_dict.keys()
@@ -215,9 +279,9 @@ def api_get_field_values(request, field_name):
             gstudio_working_gapps_mof_list = node_collection.find({'_type': 'GSystemType', 'name': {'$in': GSTUDIO_WORKING_GAPPS} }).distinct('_id')
             result_list = node_collection.find({'_type': 'GSystem', 'status': u'PUBLISHED', 'access_policy': 'PUBLIC', 'member_of': {'$in': gstudio_working_gapps_mof_list}}).distinct(field_name)
 
-        return HttpResponse(json.dumps(result_list, ensure_ascii=False, cls=NodeJSONEncoder).encode('utf16'), content_type='application/json')
+        return HttpResponse(json.dumps(result_list, ensure_ascii=False, cls=NodeJSONEncoder, sort_keys=True, indent=4).encode('utf16'), content_type='application/json')
 
     elif field_name in node_collection.find({'_type': 'AttributeType'}).distinct('name'):
-        return HttpResponse( json.dumps(node_collection.find().distinct('attribute_set.' + field_name)), content_type='application/json')
+        return HttpResponse( json.dumps(node_collection.find().distinct('attribute_set.' + field_name), sort_keys=True, indent=4), content_type='application/json')
 
     return HttpResponse(["Invalid Field"], content_type='application/json')

@@ -18,29 +18,37 @@
         {% else %}
             <img  src="/static/ndf/images/module-card.png"/></img>
         {% endif %}
-            <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
-                {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
-            </h4>
     {% get_dict_from_list_of_dicts node.attribute_set as node_attrs %}
     </div>
     <div class="card_summary">
         <div class="card_section">
-            <p class="module_brief">
-                {{node.content|safe|striptags|truncatechars:100}}
-            </p>
+        <h4 class="card_title" title="{% firstof node.altnames node.name %} ">
+            {% firstof node.altnames|truncatechars:50 node.name|truncatechars:50  %}
+        </h4>
         </div>
         <div class="card_section">
             <span class="card_label">
+                <i class="fa fa-book theme-color"></i>
                 {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
             <span class="card_label">
+                <i class="fi-list-thumbnails theme-color"></i>
                 {% trans "No. of Units" %}: {{node.collection_set|length}}
             </span class="card_label">
             <p class="ellipsis"></p>
-                <span class="card_label">
-                   {% trans "Grade" %} : {{node_attrs.educationallevel|join:', '}}
-                </span class="card_label">
+            {% comment %}
+            <!--
+            <span class="card_label">
+                {% trans "No. of Units" %}: {{node.collection_set|length}}
+            </span class="card_label">
+            <p class="ellipsis"></p>
+            -->
+            {% endcomment %}
+            <span class="card_label">
+                <i class="fa fa-certificate theme-color"></i>
+               {% trans "Class / Grade" %} : {% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}
+            </span class="card_label">
             <p class="ellipsis"></p>
                 <!-- <span class="card_label">
                     Units

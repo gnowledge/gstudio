@@ -19,7 +19,7 @@ from gnowsys_ndf.ndf.models import node_collection,triple_collection
 
 from gnowsys_ndf.ndf.views.group import CreateGroup
 from gnowsys_ndf.ndf.views.translation import get_lang_node,get_unit_hierarchy
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, create_gattribute,get_language_tuple,create_grelation, update_unit_in_modules
 from gnowsys_ndf.ndf.views.ajax_views import get_collection
 
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
@@ -97,41 +97,11 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         if educationalsubject_val and "choose" not in educationalsubject_val.lower():
             educationalsubject_at = node_collection.one({'_type': 'AttributeType', 'name': "educationalsubject"})
             create_gattribute(unit_node._id, educationalsubject_at, educationalsubject_val)
+
         # modules
         module_val = request.POST.getlist('module', [])
-        # get all modules which are parent's of this unit/group
-        parent_modules = node_collection.find({
-                '_type': 'GSystem',
-                'member_of': gst_module_id,
-                'collection_set': {'$in': [unit_id]}
-            })
-        # check for any mismatch in parent_modules and module_val
-        if parent_modules or module_val:
-            # import ipdb; ipdb.set_trace()
-            module_oid_list = [ObjectId(m) for m in module_val if m]
-            parent_modules_oid_list = [o._id for o in parent_modules]
-
-            # summing all ids to iterate over
-            oids_set = set(module_oid_list + parent_modules_oid_list)
-
-            for each_oid in oids_set:
-                if each_oid not in module_oid_list:
-                    # it is an old module existed with curent unit.
-                    # remove current node's id from it's collection_set
-                    # existing deletion
-                    each_node_obj = Node.get_node_by_id(each_oid)
-                    each_node_obj_cs = each_node_obj.collection_set
-                    each_node_obj_cs.pop(each_node_obj_cs.index(unit_id))
-                    each_node_obj.collection_set = each_node_obj_cs
-                    each_node_obj.save(group_id=group_id)
-                elif each_oid not in parent_modules_oid_list:
-                    # if this id does not exists with existing parent's id list
-                    # then add current node_id in collection_set of each_oid.
-                    # new addition
-                    each_node_obj = Node.get_node_by_id(each_oid)
-                    if unit_id not in each_node_obj.collection_set:
-                        each_node_obj.collection_set.append(unit_id)
-                        each_node_obj.save(group_id=group_id)
+        if module_val:
+            update_unit_in_modules(module_val, unit_id)
 
         if not success_flag:
             return HttpResponseRedirect(reverse('list_units', kwargs={'group_id': parent_group_id, 'groupid': parent_group_id,}))
@@ -148,14 +118,31 @@ def unit_create_edit(request, group_id, unit_group_id=None):
         unit_node.fill_group_values(group_type=group_type,tags=tags,author_set=unit_node.author_set)
         unit_node.content = content
         tab_name = request.POST.get('tab_name', '')
+        resource_name = request.POST.get('resource_name', '')
+        blog_name = request.POST.get('blog_name', '')
         section_name = request.POST.get('section_name', '')
         subsection_name = request.POST.get('subsection_name', '')
+
         if tab_name:
             unit_node['project_config'].update( {"tab_name":tab_name})
         elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
             unit_node['project_config'].update( {"tab_name":"Lessons"})
         else:
             unit_node['project_config'].update( {"tab_name":"Tab Name"})
+
+        if resource_name:
+            unit_node['project_config'].update( {"resource_name":resource_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update( {"resource_name":"Resources"})
+        else:
+            unit_node['project_config'].update( {"resource_name":"Resource Name"})
+
+        if blog_name:
+            unit_node['project_config'].update( {"blog_name":blog_name})
+        elif "base_unit" in unit_node.member_of_names_list or "announced_unit" in unit_node.member_of_names_list :
+            unit_node['project_config'].update( {"blog_name":"e-Notes"})
+        else:
+            unit_node['project_config'].update( {"blog_name":"blog Name"})
         
         if section_name:
             unit_node['project_config'].update( {"section_name":section_name})
@@ -172,7 +159,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
             unit_node['project_config'].update({"subsection_name":"Add SubSection"})
 
         unit_node.save()
-        return HttpResponseRedirect(reverse('course_about',
+        return HttpResponseRedirect(reverse('course_content',
             kwargs={'group_id': unit_node._id}))
 
 
@@ -186,15 +173,18 @@ def unit_detail(request, group_id):
 
     unit_structure = get_unit_hierarchy(unit_group_obj, request.LANGUAGE_CODE)
     # template = "ndf/unit_structure.html"
-    template = 'ndf/gevent_base.html'
+    # template = 'ndf/gevent_base.html'
+    template = 'ndf/lms.html'
 
     # print unit_structure
     req_context = RequestContext(request, {
                                 'title': 'unit_authoring',
                                 'hide_bannerpic': True,
-                                'group_id': group_id,
-                                'groupid': group_id,
+                                'group_id': unit_group_obj._id,
+                                'groupid': unit_group_obj._id,
+                                'group_name': unit_group_obj.name,
                                 'unit_obj': unit_group_obj,
+                                'group_obj': unit_group_obj,
                                 'unit_structure': json.dumps(unit_structure)
                             })
     return render_to_response(template, req_context)

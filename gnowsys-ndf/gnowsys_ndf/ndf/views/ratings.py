@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.ndf.models import get_database
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.ndf.views.methods import get_execution_time
+from gnowsys_ndf.ndf.views.methods import get_execution_time, auto_enroll
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -24,6 +24,7 @@ except ImportError:  # old pymongo
 
 @get_execution_time
 @login_required
+@auto_enroll
 def ratings(request, group_id, node_id):
 
 	rating_given = request.POST.get('rating', '')

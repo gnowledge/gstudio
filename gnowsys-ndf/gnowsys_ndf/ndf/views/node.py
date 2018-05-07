@@ -19,12 +19,13 @@ from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_NOTE_CREATE_POINTS
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem, Buddy, Counter  #, Triple
 from gnowsys_ndf.ndf.models import node_collection
 
-from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required
+from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, auto_enroll
 from gnowsys_ndf.ndf.views.methods import get_language_tuple, create_gattribute, create_thread_for_node
 
 ''' -- common db queries -- '''
 
 @login_required
+@auto_enroll
 @get_execution_time
 def node_create_edit(request,
                     group_id=None,

@@ -1,8 +1,7 @@
 {% load get_course_filters get_username user_access_policy get_group_object get_gstudio_workspace_instance from ndf_tags %}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% load simple_filters %}
-
-
+{% load i18n %}
 
 {% get_group_object group_id as group_object %}
 {% get_gstudio_workspace_instance as is_workspace %}
@@ -17,8 +16,9 @@
       <input type="hidden"  class="title-for-filters" value="notebook_lms">
         {% get_course_filters group_id "notebook_lms" as filter_dict %}
       {% endif %}
-    {% include "ndf/filters.html" with filter_dict=filter_dict %}
-
+        <div class="filter-position">
+            {% include "ndf/filters.html" with filter_dict=filter_dict %}
+        </div>
 </div>
 
 
@@ -87,22 +87,21 @@
         </div>
     </div> -->
     <div class="notebook-body">
-        <div class="small-12 medium-4 large-3 columns notebook-index panel">
+        <div class="small-12 medium-4 large-3 columns notebook-index panel" style="display: block;">
             <div class="row">
                 <div class="small-12 columns">
-                    <span style="font-size: 17px;margin: 7px 19px;display: inline-block;color: #6153AE;"> {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %} Blogs {% else %} Notes {% endif %}</span>
                     {% if request.user.is_authenticated %}
                     {% comment %}
                     <a href="#" data-reveal-id="newNoteModal" class="button expand radius" style="margin: 0em 0em 1em;"><i class="fi-plus"></i> </a>
                     {% endcomment %}
 
+                    {% comment %}
                     <a {% if user_access_priv == "allow" %} class=" add-note-btn button radius" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fi-plus"></i></a>
+                    {% endcomment %}
 
+                    <a {% if user_access_priv == "allow" %} class="add-note-btn" title="Create Note" {% else %} class="bef-note-btn button radius user_not_enrolled" {% endif %}><i class="fa fa-pencil"></i> {% trans "New" %} {% if 'Group' in group_object.member_of_names_list and 'base_unit' not in group_object.member_of_names_list %} {% trans "Blog" %} {% else %} {% trans "Note" %} {% endif %}</a>
                     {# <a class="add-note-btn"><i class="fi-plus"></i></a> #}
-<!--                     <a href="{% url 'page_create_edit' group_name %}?course_event_id={{group_id}}&blog_type=True" class="button radius" style="padding: 3px 11px;border-radius: 100%;float: right;margin: 5px 5px 8px 0px;border: 1px solid #6153AE;background: #fff;font-size: 23px;color: #6153AE;"><i class="fi-plus"></i></a>
-
-
- -->                    {% endif %}
+                    {% endif %}
                 </div>
             </div>
 
@@ -195,12 +194,12 @@
 
             </div>
         </div>
-            <div class="small-12 medium-7 large-7 columns note-page panel">
+            <div class="small-12 medium-7 large-7 columns note-page panel" style="display: block;">
                {% if node %}
                    {% include "ndf/note_page.html" %}
                {% endif %}
            </div>
-        </div>
+    </div>
 </div>
 
 {# {% include "ndf/add_new_note.html" %} #}

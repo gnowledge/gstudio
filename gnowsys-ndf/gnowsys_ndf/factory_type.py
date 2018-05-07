@@ -113,7 +113,7 @@ factory_attribute_types = [{'start_time':{'gsystem_names_list':['QuizItem','Foru
                            {'educationalsubject':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit', 'Module'],
                                                   'data_type':'basestring',
                                                   'meta_type':'factory_types'}},
-                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit', 'Module'],
+                           {'educationallevel':{'gsystem_names_list':['Quiz','Topic','File','Page','Pandora_video', 'E-Book','Jsmol', 'base_unit','Asset', 'announced_unit', 'Module', 'Author'],
                                                 'data_type':'list',
                                                 'meta_type':'factory_types'}},
                            {'educationalalignment':{'gsystem_names_list':['Quiz','QuizItem','Topic','File','Page','NUSSD Course', 'Pandora_video', 'Theme', 'E-Book','Jsmol','Asset'],

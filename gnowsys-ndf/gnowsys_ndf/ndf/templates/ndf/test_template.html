@@ -4,261 +4,122 @@
 {% load ndf_tags %}
 {% block body_content %}
 
-        <div class="small-12 columns curriculum_creator">
-            <h3>Create Curriculum Tree Structure</h3>
-            <div id="curriculum_tree"></div>
-            <!--button type="button" class="blue-white-button" id="create_first_branch">Create Branch</button-->
-        </div>
 
-        <div id="addBranch" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        	<div>
-	            <h4>Create new Section</h4>
-	            <label>Section Name
-	                <input type="text" placeholder="Section Name" name="branch_name"/>
-	            </label>
-	            <label>Section Description
-	                <textarea type="text" placeholder="Section description" ></textarea>
-	            </label>
-	            <br />
-	            <button type="button" class="blue-white-button create_branch">
-	                Add
-	            </button>
-	            <button type="button" class="blue-white-button delete_branch" style="display: none;">
-	                Delete
-	            </button>
-        	</div>
-      		<a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    	</div>
+<style type="text/css">
+    html, body {
+  height: 100%;
+  margin: 0;
+}
+.content {
+  padding: 20px;
+  min-height: 100%;
+  margin: 0 auto -50px;
+}
+.footer,
+.push {
+  height: 50px;
+}
 
-    	    <div id="addDivision" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-        <div>
-            <h4>Create new Sub-Section</h4>
-            <label>Sub-Section Name
-                <input type="text" placeholder="Sub-Section Name" />
-            </label>
-            <label>Topic
-                <input type="checkbox" name="isLeafNode" value="leafNode"/>
-            </label>
-            <br />
+</style>
 
-            <br />
-            <button type="button" class="blue-white-button create_division">
-                Add
-            </button>
-            <button type="button" class="blue-white-button delete_division" style="display: none;">
-                Delete
-            </button>
-        </div>
-      <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+<div class="content">
+  <h1>Sticky Footer with Negative Margin 1</h1>
+  <p><button id="add">Add Content</button></p>
+  <div class="push"></div>
+</div>
+
+<footer class="footer">
+  
+<div class="" style="margin-top:-19px;">
+<hr>
+<div style="background-color:#71355808; margin-top:-20px;">
+    <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
+                {% comment %}
+          <div class="row">
+                <div class="small-2 columns">
+                    <p>Seeded By</p>
+                </div>
+                <div class="small-4 columns">
+                    <p>Founding Partner</p>
+                </div>
+                <div class="small-3 columns" style="margin-left:-36px;">
+                    <p>Technology Partner</p>
+                </div>
+                 </div>
+                {% endcomment %}
+          <div class="row" style="width:100%;">
+                <div class="small-3 columns">
+                    <a href="http://tatatrusts.org/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/tata_trusts.svg" style="margin-top:45px;"/>
+                    </a>
+                </div>
+                <div class="small-2 columns">
+                    <a href="http://www.tiss.edu/" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/tiss.svg"/>
+                    </a>
+                </div>
+                <div class="small-3 columns">
+                    <a href="http://www.mit.edu" target="_blank">
+                        <img src="/static/ndf/images/footer-svg/mit.svg" style="margin-top:50px;"/>
+                    </a>
+                </div>
+                {% comment %}
+                <div class="small-2 columns">
+                    <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                        <img src="/static/ndf/images/logos/tifr.png"/>
+                    </a>
+                </div>
+                {% endcomment %}
+          </div>
     </div>
+    <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
+        <ol>
+            <li>
+                <a href="{% url 'site_about' %}" style="font-size: 18px!important" target="_blank">About</a>
+            </li>
+            <li>
+                <a href="{% url 'site_credits' %}" style="font-size: 18px!important">Credits</a>
+            </li>
+            <li>
+                <a href="{% url 'site_contact' %}" style="font-size: 18px!important" target="_blank">Contact Us</a>
+            </li>
+        </ol>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <hr>
+        <div class="small-2 columns coyright-links">
+            <a href="{% url 'site_termsofuse' %}" style="font-size: 15px!important">Terms of Use</a>
+               
+        </div>
+        <div class="small-2 columns coyright-links">
+            <a href="{% url 'site_privacypolicy' %}" style="font-size: 15px!important">Privacy Policy</a>
+        </div>
+        <div class="small-8 columns coyright-links">
+            {% comment %}
+                {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
+            {% endcomment %}
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="margin-left:319px;font-size: 15px!important" target="_blank">Powered by Gstudio</a>
+            <a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 360px;margin-bottom:10px;" />
+            </a>
+        </div>
+<br> 
+       </div>
+    </div>
+</div>
+</footer>
 
 
-
-
-
-
-
-
-
-
-
-
-    <script type="text/javascript">
-        // var baseTree = [{
-        //     name: 'Add Branch',
-        //     class: 'create_branch',
-        //     type: 'branch'
-        // }];
-        var baseTree = [{"name":"asdasd","description":"","is_open":true,"children":[{"name":"asdasd","isLeaf":false,"is_open":true,"children":[{"name":"Add Division","class":"create_division"}]},{"name":"Add Division","class":"create_division"}]},{"name":"Add Branch","class":"create_branch"}];
-        var selectedBranch;
-        var selectedDivison;
-        var isUpdateOperation;
-
-        $(function(){
-
-            $(document).foundation({
-                accordion: {
-                    multi_expand: true
-                }
-            });
-
-            //Describing the tree and the render method
-            $('#curriculum_tree').tree({
-                data: baseTree,
-                onCreateLi: function(node, $li) {
-                    var leafClass = node.isLeaf ? 'leaf_node' : '';
-
-                    // Classes are there for only butons
-                    //var delete_edit_icons = '<button type="button" class="edit_icon_button right">Edit</button><button type="button" class="delete_icon_button right">Delete</button>'
-                    var delete_edit_icons = '';
-                    switch (node.class) {
-                        case 'create_branch':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch '+leafClass+'">Add Section</button>');
-                        break;
-                        case 'create_division':
-                            $li.find('.jqtree-title').html('<button type="button" class="button-small blue-white-button add_branch'+leafClass+'">Add Sub-Section</button>');
-                        break;
-                        default:
-                            $li.find('.jqtree-element').addClass(leafClass);
-                            $li.find('.jqtree-title').append(delete_edit_icons);
-                        break
-                    }
-                }
-            });
-
-            var curriculum_tree = $('#curriculum_tree');
-
-            // Binding to the tree to capture different events
-            curriculum_tree.bind('tree.click', function(event) {
-                var node = event.node;
-                switch(node.class) {
-                    case 'create_branch' :
-                        selectedBranch = node;
-                        isUpdateOperation = false;
-                        $('#addBranch').find('input, textarea').val('');
-                        $('#addBranch').find('.create_branch').html('Add Section');
-                        $('#addBranch').find('.delete_branch').hide();
-                        $('#addBranch').foundation('reveal', 'open');
-                    break;
-                    case 'create_division' :
-                        selectedDivison = node;
-                        isUpdateOperation = false;
-                        $('#addDivision').find('input').val('');
-                        $('#addDivision').find('input[type="checkbox"]').attr('checked', false);
-                        $('#addDivision').find('label').show();
-                        $('#addDivision').find('.create_division').html('Add Sub-Section');
-                        $('#addDivision').find('.delete_division').hide();
-                        $('#addDivision').find('.add_asset').hide();
-                        $('#addDivision').foundation('reveal', 'open');
-                    break;
-                    default:
-                        isUpdateOperation = true;
-                        if(node.type === 'branch') {
-                            selectedBranch = node;
-                            $('#addBranch').find('.create_branch').html('Update Section');
-                            $('#addBranch').find('.delete_branch').show();
-                            $('#addBranch').find('input').val(node.name);
-                            $('#addBranch').find('textarea').val(node.description);
-                            $('#addBranch').foundation('reveal', 'open');
-                        } else if(node.type === 'division') {
-                            selectedDivison = node;
-                            if(node.isLeaf) {
-                                $('#addDivision').find('.add_asset').show();
-                            }
-                            $('#addDivision').find('.create_division').html('Update Sub-Section');
-                            $('#addDivision').find('.delete_division').show();
-                            $('#addDivision').find('input[type=text][name="branch_name"]').val(node.name);
-                            //$('#addDivision').find('input[type=checkbox]').val(node.isLeaf);
-                            $('#addDivision').find('input[type=checkbox][name="isLeafNode"]').closest('label').hide();
-                            $('#addDivision').foundation('reveal', 'open');
-                        }
-                    break;
-                }
-            })
-
-            // Creation of the Branch
-            $('.create_branch').on('click', function(){
-                var branchName = $('#addBranch input').val();
-                if (branchName === '') {
-                    alert('Branch name cannot be empty');
-                    return;
-                }
-                $('.close-reveal-modal').trigger('click');
-                var branchDesc = $('#addBranch textarea').val();
-                var branchObj = {
-                    name: branchName,
-                    description: branchDesc,
-                    type: 'branch'
-                };
-                if (!isUpdateOperation) { //Create operation
-
-                    var createdBranch = curriculum_tree.tree('addNodeBefore', branchObj, selectedBranch);
-                    curriculum_tree.tree('appendNode', {
-                        name: 'Add Division',
-                        class: 'create_division'
-                    }, createdBranch);
-                    curriculum_tree.tree('openNode', createdBranch);
-                } else { //Update operation
-
-                    curriculum_tree.tree(
-                        'updateNode',
-                        selectedBranch,
-                        {
-                            name: branchName,
-                            description: branchDesc,
-                            type: 'branch',
-                            children: selectedBranch.children
-                        }
-                    );
-                }
-            })
-
-            // Creation of the Division
-            $('.create_division').on('click', function(){
-                var divisionName = $('#addDivision input').val();
-                if (divisionName === '') {
-                    alert('Division name cannot be empty.');
-                    return;
-                }
-                $('.close-reveal-modal').trigger('click');
-                var isLeafNode = $('#addDivision [name="isLeafNode"]').is(":checked");
-                var divisionObj = {
-                    name: divisionName,
-                    isLeaf: isLeafNode,
-                    type: 'division'
-                };
-                if (!isUpdateOperation) { //Create operation
-                    var createdDivision = curriculum_tree.tree('addNodeBefore', divisionObj, selectedDivison);
-
-                    if (!isLeafNode) {
-                        curriculum_tree.tree('appendNode', {
-                            name: 'Add Division',
-                            class: 'create_division'
-                        }, createdDivision);
-                    };
-
-                    curriculum_tree.tree('openNode', createdDivision);
-                } else {
-                    curriculum_tree.tree(
-                        'updateNode',
-                        selectedDivison,
-                        {
-                            name: divisionName,
-                            type: 'division',
-                            children: selectedDivison.children
-                        }
-                    );
-                }
-
-            })
-
-            //Deleting a Branch
-            $('.delete_branch').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedBranch);
-            });
-
-            //Deleting a division
-            $('.delete_division').on('click', function(){
-                $('.close-reveal-modal').trigger('click');
-                curriculum_tree.tree('removeNode', selectedDivison);
-            });
-
-            // Save and close handled
-            $('#save_page').on('click', function(){
-                // You can save the json from here and redirect.
-                var jsonTree = curriculum_tree.tree('toJson');
-                console.log(jsonTree);
-                jsonTree = jsonTree.replace(',{"name":"Add Division","class":"create_division"}', '');
-                jsonTree = jsonTree.replace('{"name":"Add Division","class":"create_division"}', '');
-                /*jsonTree = jsonTree.replace('{"name":"Add Division","class":"create_division"}', '');*/
-                jsonTree = jsonTree.replace(',{"name":"Add Branch","class":"create_branch"}', '');
-                console.log(jsonTree);
-                console.log(JSON.parse(jsonTree));
-            })
-        })
-    </script>
-
-
+<script type="text/javascript">
+    $("#add").on("click", function() {
+  $("<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>").insertBefore(".push");
+});
+</script>
 
 {% endblock body_content %}

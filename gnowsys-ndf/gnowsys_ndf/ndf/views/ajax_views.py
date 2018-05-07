@@ -6650,7 +6650,7 @@ def get_group_resources(request, group_id, res_type="Page"):
     card_class = 'activity-page'
 
     try:
-        res_query = {'_type': 'GSystem'}
+        res_query = {'_type': 'GSystem', 'group_set': ObjectId(group_id)}
         except_collection_set_of_id = request.GET.get('except_collection_set_of_id', None)
 
         except_collection_set_of_obj = Node.get_node_by_id(except_collection_set_of_id)
@@ -6759,7 +6759,6 @@ def add_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
-
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
   context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
@@ -6769,7 +6768,7 @@ def add_asset(request,group_id):
   if node_obj:
     context_variables.update({'asset_obj': node_obj,'topic_nodes':topic_nodes})
     context_variables.update({'edit': True})
-  context_variables.update({'group_obj': group_obj,'title':title,'topic_nodes':topic_nodes})
+  context_variables.update({'group_obj': group_obj, 'group_name': group_obj.name, 'title':title,'topic_nodes':topic_nodes})
   return render_to_response("ndf/add_asset.html",RequestContext(request,
     context_variables))
 
@@ -6781,7 +6780,6 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-  
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
   # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
@@ -6815,21 +6813,29 @@ def create_edit_asset(request,group_id):
     if selected_topic:
       # selected_topic_list = map(ObjectId,selected_topic_list)
       create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
-    
     if "asset@asset" not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       asset_obj.tags.append(u'asset@asset')
 
-    if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+
+    # if is_raw_material and u'raw@material' not in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+    if is_raw_material and u'raw@material' not in asset_obj.tags:
+      # marking Asset as RawMaterial
       asset_obj.tags.append(u'raw@material')
-    elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+
+    elif not is_raw_material and u'raw@material' in asset_obj.tags:
+      # elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
+      # UNmarking Asset as RawMaterial
       asset_obj.tags.remove(u'raw@material')
     
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
     
-    if "announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list and "gallery" == title:
+    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list) and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
+    if "announced_unit" in group_obj.member_of_names_list  and title == None or title == "None":
+      asset_obj.tags.append(u'asset@asset')
+
     if asset_lang:
       language = get_language_tuple(asset_lang)
       asset_obj.language = language

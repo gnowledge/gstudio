@@ -51,6 +51,7 @@ gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+gst_author_name, gst_author_id = GSystemType.get_gst_name_id('Author')
 
 
 #######################################################################################################################################
@@ -549,6 +550,8 @@ def group_dashboard(request, group_id):
         context_instance=RequestContext(request)
     )
 
+@get_execution_time
+@login_required
 def user_profile(request, group_id):
     from django.contrib.auth.models import User
 
@@ -607,6 +610,8 @@ def user_profile(request, group_id):
 				context_instance=RequestContext(request)
 		)
 
+@get_execution_time
+@login_required
 def user_data_profile(request, group_id):
 	user = {}
 	auth_node = node_collection.one({"_id":ObjectId(group_id)})
@@ -616,6 +621,7 @@ def user_data_profile(request, group_id):
 	user['node'] = auth_node
 	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
 
+@get_execution_time
 def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
@@ -675,7 +681,8 @@ def upload_prof_pic(request, group_id):
         else:
             return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
-
+@get_execution_time
+@login_required
 def my_courses(request, group_id):
 
     if str(request.user) == 'AnonymousUser':
@@ -703,6 +710,8 @@ def my_courses(request, group_id):
                 context_instance=RequestContext(request)
         )
 
+@get_execution_time
+@login_required
 def my_desk(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -741,14 +750,34 @@ def my_desk(request, group_id):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    
+    list_of_attr = ['first_name', 'last_name', 'enrollment_code', 'organization_name', 'educationallevel']
+    auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
+    auth_profile_exists = all(v not in ['', None] for v in auth_attr.values())
     my_units = node_collection.find(
                 {'member_of':
                     {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
                 },
                 'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                'agency_type': {'$ne': unicode("School")},
                 'author_set': request.user.id}).sort('last_update', -1)
-
+    
+    query =  {'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST } }
+    
+    
+    if auth_obj.agency_type == "Teacher":
+        query.update({'member_of': { '$in' :  [gst_author_id,gst_group._id]},
+                     '$or': [
+                        {'agency_type': {'$eq': unicode("School")}}, 
+                        {'_type': unicode ("Author"),
+                         'created_by' : request.user.id,
+                        } 
+                    ],    
+                })
+    else:
+        query.update({'agency_type': {'$eq': unicode("School")}})
+    my_workspaces = node_collection.find(query).sort('last_update', -1)
+    
+        
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -756,11 +785,15 @@ def my_desk(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
+                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists,
                     # 'modules_cur': my_modules_cur
+                    'workspaces_cur' : my_workspaces,
                 },
                 context_instance=RequestContext(request)
         )
 
+@get_execution_time
+@login_required
 def my_groups(request, group_id,page_no=1):
 
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -802,7 +835,8 @@ def my_groups(request, group_id,page_no=1):
                 context_instance=RequestContext(request)
         )
 
-
+@get_execution_time
+@login_required
 def my_dashboard(request, group_id):
 
     user_id = eval(group_id)
@@ -843,7 +877,8 @@ def my_dashboard(request, group_id):
                 context_instance=RequestContext(request)
         )
 
-
+@get_execution_time
+@login_required
 def my_performance(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -860,6 +895,9 @@ def my_performance(request, group_id):
 
     auth_id = auth_obj._id
     title = 'my performance'
+    list_of_attr = ['first_name', 'last_name', 'enrollment_code', 'organization_name', 'educationallevel']
+    auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
+    auth_profile_exists = all(v not in ['', None] for v in auth_attr.values())
 
     my_units = node_collection.find(
                 {'member_of':
@@ -873,7 +911,53 @@ def my_performance(request, group_id):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
+                    'auth_attr': auth_attr, 'auth_profile_exists': auth_profile_exists
                     # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)
         )
+
+@get_execution_time
+@login_required
+def save_profile(request, user_id):
+    from django.contrib.auth.models import User
+
+    user_dict = {'success': True, 'message': 'Profile updated successfully.'}
+    request_variables = {}
+    auth_attr = None
+    auth_obj = Author.get_author_by_userid(int(user_id))
+    try:
+        auth_id = auth_obj._id
+        if request.method == "POST":
+
+            first_name = request.POST.get('first_name', None)
+            last_name = request.POST.get('last_name', None)
+            educationallevel = request.POST.get('educationallevel', None)
+            organization_name = request.POST.get('organization_name', None)
+            enrollment_code = request.POST.get('enrollment_code', None)
+            request_variables.update({'first_name': first_name, 'last_name': last_name,
+                'educationallevel': educationallevel, 'organization_name': organization_name,
+                'enrollment_code': enrollment_code})
+
+            for at_name, ga_val in request_variables.items():
+                if ga_val:
+                    create_gattribute(auth_id, at_name, ga_val)
+
+            auth_attr = request_variables
+
+    except AttributeError as no_auth:
+        # user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+    except Exception as no_auth:
+        # user_dict.update({'success': False, 'message': 'Something went wrong. Please try again later.'})
+        pass
+    # return HttpResponse(json.dumps(user_dict))
+
+
+    return render_to_response('ndf/widget_user_profile.html',
+                {
+                    'auth_attr': auth_attr, #'user_dict': json.dumps(user_dict)
+                },
+                context_instance=RequestContext(request)
+        )
+

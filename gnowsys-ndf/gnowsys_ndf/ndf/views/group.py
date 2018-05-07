@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
+from django.core.cache import cache
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -25,10 +27,10 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_GROUP_AGENCY_TYPES, GSTUDIO_NROER_MENU, GSTUDIO_NROER_MENU_MAPPINGS,GSTUDIO_FILE_UPLOAD_FORM, GSTUDIO_FILE_UPLOAD_POINTS, GSTUDIO_BUDDY_LOGIN
 from gnowsys_ndf.settings import GSTUDIO_MODERATING_GROUP_ALTNAMES, GSTUDIO_PROGRAM_EVENT_MOD_GROUP_ALTNAMES, GSTUDIO_COURSE_EVENT_MOD_GROUP_ALTNAMES
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
-from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection
+from gnowsys_ndf.ndf.models import NodeJSONEncoder, node_collection, triple_collection, Counter, counter_collection, Node
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.views.asset import *
-
+from gnowsys_ndf.ndf.views.utils import add_to_list
 # from gnowsys_ndf.ndf.models import GSystemType, GSystem, Group, Triple
 # from gnowsys_ndf.ndf.models import c
 from gnowsys_ndf.ndf.views.ajax_views import *
@@ -1623,8 +1625,17 @@ class EventGroupCreateEditHandler(View):
         nodes_list = []
         spl_group_type = sg_type
         logo_img_node = None
+        gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
+        modules = GSystem.query_list('home', 'Module', request.user.id)
         # spl_group_type = request.GET.get('sg_type','')
         # print "\n\n spl_group_type", spl_group_type
+        title = action + ' ' + spl_group_type
+        context_variables = {
+            'title': title, 'modules': modules,
+            'spl_group_type': spl_group_type,
+            'groupid': group_id, 'group_id': group_id,
+            'nodes_list': nodes_list
+          }
 
         if action == "edit":  # to edit existing group
 
@@ -1642,6 +1653,14 @@ class EventGroupCreateEditHandler(View):
                 logo_img_node = grel_dict.get("grel_node")
                 grel_id = grel_dict.get("grel_id")
 
+            # get all modules which are parent's of this unit/group
+            parent_modules = node_collection.find({
+                    '_type': 'GSystem',
+                    'member_of': gst_module_id,
+                    'collection_set': {'$in': [group_id]}
+                })
+            context_variables.update({'module_val_list': [str(pm._id) for pm in parent_modules],
+                'node': group_obj, 'logo_img_node':logo_img_node})
 
             # as group edit will not have provision to change name field.
             # there is no need to send nodes_list while group edit.
@@ -1653,21 +1672,11 @@ class EventGroupCreateEditHandler(View):
             # making list of group names (to check uniqueness of the group):
             nodes_list = [str(g_obj.name.strip().lower()) for g_obj in available_nodes]
 
-        title = action + ' ' + spl_group_type
+            context_variables.update({'nodes_list': nodes_list})
 
         # In the case of need, we can simply replace:
         # "ndf/create_group.html" with "ndf/edit_group.html"
-        return render_to_response("ndf/create_event_group.html",
-                                    {
-                                        'node': group_obj, 'title': title,
-                                        'nodes_list': nodes_list,
-                                        'spl_group_type': spl_group_type,
-                                        # 'course_node_id': course_node_id,
-                                        'groupid': group_id, 'group_id': group_id,
-                                        'logo_img_node':logo_img_node
-
-                                        # 'appId':app._id, # 'is_auth_node':is_auth_node
-                                      }, context_instance=RequestContext(request))
+        return render_to_response("ndf/create_event_group.html",RequestContext(request, context_variables))
     # --- END of get() ---
 
     @method_decorator(login_required)
@@ -1720,6 +1729,11 @@ class EventGroupCreateEditHandler(View):
                 if parent_group_obj.project_config:
                     group_obj.project_config = parent_group_obj.project_config
                 group_obj.save()
+                # modules
+                module_val = request.POST.getlist('module', [])
+                if module_val:
+                    update_unit_in_modules(module_val, group_obj._id)
+
                 if node_id:
                     return HttpResponseRedirect(reverse('groupchange',
                      kwargs={'group_id': group_name}))
@@ -2015,11 +2029,11 @@ def group(request, group_id, app_id=None, agency_type=None):
 @login_required
 @get_execution_time
 def populate_list_of_members():
-	members = User.objects.all()
-	memList = []
-	for mem in members:
-		memList.append(mem.username)
-	return memList
+    members = User.objects.all()
+    memList = []
+    for mem in members:
+        memList.append(mem.username)
+    return memList
 
 
 @login_required
@@ -2074,7 +2088,7 @@ def group_dashboard(request, group_id=None):
         "CourseEventGroup" in group_obj.member_of_names_list or
         "BaseCourseGroup" in group_obj.member_of_names_list or 
         "announced_unit" in group_obj.member_of_names_list):
-        return HttpResponseRedirect(reverse('course_about', kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
 
     if group_obj and group_obj.post_node:
         # subgroups_cur = node_collection.find({'_id': {'$in': group_obj.post_node}, 'edit_policy': {'$ne': "EDITABLE_MODERATED"},
@@ -2257,7 +2271,7 @@ def group_dashboard(request, group_id=None):
   default_template = "ndf/groupdashboard.html"
   # print "\n\n blog_pages.count------",blog_pages
   if alternate_template:
-    return HttpResponseRedirect( reverse('course_about', kwargs={"group_id": group_id}) )
+    return HttpResponseRedirect( reverse('course_content', kwargs={"group_id": group_id}) )
   else:
     return render_to_response([alternate_template,default_template] ,{'node': group_obj, 'groupid':group_id,
                                                        'group_id':group_id, 'user':request.user,
@@ -2572,6 +2586,85 @@ def switch_group(request,group_id,node_id):
   except Exception as e:
     print "Exception in switch_group: "+str(e)
     return HttpResponse("Failure")
+
+
+@login_required
+@get_execution_time
+def cross_publish(request, group_id):
+    try:
+        group_id = ObjectId(group_id)
+    except:
+        group_name, group_id = get_group_name_id(group_id)
+
+    gstaff_access = check_is_gstaff(group_id,request.user)
+    if request.method == "GET":
+        query = {'_type': 'Group', 'status': u'PUBLISHED',
+                '$or': [
+                            {'access_policy': u"PUBLIC"},
+                            {'$and': [
+                                    {'access_policy': u"PRIVATE"},
+                                    {'created_by': request.user.id}
+                                ]
+                            }
+                        ],
+                }
+
+        if gstaff_access:
+            query.update({'group_type': {'$in': [u'PUBLIC', u'PRIVATE']}})
+        else:
+            query.update({'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST},
+                        'group_type': u'PUBLIC'})
+        group_cur = node_collection.find(query,{ '_id': 1, 'name':1, 'altnames':1}).sort('last_update', -1)
+        response_dict = {'groups_cur': group_cur}
+        return HttpResponse(json.dumps(list(group_cur), cls=NodeJSONEncoder))
+    elif request.method == "POST":
+        success_flag = True
+        target_group_ids = request.POST.getlist("group_ids[]", None)
+
+        # print "\ntarget_group_ids:", target_group_ids
+        if target_group_ids:
+            try:
+                target_group_ids = map(ObjectId, list(set(target_group_ids)))
+                node_id = request.POST.get("node_id", None)
+                # remove_from_curr_grp_flag = eval((request.POST.get("remove_from_curr_grp_flag", "False")).title())
+                publish_children = eval(request.POST.get("publishChildren", False))
+                node_obj = Node.get_node_by_id(node_id)
+                if publish_children:
+                    # Exclusive action for Asset
+                    if u"Asset" in node_obj.member_of_names_list:
+                        asset_content_tr = node_obj.get_relation("has_assetcontent")
+                        child_ids = [each_tr.right_subject for each_tr in asset_content_tr]
+                    else:
+                        child_ids = node_obj.collection_set
+                    child_cur =  node_collection.find({'_id': {'$in': child_ids}})
+                    for each_child in child_cur:
+                        # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                        each_child.group_set = target_group_ids
+                        each_child.save()
+                    # if remove_from_curr_grp_flag:
+                    #     for each_child in child_cur:
+                    #         # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                    #         each_child.group_set = filter(lambda x: x != group_id, target_group_ids)
+                    #         each_child.save()
+                    # else:
+                    #     for each_child in child_cur:
+                    #         # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
+                    #         each_child.group_set = target_group_ids
+                    #         each_child.save()
+                # node_obj.group_set = add_to_list(node_obj.group_set, target_group_ids)
+                node_obj.group_set = target_group_ids
+                # if remove_from_curr_grp_flag:
+                #     node_obj.group_set = filter(lambda x: x != group_id, target_group_ids)
+                # else:
+                #     node_obj.group_set = target_group_ids
+                node_obj.save()
+            except Exception as e:
+                print "\nError occurred in Cross-Publish", e
+                success_flag = False
+                pass
+
+        return HttpResponse(json.dumps(target_group_ids, cls=NodeJSONEncoder))
+
 
 
 @login_required
@@ -2911,3 +3004,54 @@ def upload_using_save_file(request,group_id):
     else:
         return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':fileobj_id}))
     # return HttpResponseRedirect(url_name)
+
+
+
+@get_execution_time
+def notification_details(request,group_id):
+    from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
+    group_name, group_id = get_group_name_id(group_id)
+    group_obj = node_collection.find({'group_set':ObjectId(group_id)}).sort('last_update', -1)
+    files_list = []
+    user_activity = []
+    user_activity_append_temp=user_activity.append
+    files_list_append_temp=files_list.append
+    for each in group_obj:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          if each.if_file.mime_type:
+            activity =  'created in asset'
+          else:
+            activity =  'created ' + each.name 
+              
+        else:
+          rel_set_dict = get_dict_from_list_of_dicts(each.relation_set)
+          if each.if_file.mime_type and 'assetcontent_of' in rel_set_dict:
+            node_obj = Node.get_node_by_id(each.relation_set[0]['assetcontent_of'][0])
+            if node_obj:
+                activity =  'uploaded ' + each.name +  ' in ' + node_obj.name
+          elif 'Asset' in each.member_of_names_list and 'asset@gallery' in each.tags:
+            activity =  'Modified Folder ' + each.name
+          elif 'Asset' in each.member_of_names_list and 'raw@material' in each.tags:
+            activity =  'Modified Resource ' + each.name
+          elif 'Asset' in each.member_of_names_list:
+            activity =  'Modified Asset ' + each.name
+          else:
+            activity =  'Modified ' + each.name
+
+      else:
+        activity =  'created ' + each.name
+      if each._type == 'Group':
+        user_activity_append_temp(each)
+      each.update({'activity':activity})
+      files_list_append_temp(each)
+    
+
+    return render_to_response('ndf/notification_detail.html',
+                                { 
+                                  'group_id': group_id,
+                                  'groupid':group_id,
+                                  'activity_list' : files_list
+                                },
+                                context_instance = RequestContext(request)
+                            )

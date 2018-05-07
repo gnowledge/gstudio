@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load multiply from simple_filters %}
-{% load get_group_object from ndf_tags %}
+{% load get_group_object check_is_gstaff get_site_variables from ndf_tags %}
+{% get_site_variables as site %}
 
 <style type="text/css">
   .reveal-modal{
@@ -15,257 +16,254 @@
 
 </style>
 <script src="/static/ndf/bower_components/d3/d3.js"></script>
-<div class="user-analytics-data">
-<div class="pre-analytics-msg-div text-center hide">
-   {% trans "Your analytics is loading. Please wait." %} 
-</div>
-<div class="row">
-<h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
-    <a class="close-reveal-modal" aria-label="Close">Close [&#215;]</a>
-  <div class="small-6 columns">
-    <h3 class="inner left-space"> {{ group_name }} </h3><br/>
-    <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
+<script src="/static/ndf/bower_components/pdfmake/build/pdfmake.min.js"></script>
+<script src="/static/ndf/bower_components/html2canvas/build/html2canvas.js"></script>
+<script src="/static/ndf/bower_components/pdfmake/build/vfs_fonts.js"></script>
+{% check_is_gstaff group_id request.user as gstaff_access %}
+<a class="download-report download-progress-report-{{group_id|slugify}}-{{request.user.pk}}" ><i class="fi-archive"></i> Download </a><br/>
+<div class="user-analytics-data" id="user-pr-report-{{group_id|slugify}}-{{request.user.pk}}">
+  <div class="pre-analytics-msg-div text-center hide">
+     {% trans "Your analytics is loading. Please wait." %} 
   </div>
-  <div class="small-6 columns">
-    <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
-  </div>
-</div><hr/>
-<div class="course-overview-container">
-  <div class="row collapse course-overview">
-    <div class="columns small-12 medium-6">
-      <div class="course-status">
-        {% comment %}
-        <h4>{% trans "Course status" %}</h4>
-        {% endcomment %}
-        <div class="row">
+
+  <div class="row">
+    <h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
+    <div class="small-6 columns">
+      <h3 class="inner left-space"> {% firstof group_obj.altnames group_obj.name%} </h3><br/>
+      <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
+    </div>
+    <div class="small-6 columns">
+      <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
+    </div>
+  </div><hr/>
+  <div class="row course-overview-container">
+    <div class="collapse course-overview">
+      <div class="columns small-12 medium-6">
+        <div class="course-status">
+          {% comment %}
+          <h4>{% trans "Course status" %}</h4>
+          {% endcomment %}
           <div class="small-12 columns">
-            <span class="course-metric-heading">{{level1_lbl}}</span>
-            <h4 class="module_progress_stmt">{{level1_progress_stmt}}</h4>
-            <div class="progress success round">
-              <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
+            <div class="small-12 columns">
+              <span class="course-metric-heading">{{level1_lbl}}</span>
+              <h4 class="module_progress_stmt">{{level1_progress_stmt}}</h4>
+              <div class="progress success round">
+                <div class="module_progress_meter meter" style="width:{{level1_progress_meter}}%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="small-12 columns">
+            <div class="small-12 columns">
+              <span class="course-metric-heading">{{level2_lbl}}</span>
+              <h4 class='units_progress_stmt'>{{level2_progress_stmt}}</h4>
+              <div class="progress success round">
+                <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
+              </div>
+
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="small-12 columns">
-            <span class="course-metric-heading">{{level2_lbl}}</span>
-            <h4 class='units_progress_stmt'>{{level2_progress_stmt}}</h4>
-            <div class="progress success round">
-              <div class="unit_progress_meter meter" style="width:{{level2_progress_meter}}%"></div>
+      </div>
+      <div class="columns small-12 medium-6 points-data">
+        <div class="course-points-breakup">
+        </div>
+      </div>
+    </div>
+    <div class="analytics-panels">
+      {% with group_obj.member_of_names_list as group_member_of_name %}
+      <!-- Assessment/Quiz Performance and Inetractions -->
+      <div class="small-12 columns">
+        <div class="columns small-12 medium-6">
+          <div class="course-quiz-perf course-section">
+            <span class="course-section-heading inner">Assessment Performance  </span>
+            {% if "announced_unit" in group_member_of_name %}
+              <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
+              <span class="course-section-icon">
+                <i class="fa fa-question-circle"></i>
+              </span>
+            {% endif %}
+
+            <!-- Total Questions and Correct Answers -->
+            <div class="small-12 columns">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{% trans "Total Questions" %}</span>
+                <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
+              </div>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Correct Answers</span>
+                <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
+              </div>
             </div>
 
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="columns small-12 medium-6 points-data">
-      <div class="course-points-breakup">
-      </div>
-    </div>
-  </div>
-  <div class="analytics-panels">
-  {% with group_obj.member_of_names_list as group_member_of_name %}
-  <!-- Assessment/Quiz Performance and Inetractions -->
-  <div class="row">
-    <div class="columns small-12 medium-6">
-      <div class="course-quiz-perf course-section">
-        <span class="course-section-heading inner">Assessment Performance  </span>
-          {% if "announced_unit" in group_member_of_name %}
-          <a class="fetch-assessment-analytics inner left-space" data-user-id={{user_id}}>Refresh</a>
-          <span class="course-section-icon">
-            <i class="fa fa-question-circle"></i>
-          </span>
-        </span>
-        {% endif %}
-        <!-- Total Questions and Correct Answers -->
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Total Questions" %}</span>
-            <span class="course-metric-count total_quizitems">{{total_quizitems}}</span>
-          </div>
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Correct Answers</span>
-            <span class="course-metric-count correct-count correct_attempted_quizitems">{{correct_attempted_quizitems}}</span>
-          </div>
-        </div>
-
-        <!-- Attempted Questions and Incorrect Answers -->
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Attempted</span>
-            <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
-          </div>
-
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
-            <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
-          </div>
-        </div>
-
-        {% if "announced_unit" in group_member_of_name %}
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
-            <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
-          </div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    <div class="columns small-12 medium-6">
-      <div class="course-interactions course-section">
-        <span class="course-section-heading">{% trans "Interactions" %}
-        <span class="course-section-icon">
-          <i class="fa fa-comments"></i>
-        </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Comments By me" %}</span>
-            <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
-          </div>
-          {% comment %}
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Avg Rating for my comments</span>
-            <span class="course-metric-count">
-              <div class="row avg_rating_for_my_cmnts">
-                <div class="columns small-6 medium-6 rating-stars"></div>
-                <div class="columns small-6 medium-6 rating_lbl left"></div>
-              </div>
-            </span>
-          </div>
-          {% endcomment %}
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">{% trans "Comments for me" %}</span>
-            <span class="course-metric-count cmnts_rcvd_by_user">{{cmnts_rcvd_by_user}}</span>
-          </div>
-          {% comment %}
-          <div class="columns small-12 medium-6">
-            <span class="course-metric-heading">Avg Ratings to others</span>
-            <span class="course-metric-count">
-              <div class="row avg_rating_to_othr_cmnts_by_me">
-                <div class="columns small-6 medium-6 rating-stars"></div>
-                <div class="columns small-6 medium-6 rating_lbl left"></div>
+            <!-- Attempted Questions and Incorrect Answers -->
+            <div class="small-12 columns">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Attempted</span>
+                <span class="course-metric-count attempted_quizitems">{{attempted_quizitems}}</span>
               </div>
 
-            </span>
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{% trans "Incorrect answers" %}</span>
+                <span class="course-metric-count incorrect-count incorrect_attempted_quizitems">{{incorrect_attempted_quizitems}}</span>
+              </div>
+            </div>
+
+            {% if "announced_unit" in group_member_of_name %}
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{% trans "Not Attempted" %}</span>
+                <span class="course-metric-count unattempted_quizitems">{{unattempted_quizitems}}</span>
+              </div>
+            </div>
+            {% endif %}
           </div>
-          {% endcomment %}
+        </div>
+        <div class="columns small-12 medium-6">
+          <div class="course-interactions course-section">
+            <span class="course-section-heading">{% trans "Interactions" %}
+            <span class="course-section-icon">
+              <i class="fa fa-comments"></i>
+            </span>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{% trans "Comments By me" %}</span>
+                <span class="course-metric-count total_cmnts_by_user">{{total_cmnts_by_user}}</span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Rating for my comments</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_for_my_cmnts">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+                </span>
+              </div>
+              {% endcomment %}
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">{% trans "Comments for me" %}</span>
+                <span class="course-metric-count cmnts_rcvd_by_user">{{cmnts_rcvd_by_user}}</span>
+              </div>
+              {% comment %}
+              <div class="columns small-12 medium-6">
+                <span class="course-metric-heading">Avg Ratings to others</span>
+                <span class="course-metric-count">
+                  <div class="row avg_rating_to_othr_cmnts_by_me">
+                    <div class="columns small-6 medium-6 rating-stars"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left"></div>
+                  </div>
+
+                </span>
+              </div>
+              {% endcomment %}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  {% endwith %}
+      {% endwith %}
 
-  <!-- Gallery and Notes -->
-  <div class="row">
-    <div class="columns small-12 medium-6">
+      <!-- Gallery and Notes -->
+      <div class="small-12 columns">
+        <div class="columns small-12 medium-6">
 
-      <div class="course-gallery-uploads course-section">
-        <span class="course-section-heading">{% trans "Gallery uploads" %}
-          <span class="course-section-icon">
-            <i class="fa fa-file-image-o"></i>
-          </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
-            <span class="course-metric-count user_files">{{user_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits gained" %}</span>
-            <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
-            <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
-            <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments on other files" %}</span>
-            <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
-            <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12">
-            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
-            <span class="course-metric-count">
-              <div class="row total_rating_rcvd_on_files">
-                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
-                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_files}}</div>
-              </div>
+          <div class="course-gallery-uploads course-section">
+            <span class="course-section-heading">{% trans "Gallery uploads" %}
+              <span class="course-section-icon">
+                <i class="fa fa-file-image-o"></i>
+              </span>
             </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="columns small-12 medium-6">
-
-      <div class="course-notes course-section">
-        <span class="course-section-heading">{% trans "Note Making" %}
-        <span class="course-section-icon">
-          <i class="fi-clipboard-pencil"></i>
-        </span>
-        </span>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Notes Written" %}</span>
-            <span class="course-metric-count user_notes">{{user_notes}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Views Gained" %}</span>
-            <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
-            <span class="course-metric-count cmts_on_user_notes">{{cmts_on_user_notes}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
-            <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
-          </div>
-          <div class="columns small-12 medium-4">
-            <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
-            <span class="course-metric-count commented_on_others_notes">{{commented_on_others_notes}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="columns small-12">
-            <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
-            <span class="course-metric-count">
-              <div class="row total_rating_rcvd_on_notes">
-                <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_notes|multiply:16}}px;{% if total_rating_rcvd_on_notes > 0 %}display:block !important;{% endif %}"></div>
-                <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_notes}}</div>
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Files Uploaded" %}</span>
+                <span class="course-metric-count user_files">{{user_files}}</span>
               </div>
-            </span>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Visits gained" %}</span>
+                <span class="course-metric-count other_viewing_my_files">{{other_viewing_my_files}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+                <span class="course-metric-count cmts_on_user_files">{{cmts_on_user_files}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Visits on Other Files" %}</span>
+                <span class="course-metric-count total_files_viewed_by_user">{{total_files_viewed_by_user}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Comments on other files" %}</span>
+                <span class="course-metric-count commented_on_others_files">{{commented_on_others_files}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Comments by unique users" %}</span>
+                <span class="course-metric-count unique_users_commented_on_user_files">{{unique_users_commented_on_user_files}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12">
+                <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_files">
+                    <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_files|multiply:16}}px; {% if total_rating_rcvd_on_files > 0 %}display:block !important;{% endif %}"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_files}}</div>
+                  </div>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+        <div class="columns small-12 medium-6">
+
+          <div class="course-notes course-section">
+            <span class="course-section-heading">{% trans "Note Making" %}
+            <span class="course-section-icon">
+              <i class="fi-clipboard-pencil"></i>
+            </span>
+            </span>
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Notes Written" %}</span>
+                <span class="course-metric-count user_notes">{{user_notes}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Views Gained" %}</span>
+                <span class="course-metric-count others_reading_my_notes">{{others_reading_my_notes}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Comments recieved" %}</span>
+                <span class="course-metric-count cmts_on_user_notes">{{cmts_on_user_notes}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Visits on Other Notes" %}</span>
+                <span class="course-metric-count total_notes_read_by_user">{{total_notes_read_by_user}}</span>
+              </div>
+              <div class="columns small-12 medium-4">
+                <span class="course-metric-heading">{% trans "Comments on other notes" %}</span>
+                <span class="course-metric-count commented_on_others_notes">{{commented_on_others_notes}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="columns small-12">
+                <span class="course-metric-heading">{% trans "Avg. Rating Awarded" %}</span>
+                <span class="course-metric-count">
+                  <div class="row total_rating_rcvd_on_notes">
+                    <div class="columns small-6 medium-6 rating-stars" style="width:{{total_rating_rcvd_on_notes|multiply:16}}px;{% if total_rating_rcvd_on_notes > 0 %}display:block !important;{% endif %}"></div>
+                    <div class="columns small-6 medium-6 rating_lbl left">{{total_rating_rcvd_on_notes}}</div>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>  
       </div>
     </div>  
   </div>
-  </div>  
-  {% comment %}
-  <div class="course-warning course-section">
-      <h5>WAITING FOR YOUR FEEDBACK</h5>
-      <div><i class="fa fa-sign-in"></i><a>3 New notes added</a></div>
-      <div><i class="fa fa-file-image-o"></i><a>36 New files uploaded in the gallery</a></div>
-      <div></div>
-  </div>
-  {% endcomment %}
-</div>
 </div>
 
 
@@ -376,6 +374,7 @@
     }
 
     $(document).ready(function() {
+      {% if users_points %}
       var points_dict = {{users_points_breakup|safe}}
         if({{users_points}} >  0){
           if (points_dict.hasOwnProperty('Total')){
@@ -391,6 +390,7 @@
         else{
           $(".course-points-breakup").html("<i>No points to show Pie Chart</i>")
         }
+      {% endif %}
       })
 
     $(document).on('click', '.fetch-assessment-analytics', function(){
@@ -407,7 +407,6 @@
         dataType: "json",
 
         success: function(data){
-          console.log(data)
           $(".correct_attempted_quizitems").html(data['correct_attempted_quizitems'])
           $(".unattempted_quizitems").html(data['unattempted_quizitems'])
           // $(".visited_quizitems").html(data['visited_quizitems'])
@@ -418,6 +417,46 @@
         },
       });//end of ajax
 
+    })
+
+    $(document).on('click',".download-progress-report-{{group_id|slugify}}-{{request.user.pk}}",function(){
+      var datetime_val = get_current_datetime_val()
+      html2canvas(document.getElementById('user-pr-report-{{group_id|slugify}}-{{request.user.pk}}'), {
+            onrendered: function (canvas) {
+                var data = canvas.toDataURL();
+                var docDefinition = {
+                    pageMargins: [ 30, 30, 30, 30 ],
+                    content: [{
+                        image: data,
+                        width: 400,
+                        margin: [30, 30, 0, 0],
+                    }],
+
+                header: {
+                        margin: 10,
+                        columns: [
+                            {
+                                image: header_logo_dataURL,
+                                width: 120,
+                                margin: [30, 20, 0, 0],
+                            },
+                        ]
+                },
+
+                footer: function() {
+                    return { 
+                        columns: [ 
+                            "{{site.GSTUDIO_DOC_FOOTER_TEXT}}", 
+                            { text: datetime_val, alignment: 'right' }
+                        ],
+                        margin: [10, 0]
+                    };
+                },
+
+                };
+                pdfMake.createPdf(docDefinition).download("{% firstof group_obj.altnames|slugify group_obj.name|slugify %}-{{username}}.pdf");
+            }
+      });
     })
 
 </script>

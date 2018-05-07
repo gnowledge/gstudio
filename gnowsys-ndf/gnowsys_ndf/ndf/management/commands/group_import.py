@@ -66,7 +66,6 @@ def call_exit():
     print "\n Exiting..."
     os._exit(0)
 
-
 # def get_file_path_with_id(node_id):
 #     file_name = (node_id + '.json')
     
@@ -508,7 +507,6 @@ def restore_counter_objects(rcs_counters_path):
 #     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
 #     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
 #     rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
-
 #     # Following sequence is IMPORTANT
 #     # restore_filehive_objects(rcs_filehives_path)
 #     restore_node_objects(rcs_nodes_path, log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
@@ -630,7 +628,7 @@ def restore_node(filepath, non_grp_root_node=None):
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
-    print node_json
+    # print node_json
     proceed_flag = True
     try:
         if non_grp_root_node:
@@ -729,6 +727,19 @@ def restore_node(filepath, non_grp_root_node=None):
                 #     node_obj.collection_set = node_json['collection_set']
                 #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 #     node_changed = True
+
+
+                if node_obj.name != node_json['name'] and node_json['name']:
+                    log_file.write("\n Old name :\n\t "+ str(node_obj.name))
+                    node_obj.name = node_json['name']
+                    node_changed = True
+                    log_file.write("\n New name :\n\t "+ str(node_obj.name))
+
+                if node_obj.altnames != node_json['altnames'] and node_json['altnames']:
+                    log_file.write("\n Old altnames :\n\t "+ str(node_obj.altnames))
+                    node_obj.altnames = node_json['altnames']
+                    node_changed = True
+                    log_file.write("\n New altnames :\n\t "+ str(node_obj.altnames))
 
                 if node_obj.content != node_json['content'] and node_json['content']:
                     log_file.write("\n Old content :\n\t "+ str(node_obj.content))
@@ -829,6 +840,13 @@ def get_json_file(filepath):
         # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
+
+        if not os.path.exists(fp):
+            if filepath.endswith(',v'):
+                fp = fp.split(',')[0]
+            elif filepath.endswith('.json'):
+                fp = filepath
+        # print "fp: ", fp
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_json_values(obj_as_json)

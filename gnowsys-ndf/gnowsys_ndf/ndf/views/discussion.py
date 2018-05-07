@@ -29,7 +29,7 @@ from gnowsys_ndf.ndf.views.moderation import create_moderator_task
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_thread_node, get_relation_value
-from gnowsys_ndf.ndf.views.methods import create_thread_for_node
+from gnowsys_ndf.ndf.views.methods import create_thread_for_node, auto_enroll
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
@@ -61,6 +61,7 @@ reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 
 @login_required
 @get_execution_time
+@auto_enroll
 def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
@@ -137,6 +138,7 @@ def create_discussion(request, group_id, node_id):
 # to add discussion replie
 @get_execution_time
 @login_required
+@auto_enroll
 def discussion_reply(request, group_id, node_id):
     try:
         group_id = ObjectId(group_id)
@@ -416,6 +418,7 @@ def discussion_delete_reply(request, group_id, node_id):
 
 
 @login_required
+@auto_enroll
 @get_execution_time
 def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 

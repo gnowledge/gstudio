@@ -23,6 +23,7 @@
 {% block body_content %}
 	{% url 'auth_password_reset' as auth_pwd_reset_url %}
 	{% url 'registration_register' as register_url %}
+	
 	<div class="login-page row">
 		<div class="login-page-opacity"></div>
         <div class="login-page-form">
@@ -49,9 +50,14 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="small-12 columns end">
-						{{ form.username }}
-					</div>
+                    <div class="small-10 columns">
+                        {{ form.username }}
+                    </div>
+                    {% if USERNAME_SELECTION_WIDGET %}
+                    <div class="small-2 columns">
+                    {% include "registration/user-icon-to-name.html"  %}
+                    </div>
+                    {% endif %}
 				</div>
 
 				<!-- Password -->

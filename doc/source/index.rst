@@ -11,9 +11,22 @@ Welcome to gstudio's documentation
        
     gstudio-index
     api
-    counter-analytics-notes
-    dump-restore
     quiz
+    cookie
+    curation-workflow
+    dump-restore
+    CounterAnalyticsNotes
+    data-collection
+    implementation/implementing-interactives
+    implementation/gstudio-lite
+    gStudio-clix-integration
+
+
+.. toctree::
+    :hidden:
+
+.. counter-analytics-notes.rst
+
 
 .. :titlesonly:
 .. :name: mastertoc

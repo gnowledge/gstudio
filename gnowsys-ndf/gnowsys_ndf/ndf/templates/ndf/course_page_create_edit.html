@@ -92,11 +92,14 @@
                     </div>
                 </div>
                 <br/>
-
                 <div class="row">
-                    <input type="submit" class="orange-button" style="margin-left: 21px" class="saveActivityPage" value="Save">
-                    <a href="{{cancel_activity_url}}" class="orange-button cancel-page-create">{% trans "Cancel" %}</a>
+                    <input type="submit" class="button-save-new" class="saveActivityPage" value="Save">
+                    <button class="button-cancel-new">
+                        <a href="{{cancel_activity_url}}" class="cancel-page-create">{% trans "Cancel" %}</a>
+                    </button>
                 </div>
+                <br/>
+                <br/>
             </div>
         </form>
     </div>
@@ -115,14 +118,14 @@
         node_altname_val = $(".node_altname").val()
         updateAllTags();
         var tagsStr = tags.value.trim();
-        if(checkTag())
-        {
-            $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
-        }
-        else if(tagsStr)
-        {
-            event.preventDefault();
-        }
+        // if(checkTag())
+        // {
+        //     $("input:hidden[name='tags']").val($("input:hidden[name='tags']").val() + ', ' + tagsStr);
+        // }
+        // else if(tagsStr)
+        // {
+        //     event.preventDefault();
+        // }
         if(!node_name_val){
             event.preventDefault()
             $('.node_name_empty').removeClass('hide')

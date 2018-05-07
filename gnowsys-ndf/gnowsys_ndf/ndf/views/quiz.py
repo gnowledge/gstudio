@@ -60,11 +60,15 @@ def quiz(request, group_id):
     group_name = group_obj.name
     title = gst_quiz.name
     quiz_nodes = node_collection.find({'member_of': gst_quiz._id, 'group_set': ObjectId(group_id)}).sort('last_update', -1)
-    gst_quiz_item_ids = [gst_quiz_item._id]
-    if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
-        gst_quiz_item_ids = [gst_quiz_item_event._id]
-    quiz_item_nodes = node_collection.find({'member_of': {'$in': gst_quiz_item_ids},
+    # gst_quiz_item_ids = [gst_quiz_item._id]
+    quiz_item_nodes = node_collection.find({'member_of': gst_quiz_item._id,
      'group_set': ObjectId(group_id)}).sort('last_update', -1)
+
+    if "CourseEventGroup" in group_obj.member_of_names_list or "announced_unit" in group_obj.member_of_names_list:
+        # gst_quiz_item_ids = [gst_quiz_item_event._id]
+        # if not quiz_item_nodes.count():
+        quiz_item_nodes = node_collection.find({'member_of': {'$in': [gst_quiz_item_event._id, gst_quiz_item._id]},
+             'group_set': ObjectId(group_id)}).sort('last_update', -1)
     supported_languages = ['Hindi', 'Telugu']
 
     print "\nquiz_item_nodes: ", quiz_item_nodes.count()
@@ -126,8 +130,8 @@ def created_trans_node(request, group_id, node_id, trans_node_id, language):
 
 
 def get_quiz_item_name_content(request):
-    question_name = request.POST.get('quiz_item_name','Untitled')
-    question_content = request.POST.get('content_org','Untitled')
+    question_name = request.POST.get('quiz_item_name',u'Untitled')
+    question_content = request.POST.get('content_org',u'Untitled')
     question_name = question_name.split(' ')
     question_name = question_name[:4]
     question_name = ' '.join(question_name)

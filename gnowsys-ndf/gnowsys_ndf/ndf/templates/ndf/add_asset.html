@@ -19,6 +19,7 @@
 
    <!--  Interaction settings modal ends  -->
    {% include 'ndf/widget_user_access_modal.html' %}
+   {% include 'ndf/widget_cross_publish.html' with node=asset_obj %}
 
 <div class="overlay-head">
    <div class="row">
@@ -26,32 +27,26 @@
             <a class="right close-reveal-modal reveal-modal-overlay" aria-label="Close">&#215;</a>
         {% endif %}
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
-                  {% if title == "asset_detail" %}
+                 
                 <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "raw_material_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
-                {% if title == "asset_gallery_detail" %}
-                <a href="javascript:window.history.back();"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
-                {% endif %}
             </div>
 
             <div class="small-7 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
-
             </div>
             
-            <div class="small-4 columns right margin-right-50">       
+            <div class="small-4 columns">       
+            <!-- <div class="small-4 columns right margin-right-50"> -->
             {% if not edit and asset_obj %}
                 {% if asset_obj.created_by == request.user.id or is_gstaff  %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button right">
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                     </span>
                     <ul id="asset-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                        <li> <a class="createAsset" data-asset_id='{{asset_obj.pk}}'>{% trans "Edit" %}</a></li>
-                        <li><a class="edit-metadata">{% trans "Metadata" %}</a></li>
+                        <li><a class="createAsset" data-asset_id='{{asset_obj.pk}}'><i class="fa fa-pencil" aria-hidden="true"></i> {% trans "Edit" %}</a></li>
+                        <li><a class="edit-metadata"><i class="fa fa-info-circle" aria-hidden="true"></i> {% trans "Metadata" %}</a></li>
+                        <li><a class="crossPublish-{{asset_obj.pk}}" title="Click to Cross Publish all files "><i class="fa fa-external-link" aria-hidden="true"></i> {% trans "Cross Publish" %}</a></li>
                         <li>
                         {% if not asset_content_list.grel_id %}
                             <a class="delete-asset">
@@ -71,16 +66,22 @@
             {% endif%}
             
             {% if request.user.is_authenticated  %}            
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <!--
                 {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
                 {% if 'asset@gallery' in asset_obj.tags  %}
-                <button   type="button" class="orange-button add-asset-content right" ><i class="fi-plus"></i> {% trans "Add File" %}</button>
+                <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
                 {% if title == 'asset_detail'  %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
-
+                -->
+            {% endif %}
+            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
+            
+                <button type="button" class="orange-button delete-asset-content right"  title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             {% endif %}
             </div>
    </div>
@@ -104,8 +105,8 @@
     </div>
     <br/>
 
-    <div class="row ">
-      {{asset_obj.content|safe|striptags}} 
+    <div class="row "><label>Description: </label>
+      <p>{{asset_obj.content|default:'No description added yet.'|safe|striptags}}</p>
     </div>
             
 
@@ -126,7 +127,7 @@
                 {% endif     %}
                 </h3>
 
-                <button type="button" class="blue-white-button save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+                <!--<button type="button" class="button-hollow-grey save-asset right" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>-->
             {% endif %}
 <div class="row">
     <hr/>
@@ -172,29 +173,6 @@
             </label>
             </div>
         </div>
-        <div class="row">
-            <div class="small-12 medium-10 large-10 columns">
-            <label>  
-                     {% if asset_obj %}
-                        {% get_relation_value asset_obj.pk "teaches"  as selected_topic %}
-                    {%  endif %}                                  
-                    choose topic :
-                        <select name="topics" id = "topic_list" multiple style="height:100px">
-                                <option value="">--- Select Topic ---</option>
-                                {% for each in topic_nodes %}
-                                 {% if each.pk == selected_topic.grel_node.0.pk %}
-                                    <option selected value="{{ each.pk }}" data-topic="{{ each.pk }}">
-                                        {{each.name}}
-                                {% else %}
-                                    <option value="{{ each.pk }}" data-topic="{{ each.pk }}">
-                                        {{each.name}}
-                                {%  endif %}
-                                {% endfor %}
-                        </select>
-            </label>
-            </div>
-        </div>
-
 
         <div class="row">
             <div class="small-12 medium-10 large-10 columns">
@@ -225,17 +203,18 @@
                 </label>
             </div>
         </div>
+        {% if title ==  "asset_list"  %}
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                {% if not "announced_unit" in group_obj.member_of_names_list %}
-                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Raw Material" %}
+                <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Resource"  %} 
 
                 </label>
-                {% endif %}
             </div>
         </div>
-
+        {% endif %}
+        <button type="button" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+        
         {% endif %}
 
     <div class="asset-content-area"{% if not asset_obj %} style="display:none"{% endif %}>
@@ -273,16 +252,12 @@
 
 
         <div class="row">
-            {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
-            <div class="row">
-                <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
-            </div>
-            {% endif %}
+            
 
         <div class="row listing-row">
             {% for each in asset_content_list.grel_node %}
                 {% if  'DELETED' != each.status %}
-                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_id second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
+                   {% include "ndf/asset_card.html" with url_name="assetcontent_detail" each_asset=each first_arg=group_name second_arg=asset_obj.pk third_arg=each.pk no_asset=True %} 
                 {% endif %}
             {% endfor %}
         </div>
@@ -321,8 +296,8 @@
 
     $(".add-asset-content").click(function(){
         $(".asset-content-area").removeClass("hide")
+        $(".delete-asset-content").css('display', 'none')
         $(".name-desc-asset-cont-area").removeClass("hide")
-
         $("#upload_asset").removeClass("hide")
     });
 
@@ -428,10 +403,6 @@
         updateAllTags();
         coll_arr = []
         
-        $('#topic_list :selected').each(function(){
-            coll_arr.push($(this).val())
-        });
-        
         var tagsStr = tags.value.trim();
         if(checkTag())
         {
@@ -449,7 +420,6 @@
         sel_tags = $("input:hidden[name='tags']").val()
         sel_asset_lang =  $('#asset_lang').find(':selected').attr('data-sub-code');
         asset_name = $("#asset-name").val();
-        topic_list = $("#topic_list").find(':selected').attr('data-topic');
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
@@ -465,7 +435,6 @@
                         "sel_tags":sel_tags,
                         "sel_asset_lang":sel_asset_lang,
                         "is_raw_material": is_raw_material,
-                        'topic_list':topic_list,
                         //'coll_arr':coll_arr,
                         'title' :"{{title}}",
 

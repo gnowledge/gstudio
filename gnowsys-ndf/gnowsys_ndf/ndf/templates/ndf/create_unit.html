@@ -26,7 +26,6 @@
                 </div>
 
 
-                {% if unit_node %}
                 <div class="course_creator_header">
                     <div class="left course_heading">
                     <h5>{% trans "Enter alternate Name" %}</h5>
@@ -37,7 +36,6 @@
 
                     </div>
                 </div>
-                {% endif %}
 
                 <hr/>
                 {% if 'Group' not in unit_node.member_of_names_list or 'base_unit' in unit_node.member_of_names_list or 'announced_unit' in unit_node.member_of_names_list %}
@@ -119,6 +117,23 @@
                 </div>
                 <div class="course_creator_header">
                     <div class="left course_heading">
+                    <h5>Enter Resource-tab name</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <input id="resource-name" name="resource_name" value="{{unit_node.project_config.resource_name}}" type="text" placeholder="Enter resource name"/>
+                    </div>
+                </div>
+                <div class="course_creator_header">
+                    <div class="left course_heading">
+                    <h5>Enter Blog-tab name</h5>
+                    </div>
+                    <div class="right course_heading_unit">
+                         <input id="blog-name" name="blog_name" value="{{unit_node.project_config.blog_name}}" type="text" placeholder="Enter blog tab name"/>
+                    </div>
+                </div>
+
+                <div class="course_creator_header">
+                    <div class="left course_heading">
                     <h5>Enter Section Name</h5>
                     </div>
                     <div class="right course_heading_unit">
@@ -170,8 +185,8 @@
                         <button type="button" class ="right asset-unit-button" id="save_unit">Save</button>
                     {% endcomment %}
                     <!-- <input type="button" class="asset-unit-button right" value="Cancel"/> -->
-                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="asset-unit-button right" value="Cancel"/>{% trans "Cancel" %}</a>
-                    <input type="submit" class="asset-unit-button right" id="save_unit" value="Save"/>
+                    <a href="{% if unit_node %} {% url 'groupchange' unit_node.pk %}{% else %} {% url 'explore_basecourses' %}{% endif %} " class="button-cancel-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" value="Cancel"/>{% trans "Cancel" %}</a>
+                    <input type="submit" class="button-save-new right" style="margin-right: 30px;margin-bottom: 8px;margin-top: 300px;" id="save_unit" value="Save"/>
                 </div>
             </form>
         </div>
