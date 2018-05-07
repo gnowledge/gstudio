@@ -68,9 +68,7 @@ def call_exit():
 
 # def get_file_path_with_id(node_id):
 #     file_name = (node_id + '.json')
-    
 #     collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
-
 #     # Example:
 #     # if -- file_name := "523f59685a409213818e3ec6.json"
 #     # then -- collection_hash_dirs := "6/c/3/8/
