@@ -146,7 +146,12 @@ class Command(BaseCommand):
         global ROOT_DUMP_NODE_NAME
         global MULTI_DUMP
         global GLOBAL_DICT
-        input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Node: ")
+        input_name_or_id = None
+        if args:
+            input_name_or_id = args[0]
+        else:
+            input_name_or_id = raw_input("\n\tPlease enter ObjectID of the Node: ")
+
         dump_node_obj = node_collection.one({'_id': ObjectId(input_name_or_id), '_type': 'GSystem'})
 
         if dump_node_obj:
@@ -157,9 +162,13 @@ class Command(BaseCommand):
             global TOP_PATH
             global DUMP_NODES_LIST
             datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
-            TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', slugify(dump_node_obj.name) + "_"+ str(datetimestamp))
+            TOP_PATH = os.path.join(GSTUDIO_DATA_ROOT, 'data_export', str(dump_node_obj._id) + "_"+ str(datetimestamp))
             SCHEMA_MAP_PATH = TOP_PATH
-            print "\tRequest received for Export of : ", dump_node_obj.name , ' | ObjectId: ', dump_node_obj._id
+            print "\tRequest received for Export of : \n\t\tObjectId: ", dump_node_obj._id
+            try:
+                print "\t\tName : ", dump_node_obj.name
+            except Exception as e:
+                pass
             global RESTORE_USER_DATA
             user_data_dump = raw_input("\n\tDo you want to include Users in this export ? Enter y/Y to continue:\t ")
             if user_data_dump in ['y', 'Y']:
@@ -176,19 +185,20 @@ class Command(BaseCommand):
                 create_users_dump(group_dump_path, dump_node_obj.contributors)
 
             configs_file_path = create_configs_file(dump_node_obj._id)
-            write_md5_of_dump(group_dump_path, configs_file_path)
             global log_file
-
-            log_file.write("\n*************************************************************")
-            log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
-            print "END : ", str(datetime.datetime.now())
             update_globals()
             dump_node(node=dump_node_obj,collection_name=node_collection, variables_dict=GLOBAL_DICT)
             create_factory_schema_mapper(SCHEMA_MAP_PATH)
 
+            log_file.write("\n*************************************************************")
+            log_file.write("\n######### Script Completed at : " + str(datetime.datetime.now()) + " #########\n\n")
+            print "END : ", str(datetime.datetime.now())
+
+            write_md5_of_dump(group_dump_path, configs_file_path)
             print "*"*70
             print "\n This will take few minutes. Please be patient.\n"
             print "\n Log will be found at: ", log_file_path
+            print "\n Log will be found at: ", TOP_PATH
             print "*"*70
             log_file.close()
             call_exit()
