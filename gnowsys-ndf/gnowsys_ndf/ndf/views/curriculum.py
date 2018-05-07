@@ -1180,18 +1180,17 @@ def adminRenderGraphs(request,group_id,node_id=None,graph_type="prerequisites"):
 
 @get_execution_time
 def graph_node(request, group_id):
-  subsections = node_collection.one({'_id': ObjectId(request.GET.get("id"))})
-  subsections.get_neighbourhood(subsections.member_of)
-
-  #relation_name changed for coll_relation
+  page_node = node_collection.one({'_id': ObjectId(request.GET.get("id"))})
+  page_node.get_neighbourhood(page_node.member_of)
+  # print page_node.keys()
   coll_relation = {'relation_name': 'has_collection', 'inverse_name': 'member_of_collection'}
 
-  prior_relation = {'relation_name': 'has_prerequisite', 'inverse_name': 'is_required_for'}
+  prior_relation = {'relation_name': 'prerequisite', 'inverse_name': 'is_required_for'}
 
   def _get_node_info(node_id):
     node = node_collection.one( {'_id':node_id}  )
     # mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
-
+    print node.name
     return node.name
 
   # def _get_username(id_int):
@@ -1225,116 +1224,90 @@ def graph_node(request, group_id):
   #   return node_url
 
   # page_node_id = str(id(page_node._id))
-  node_metadata ='{"name":"' + subsections.name + '", "_id":"'+ str(subsections._id) +'", "refType":"GSystem" , "type":"division", }, '
-   
+  node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
   node_relations = ''
-  exception_items = ["content", "login_required", "attribute_set", "relation_set","description",
-                     "member_of", "status", "comment_enabled", "start_publication",
-                     "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
-                     "created_at", "group_set", "type_of", "content_org", "author_set",
-                     "fs_file_ids", "file_size", "mime_type", "location", "language",
-                     "property_order", "rating", "apps_list", "annotations", "instance of","if_file",
-                     ]
-                                                  
-
-  if subsections:
-        for each in subsections.collection_set:
-            section_dict ={}
-            section = Node.get_node_by_id(each)
-            if section:
-                section_dict['name'] = section.name
-                section_dict['id'] = str(section._id)
-                section_dict['type'] = 'branch'
-                section_dict['children'] = [] 
-                if section.collection_set:
-                    for each_section in section.collection_set:
-                        subsection_dict ={}
-                        subsection = Node.get_node_by_id(each_section)
-                        if subsection:
-                            subsection_dict['children'] = []
-                            subsection_dict['name'] = subsection.name
-                            subsection_dict['type'] = 'division'
-                            subsection_dict['id'] = str(subsection._id)
-                            if "Topic" in subsection.member_of_names_list: 
-                                # subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
-                                
+  exception_items = [
+                      "name", "content", "_id", "login_required", "attribute_set", "relation_set",
+                      "member_of", "status", "comment_enabled", "start_publication",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured", "relation_set", "access_policy", "snapshot",
+                      "created_at", "group_set", "type_of", "content_org", "author_set",
+                      "fs_file_ids", "file_size", "mime_type", "location", "language",
+                      "property_order", "rating", "apps_list", "annotations", "instance of","if_file"
+                    ]
+  print node_metadata
   # username = User.objects.get(id=page_node.created_by).username
 
-                                i = 1
-                                for key, value in subsection.items():
-                                    if (key in exception_items) or (not value):
-                                        pass
+  i = 1
+  for key, value in page_node.items():
+    if (key in exception_items) or (not value):
+      pass
 
-                                    elif isinstance(value, list):
+    elif isinstance(value, list):
 
-                                        if len(value):
+      if len(value):
 
-                                            # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
-                                            node_metadata +='{"name":"' + key + '", "_id":"'+ str(abs(hash(key+str(subsection._id)))) +'_r" , "type":"division"}, '
-                                            node_relations += '{"type":"'+ key +'", "from":"'+ str(subsection._id) +'", "to": "'+ str(abs(hash(key+str(subsection._id)))) +'_r"},'
-                                            # key_id = str(i)
-                                            key_id = str(abs(hash(key+str(subsection._id))))
-                                        # i += 1
+        # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"}, '
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+        # key_id = str(i)
+        key_id = str(abs(hash(key+str(page_node._id))))
+        # i += 1
 
-                                    # if key in ("modified_by", "author_set"):
-                                    #   for each in value:
-                                    #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
-                                    #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-                                    #     i += 1
+        # if key in ("modified_by", "author_set"):
+        #   for each in value:
+        #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+        #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+        #     i += 1
 
-                                    # else:
-                                    
-                                            for each in value:
-                                      # print "\n====", key, "------", type(each)
+        # else:
 
-                                                if isinstance(each, ObjectId):
-                                                    node_name = _get_node_info(each)
-                                                    if key == "collection_set":
-                                                        inverse = coll_relation['inverse_name']
-                                                    elif key == "division":
-                                                        inverse = prior_relation['inverse_name']
-                                                    else:
-                                                        inverse = ""
+        for each in value:
+          # print "\n====", key, "------", type(each)
 
-                                                    node_metadata ='{"name":"' + subsection.name + '",  "_id":"'+ str(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1" , "type":"division"},'
-                                                    # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
-                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
-                                                    i += 1
-                                        
-                                                  # if "each" is Object of GSystem
-                                                elif isinstance(each, GSystem):
-                                                    node_metadata += '{"name":"' + each.name + '",  "_id":"'+ str(each._id) + '", "refType":"Relation"},'
-                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each._id) +'"},'
-                                                    i += 1 
-                                                else:
+          if isinstance(each, ObjectId):
+            node_name = _get_node_info(each)
+            if key == "collection_set":
+              inverse = coll_relation['inverse_name']
+            elif key == "prior_node":
+              inverse = prior_relation['inverse_name']
+            else:
+              inverse = ""
 
-                                                    node_metadata += '{"name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
-                                                    node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
-                                                    i += 1
+            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
+            # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            i += 1
 
+          # if "each" is Object of GSystem
+          elif isinstance(each, GSystem):
+            node_metadata += '{"screen_name":"' + each.name + '", "title":"' + page_node.name + '", "_id":"'+ str(each._id) + '", "refType":"Relation"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each._id) +'"},'
 
+          else:
 
+            node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
+            i += 1
 
-                                    else:
-                                      # possibly gives GAttribute
-                                        node_metadata +='{"name":"' + key + '", "_id":"'+ str(abs(hash(key+str(subsection._id)))) +'_r", "type":"division"},'
-                                        node_relations += '{"type":"'+ key +'", "from":"'+ str(subsection._id) +'", "to": "'+ str(abs(hash(key+str(subsection._id)))) +'_r"},'
-                                        i += 1    
-      # key_id = str(i)                 
-                                        key_id = str(abs(hash(key+str(subsection._id))))
+    else:
+      # possibly gives GAttribute
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
 
-                                        if isinstance( value, list):
-                                            for each in value:
-                                              node_metadata += '{"name":"' + each + '", "_id":"'+ str(i) +'_n"},'
-                                              node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-                                              i += 1
+      # key_id = str(i)
+      key_id = str(abs(hash(key+str(page_node._id))))
 
-                                        else:
-                                            node_metadata += '{"name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-                                            node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(subsection._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+      if isinstance( value, list):
+        for each in value:
+          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1
 
-                                            i += 1
-      
+      else:
+        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+
+        i += 1
     # End of if - else
   # End of for loop
 
@@ -1368,8 +1341,8 @@ def graph_node(request, group_id):
   node_relations = node_relations[:-1]
 
   node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
-  print node_graph_data
 
+  print node_graph_data
 
   return StreamingHttpResponse(node_graph_data)
 # ------ End of processing for graph ------

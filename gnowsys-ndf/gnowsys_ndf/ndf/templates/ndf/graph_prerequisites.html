@@ -2,26 +2,25 @@
 {% load cache %}
 {% cache 3600 graph_collection_static_head %}
 {% block head %}
-<script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script>  
 <!-- Scripts required for D3 graph -->
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
   <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js"></script> <!-- checked -->
 {% endblock %}
 <style type="text/css">
-		#chart-prerequisite .link
+		#chart-collection .link
 		{
 			stroke: #ccc;
 		}
 
-		#chart-prerequisite .nodetext {
+		#chart-collection .nodetext {
 			#pointer-events: none;
 			font: 10px Serif;
 			font-style:italic;
 		}
 
 		/*Central node shown in ellipse*/
-		#chart-prerequisite .mainnode{
+		#chart-collection .mainnode{
 			font: 15px sans-serif;
 			fill:"black";
 			border-width: 1px;
@@ -30,13 +29,13 @@
 		}
 
 		/*Connector element that connects two nodes*/
-		#chart-prerequisite .relnode {
+		#chart-collection .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
 		/*Peripheral nodes to main node*/
-		#chart-prerequisite .node {
+		#chart-collection .node {
 			border-width: 1px;
 			border-color: gray;
 			fill:#154534;
@@ -50,7 +49,7 @@
 		*/
 
 		/* Div containing SVG area*/
-		#chart-prerequisite {
+		#chart-collection {
 			display: block;
 			padding-top: 1%;
 			height: 87%;
@@ -59,22 +58,22 @@
 			display: block;
 		}
 
-		#view-prerequisite-graph svg {
+		#view-collection-graph svg {
 			margin-left: 1%;
 		}
 
-		#view-prerequisite-graph .graph-info-panel {
+		#view-collection-graph .graph-info-panel {
 			background-color:#F2F2F2; 
 			width:20%; height:100%; 
 			display:inline-block; float:left;
 		}
 
-		#view-prerequisite-graph .graph-info-panel div:first-child {
+		#view-collection-graph .graph-info-panel div:first-child {
 			height:90%;
 		}
 
-		#view-prerequisite-graph .button-hollow-grey {	background-color: #008759;	}
-		#view-prerequisite-graph .button-hollow-grey:hover {	background-color: #00ba7b	;	}
+		#view-collection-graph .button {	background-color: #008759;	}
+		#view-collection-graph .button:hover {	background-color: #00ba7b	;	}
 
 		/* New CSS for Filter container 	*/
             .sidebar
@@ -127,8 +126,7 @@
 	{% endcache %}
 
 	<body>
-		
-      
+        
 		<!-- This is panel on LHS of graph -->
 		<div class="graph-info-panel">
 			<div>
@@ -148,38 +146,38 @@
     	            	<div id="filterContainer" class="filterContainer checkbox-interaction-group"></div>
     	            </div> -->
                 </div>
-			</div>
+			
 		<!-- Download Button -->
-			<input type="button" class="button-hollow-grey expand" value="Save as SVG" onclick='("{{node.name}}");' />
-		</div>
+			<input type="button" class="button expand" value="Save as SVG" onclick='collectiong_download("{{node.name}}");' />
+		</div></div>
 
 	<!-- Div containing svg area -->
-		<div id="chart-prerequisite"></div>
+		<div id="chart-collection"></div>
 			<script type="text/javascript">
 
 			var graphHeight = ($(window).height()*0.87), // Getting 87% of window height 
 				graphWidth  = ($(window).width()*0.77);	 // Getting 77% of window width 
 
-			var prerequisiteg_objectid = "{{node._id}}";				// _id of current viewing page
+			var collectiong_objectid = "{{node.pk}}";				// _id of current viewing page
 			var flag=false;								// flag used for shift+click (Fixing position of node)
 			var tempc_mainnode
 
-// -------------------Start prerequisiteg_init()---------------------
-			function prerequisiteg_init(a,b)
+// -------------------Start collectiong_init()---------------------
+			function collectiong_init(a,b)
 			{
-				prerequisiteg_nodes_by_id = _.reduce(a, function(acc, n) 
+				collectiong_nodes_by_id = _.reduce(a, function(acc, n) 
 				{
 					acc[n._id] = n;
 					return acc;
 				}, {});
 
-				prerequisiteg_all_edges = new Array();
-		    	//prerequisiteg_all_edges contains all the links between the nodes
-		   		prerequisiteg_all_edges =_(b).chain().map(function(e)
+				collectiong_all_edges = new Array();
+		    	//collectiong_all_edges contains all the links between the nodes
+		   		collectiong_all_edges =_(b).chain().map(function(e)
 		    	{
 		    		if ((e.from).slice(-2) != "_r")
 		    		{
-		    			e.source = prerequisiteg_nodes_by_id[e.from];
+		    			e.source = collectiong_nodes_by_id[e.from];
 		    			temp_mainnode = e.source;
 		    		}
 		    		else
@@ -189,52 +187,54 @@
 
 		    		if ((e.to).slice(-2) != "_r")
 		    		{
-		    			e.target = prerequisiteg_nodes_by_id[e.to];
+		    			e.target = collectiong_nodes_by_id[e.to];
 		    		}
 		    		else
 		    		{
 		    			e.target = temp_mainnode;
 		    		}
-					//e.type = prerequisiteg_nodes_by_id[e.type]
+					//e.type = collectiong_nodes_by_id[e.type]
 					return e;
 				}).filter(function(e)
 				{
-					return prerequisiteg_nodes_by_id[e.from] && prerequisiteg_nodes_by_id[e.to] && e.type == "prior_node"
+					return collectiong_nodes_by_id[e.from] && collectiong_nodes_by_id[e.to] && e.type == "collection_set"
 				}).value();  
 			}
-// -------------------End Of prerequisiteg_init()---------------------
+// -------------------End Of collectiong_init()---------------------
 
-// -------------------Start prerequisiteg_fgraph()--------------------
-			function prerequisiteg_fgraph() 
+// -------------------Start collectiong_fgraph()--------------------
+			function collectiong_fgraph() 
 			{	
-				prerequisiteg_neighbour_node	= new Array();
-	    		prerequisiteg_clicked_node	= new Array();
-			    prerequisiteg_prev_node		= new Array();
+				collectiong_neighbour_node	= new Array();
+	    		collectiong_clicked_node	= new Array();
+			    collectiong_prev_node		= new Array();
 
-			    prerequisiteg_neighbour_node	= prerequisiteg_neighbour_node.concat(prerequisiteg_objectid);  
+			    collectiong_neighbour_node	= collectiong_neighbour_node.concat(collectiong_objectid);  
     
-				$.getJSON("{% url 'get_json_graph' groupid %}?id=" + prerequisiteg_objectid, function (json1)
+				$.getJSON("{% url 'get_json_graph' groupid %}?id=" + collectiong_objectid, function (json1)
 				{
-					prerequisiteg_metadata  = json1.node_metadata;
-					prerequisiteg_relations = json1.relations;
+					
 
-					prerequisiteg_init(prerequisiteg_metadata,prerequisiteg_relations);
-					// createFilter(prerequisiteg_metadata,prerequisiteg_relations);
-					prerequisiteg_load(prerequisiteg_objectid);
+					collectiong_metadata  = json1.node_metadata;
+					collectiong_relations = json1.relations;
+
+					collectiong_init(collectiong_metadata,collectiong_relations);
+					// createFilter(collectiong_metadata,collectiong_relations);
+					collectiong_load(collectiong_objectid);
 				}); // --END of getJSON()
 			}
-// -----------------End of prerequisiteg_fgraph()-------------------
+// -----------------End of collectiong_fgraph()-------------------
 
-// -------------------Start prerequisiteg_load()--------------------
-			function prerequisiteg_load(key)
+// -------------------Start collectiong_load()--------------------
+			function collectiong_load(key)
 			{
 				var w = graphWidth,
 					h = graphHeight,
 					fill = d3.scale.category20();
 
-				var vis = d3.select("#chart-prerequisite")
+				var vis = d3.select("#chart-collection")
 							.append("svg:svg")
-							.attr("id", "prerequisiteg_amazingViz")
+							.attr("id", "collectiong_amazingViz")
 							.attr("height", h)
 							.attr("width", w)
 							.attr("xmlns", "http://www.w3.org/2000/svg")
@@ -242,7 +242,7 @@
 
 			// Definition of marker
                 vis.append("svg:marker")
-    		             .attr("id", "prerequisiteg_arrowhead")
+    		             .attr("id", "collectiong_arrowhead")
                 		 .attr("viewBox","0 0 10 10")
                 		 .attr("refX","20")
                 		 .attr("refY","5")
@@ -264,8 +264,10 @@
 
 				vis.append("svg:g").attr("class", "nodes");
 
-				prerequisiteg_nodes_by_id[key].x = w/2.0;
-				prerequisiteg_nodes_by_id[key].y = h/2.0;       
+				console.log(key)
+				console.log(collectiong_nodes_by_id)
+				collectiong_nodes_by_id[key].x = w/2.0;
+				collectiong_nodes_by_id[key].y = h/2.0;       
 
 			// Defining properties of graph
 				var force = d3.layout.force()
@@ -285,20 +287,20 @@
 				function update(edges)
 				{
 			    	// for each func
-				    _.each(prerequisiteg_nodes_by_id, function(n){n.added = false});
+				    _.each(collectiong_nodes_by_id, function(n){n.added = false});
 
 			    	// reduce the nodes list to have only those nodes for a given rel.
 				    var nodes = _.reduce(edges, function(acc, e) 
 				    {
-				    	if(prerequisiteg_nodes_by_id[e.from] && !prerequisiteg_nodes_by_id[e.from].added)
+				    	if(collectiong_nodes_by_id[e.from] && !collectiong_nodes_by_id[e.from].added)
 				    	{
-				        	prerequisiteg_nodes_by_id[e.from].added = true;
-			    	    	acc.push(prerequisiteg_nodes_by_id[e.from]);
+				        	collectiong_nodes_by_id[e.from].added = true;
+			    	    	acc.push(collectiong_nodes_by_id[e.from]);
 			    	    }
-				        if(prerequisiteg_nodes_by_id[e.to] && !prerequisiteg_nodes_by_id[e.to].added)
+				        if(collectiong_nodes_by_id[e.to] && !collectiong_nodes_by_id[e.to].added)
 				        {
-				        	prerequisiteg_nodes_by_id[e.to].added = true;
-				        	acc.push(prerequisiteg_nodes_by_id[e.to]);
+				        	collectiong_nodes_by_id[e.to].added = true;
+				        	acc.push(collectiong_nodes_by_id[e.to]);
 				        }
 				        return acc;
 				    }, []);
@@ -307,9 +309,9 @@
 				    force.links(edges);
 				    force.start();
 
-				    var link = d3.select("#chart-prerequisite g.edges")
+				    var link = d3.select("#chart-collection g.edges")
 				    		 .selectAll("line.link")
-				    		 .select(this.prerequisiteg_arrowhead)
+				    		 .select(this.collectiong_arrowhead)
 				    	     .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});	
 
 				    link.enter().append("svg:line")
@@ -321,9 +323,9 @@
 	                	.attr("x2", function(d) {	return d.target.x; })
 	                	.attr("y2", function(d) {	return d.target.y; })
 		                .attr("text", function(d) {	return d.type; })
-		                .attr("marker-end", "url(#prerequisiteg_arrowhead)");
+		                .attr("marker-end", "url(#collectiong_arrowhead)");
 
-	                var node = d3.select("#chart-prerequisite g.nodes")
+	                var node = d3.select("#chart-collection g.nodes")
 	                			 .selectAll("g.node")
 	                			 .data(nodes);
 
@@ -343,7 +345,7 @@
                 					.call(drag);
 
                 	
-                // $("#chart-prerequisite").bind('click',function(event) {
+                // $("#chart-collection").bind('click',function(event) {
                 	// if(event.ctrlKey==1){
 
 	                $(window).bind('keydown',function(event) 
@@ -352,7 +354,7 @@
 	                	{
 	                		new_g.on("click",function(d)
 	                		{
-	                			if( d.expanded=="true" && d._id!=prerequisiteg_objectid )
+	                			if( d.expanded=="true" && d._id!=collectiong_objectid )
 	                			{
 	                				$.ajax(
 	                					{	
@@ -368,33 +370,33 @@
 	                								{
 	                									if(e._id)
 	                									{
-	                										prerequisiteg_clicked_node = prerequisiteg_clicked_node.concat(e._id) ;
+	                										collectiong_clicked_node = collectiong_clicked_node.concat(e._id) ;
 	                									}
 	                								});
 
-	                							index = _.indexOf(prerequisiteg_neighbour_node , d._id);
+	                							index = _.indexOf(collectiong_neighbour_node , d._id);
 
-	                							prerequisiteg_prev_node = prerequisiteg_neighbour_node.slice(0,index);
-	                							prerequisiteg_neighbour_node = _.difference(prerequisiteg_neighbour_node,prerequisiteg_clicked_node) ;
-	                							prerequisiteg_neighbour_node= prerequisiteg_neighbour_node.concat(prerequisiteg_prev_node);
-	                							prerequisiteg_neighbour_node = _.uniq(prerequisiteg_neighbour_node);
+	                							collectiong_prev_node = collectiong_neighbour_node.slice(0,index);
+	                							collectiong_neighbour_node = _.difference(collectiong_neighbour_node,collectiong_clicked_node) ;
+	                							collectiong_neighbour_node= collectiong_neighbour_node.concat(collectiong_prev_node);
+	                							collectiong_neighbour_node = _.uniq(collectiong_neighbour_node);
 	                						}
 	                					});
 
-									prerequisiteg_metadata = []
-									prerequisiteg_relations = []
+									collectiong_metadata = []
+									collectiong_relations = []
 									metadata1 = []
 									relations1 = []
 
-									for(i=0;i<(prerequisiteg_neighbour_node.length);i++)
+									for(i=0;i<(collectiong_neighbour_node.length);i++)
 									{
-										d3.select("#prerequisiteg_amazingViz").remove();
-										g = prerequisiteg_neighbour_node[i]
+										d3.select("#collectiong_amazingViz").remove();
+										g = collectiong_neighbour_node[i]
 
 										$.ajax(
 											{
 												async:false,
-												url:"{% url 'get_json_graph' groupid %}?id=" + g,
+												url:"{% url 'get_graph_json' groupid %}?id=" + g,
 												datatype:'json',
 												success:function (json2)
 												{
@@ -403,38 +405,38 @@
 													new_metadata	= json2.node_metadata;
 													new_relations	= json2.relations;
 
-													prerequisiteg_metadata	= _.union(new_metadata,prerequisiteg_metadata);
-													prerequisiteg_relations	= _.union(new_relations,prerequisiteg_relations);
-													prerequisiteg_relations	= prerequisiteg_check_Relationtype(prerequisiteg_metadata,prerequisiteg_relations);
+													collectiong_metadata	= _.union(new_metadata,collectiong_metadata);
+													collectiong_relations	= _.union(new_relations,collectiong_relations);
+													collectiong_relations	= collectiong_check_Relationtype(collectiong_metadata,collectiong_relations);
 												}
 											});
 									}
 
-                          			_.each(prerequisiteg_metadata, function(m)
+                          			_.each(collectiong_metadata, function(m)
                           			{
-                          				for(i=0;i<prerequisiteg_neighbour_node.length;i++)
+                          				for(i=0;i<collectiong_neighbour_node.length;i++)
                           				{
-                          					if(m._id == prerequisiteg_neighbour_node[i])
+                          					if(m._id == collectiong_neighbour_node[i])
                           					{	m.expanded	=	"true";		}
                           					else
                           					{	m.expanded	=	"false";	}
                           				}
                           			});
 
-                          			prerequisiteg_init(prerequisiteg_metadata,prerequisiteg_relations);
-                          			prerequisiteg_load(prerequisiteg_objectid) ;
+                          			collectiong_init(collectiong_metadata,collectiong_relations);
+                          			collectiong_load(collectiong_objectid) ;
                           		} // --END if
-                          		// else if(d._id>0 && d._id!= prerequisiteg_objectid)
-                          		else if(d._id!= prerequisiteg_objectid)
+                          		// else if(d._id>0 && d._id!= collectiong_objectid)
+                          		else if(d._id!= collectiong_objectid)
                           		{
-                          			prerequisiteg_neighbour_node =prerequisiteg_neighbour_node.concat(d._id);
+                          			collectiong_neighbour_node =collectiong_neighbour_node.concat(d._id);
 
-                          			d3.select("#prerequisiteg_amazingViz").remove();
+                          			d3.select("#collectiong_amazingViz").remove();
 
                           			$.ajax(
                           				{
                           					async:false,
-                          					url:"{% url 'get_json_graph' groupid %}?id=" + d._id ,
+                          					url:"{% url 'get_graph_json' groupid %}?id=" + d._id ,
 		                          			datatype:'json',
 		                          			success:function (json2)
 		                          			{
@@ -443,23 +445,23 @@
 		                          				new_metadata	=	json2.node_metadata;
 		                          				new_relations	=	json2.relations;
 
-		                          				prerequisiteg_metadata	=	_.union(new_metadata,prerequisiteg_metadata);
-		                          				prerequisiteg_relations	=	_.union(new_relations,prerequisiteg_relations);
-		                          				prerequisiteg_relations	=	prerequisiteg_check_Relationtype(prerequisiteg_metadata,prerequisiteg_relations);
+		                          				collectiong_metadata	=	_.union(new_metadata,collectiong_metadata);
+		                          				collectiong_relations	=	_.union(new_relations,collectiong_relations);
+		                          				collectiong_relations	=	collectiong_check_Relationtype(collectiong_metadata,collectiong_relations);
 
-		                          				_.each(prerequisiteg_metadata, function(m)
+		                          				_.each(collectiong_metadata, function(m)
 		                          				{
-		                          					for(i=0;i<prerequisiteg_neighbour_node.length;i++)
+		                          					for(i=0;i<collectiong_neighbour_node.length;i++)
 		                          					{
-		                          						if(m._id == prerequisiteg_neighbour_node[i])
+		                          						if(m._id == collectiong_neighbour_node[i])
 		                          							m.expanded = "true";
 		                          					}
 		                          				});
 		                          			}
                           				});
 
-                					prerequisiteg_init(prerequisiteg_metadata,prerequisiteg_relations);
-                					prerequisiteg_load(prerequisiteg_objectid);
+                					collectiong_init(collectiong_metadata,collectiong_relations);
+                					collectiong_load(collectiong_objectid);
                 				}
                 			});
 						}
@@ -467,16 +469,16 @@
 						if(event.keyCode==16)
 						{
 							flag = true;
-							new_g.on("click",prerequisiteg_ondrag);
+							new_g.on("click",collectiong_ondrag);
 						}
 					});
 
 
 					new_g.filter(function(d){ return (d._id).slice(-2) =="_n"; })
 						.append("svg:rect")
-                		.attr("x", function(d) {var ttx=d.name ;  return (-ttx.length*2/1.75)} )
+                		.attr("x", function(d) {var ttx=d.screen_name ;  return (-ttx.length*2/1.75)} )
                 		.attr("y", 10)	
-                		.attr("width", function(d) {var ttx=d.name ;  return (ttx.length+22+40)})
+                		.attr("width", function(d) {var ttx=d.screen_name ;  return (ttx.length+22+40)})
                 		.attr("height", 20)
                 		.call(drag)
                 		.style("fill-opacity", ".1")
@@ -487,13 +489,14 @@
                 		.attr("cx", 25)                
                 		.attr("cy", 20)
                 		.call(drag)
-                		.attr("rx",function(d) {var ttx=d.name; return(ttx.length/2 +"em")})
+                		//removed the function for rx-sakshi
+                		.attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/2 +"em")})
                 		.attr("ry",15)
                 		.style("fill-opacity", function(d) {if (d.refType=="Relation") return 0.2; else if(d.refType=="GSystem") return 0.7;})
                 	// .style("stroke", "#666")
                 	// .style("stroke-width", "1.5px")
                 		.style("fill", function(d) {if (d.refType=="Relation") return "#008759"; else if(d.refType=="GSystem") return "#008759"; else return "none"})
-                		.on("dblclick",prerequisiteg_dblclick);
+                		.on("dblclick",collectiong_dblclick);
 
 
                 	var text1 = new_g.append("svg:text")
@@ -509,7 +512,7 @@
                 				 .attr("text-anchor","middle")
                 				 .on("drag",drag)
                 				 .text(function(d){  if((d._id).slice(-2) != "_r")
-                				 					 {	return d.name; }
+                				 					 {	return d.screen_name; }
                 				 					}	)
                 				 .style("font", function(d){
 
@@ -522,7 +525,7 @@
                 				 	else if((d._id).slice(-2)=="_r")
                 				 		{ return "#404040"}
                 				 })
-                				 .on("dblclick", prerequisiteg_dblclick)
+                				 .on("dblclick", collectiong_dblclick)
                 				 .attr("class","nodeText");
 
                 		// bbox = text1.node().getBBox();
@@ -543,8 +546,8 @@
 
                 	force.on("tick", function()
                 	{
-                		var x_center = $("#chart-prerequisite").width() / 2;
-                		var y_center = $("#chart-prerequisite").height() / 2;
+                		var x_center = $("#chart-collection").width() / 2;
+                		var y_center = $("#chart-collection").height() / 2;
 
                 		link.attr("x1", function(d) { return d.source.x; })
                 			.attr("y1", function(d) { return d.source.y; })
@@ -556,22 +559,22 @@
                 }
         //---------------END of update()---------------
 
-                update(prerequisiteg_all_edges);
+                update(collectiong_all_edges);
 
                 vis.style("opacity", 1e-6)
                 	.transition()
                 	.duration(1000)
                 	.style("opacity", 1);
             }
-//---------------END of prerequisiteg_load()---------------
+//---------------END of collectiong_load()---------------
 
 //----------------- Sticky Feature Code -----------------
-			function prerequisiteg_dblclick(d)
+			function collectiong_dblclick(d)
             {
             	//double click to remove the fix posiotion of node.
             	d3.select(this).classed("fixed", d.fixed = false);
             }
-            function prerequisiteg_ondrag(d)
+            function collectiong_ondrag(d)
             {
             	//Check if flag is true then it will fix the position for node.
                	//But without shift + click node will not fix.
@@ -617,7 +620,7 @@
 //                 	  .append("label")
 //                 	  .each(function (d)
 //                 	  {
-//                 	  	if(d._id.slice(-2) == "_r" && d.screen_name!="prior_node" && d.screen_name!="prerequisite_set")
+//                 	  	if(d._id.slice(-2) == "_r" && d.screen_name!="prior_node" && d.screen_name!="collection_set")
 //                 	  	{
 //                 	  	// Create checkbox for each data
 // 	                	  	d3.select(this)
@@ -672,7 +675,7 @@
 // 				}
 //--------------- END of Graph filtration Code ----------------
 
-                function prerequisiteg_check_Relationtype(metadata,relations)
+                function collectiong_check_Relationtype(metadata,relations)
                 {
                 	_.each(metadata,function(d)
                 	{
@@ -685,16 +688,27 @@
                 			}
                 			else if (d.flag==0)
                 			{
-                				relations= _.reject(relations,function(e){ return e.type == d.name });
+                				relations= _.reject(relations,function(e){ return e.type == d.screen_name });
                 			}
                 		}
                 	});
                 	return relations;
                 }
 
-                $(prerequisiteg_fgraph());
+                $(collectiong_fgraph());
 
 //--------------- Save the Graph ----------------
+                function collectiong_download(filename) 
+                {
+				    // var el = document.createElement('a');
+				    // el.setAttribute('href', 'data:image/svg+xml;,' + encodeURIComponent(svgdata));
+				    // el.setAttribute('collectiong_download', filename);
+				    // el.click();
 
+				    var blob = new Blob([$("#chart-collection").html()], {type: "image/svg+xml"});
+				    filename = filename.replace(/\ /g, '_');
+				    filename += "_Collection_Graph.svg";
+					saveAs(blob, filename);
+				}
 		</script>
 	</body>

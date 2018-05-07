@@ -1,8 +1,6 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-
-
 {% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
 {% endblock %}
 
@@ -76,6 +74,20 @@ float:left;
                             <a href="" class="hyperlink-style">Title: {{curriculum_obj.name}} </a>
                             <a href="" class="hyperlink-info"> No. of Sections:{{curriculum_obj.collection_set|length}} </a>
                             <a href="" class="hyperlink-info"> Created on: {{curriculum_obj.created_at}}</a>
+                                        <div class="content reveal-modal graph-div " id="view-prerequisite-graph" data-reveal>
+              <a class="close-reveal-modal">&#215;</a>
+              {% include "ndf/graph_prerequisites.html" with node=curriculum_obj %}
+            </div>
+        
+             
+                    
+            
+          
+                                    
+
+    
+                    <a href="#view-prerequisite-graph"  data-reveal-id="view-prerequisite-graph" type="button" class="button-hollow-grey" style="margin-left: 0px;">
+                        View Graph </a>
                         </div>
                     </div>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
@@ -284,7 +296,7 @@ float:left;
 
 
 
-    <script type="text/javascript">
+   <script type="text/javascript">
         // var baseTree = [{
         //     name: 'Add Branch',
         //     class: 'create_branch',
