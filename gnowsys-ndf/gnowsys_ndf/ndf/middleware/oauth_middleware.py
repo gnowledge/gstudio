@@ -24,7 +24,6 @@ class mastodon_login(object):
             Username = request.POST.get('username')
             Password = request.POST.get('password')
            
-            
             ###CHECKING CLIENT CREDENTIALS USING MASTODON API##########
             mastodon_var = mastodon.Mastodon(
                
@@ -40,16 +39,13 @@ class mastodon_login(object):
                 Username,
                 Password,
                 to_file='gnowsys_ndf/gstudio_configs/NROER-access_token.secret',
-               
-               
                 )
                 mastodon_var2 = Mastodon(
                     client_id = 'gnowsys_ndf/gstudio_configs/NROER-client_cred.secret',
                     access_token = access_token,
                     api_base_url = 'https://member.metastudio.org'
                 )
-            except Exception as e:
-                print e
+            except Exception as e: 
                 pass       
                
             name = Username
@@ -67,9 +63,7 @@ class mastodon_login(object):
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
                     if(nodes!=None):
-                        #nodes.access_token = access_token
-                        if (nodes.access_token!=None): 
-
+                        
                         ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
                             user = authenticate(username=name, password=None)
 
@@ -82,23 +76,8 @@ class mastodon_login(object):
                                    
                                     return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error1")
-                        else:
-                            nodes.access_token=access_token
-                        ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
-                            user = authenticate(username=name, password=None)
-
-                            if user is not None:
-                            
-                                if user.is_active:
-                                    user.is_active=True
-                                   
-                                    login(request,user)
-                                   
-                                    return HttpResponseRedirect( reverse('landing_page') )
-                            else:
-                                HttpResponse("Error1")
-
+                                HttpResponse("Invalid Credentials")
+                        
                     else:
                         ##Creating auth object for user
                         member = User.objects.get(email=name) 
@@ -107,9 +86,6 @@ class mastodon_login(object):
                         ##Fetch auth object using email
                         author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
                         
-                        ##Assign access token for auth object
-                        author.access_token = access_token
-
                         author.save()
                             
                         #By default layer and customise layer of authentication
@@ -119,7 +95,7 @@ class mastodon_login(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error1")
+                                HttpResponse("Invalid Credentials")
 
                 else:
                     ##Creating user in django user table 
@@ -129,16 +105,17 @@ class mastodon_login(object):
                     ##Fetch auth object using email
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
-                    if(nodes!=None):
+                    if(nodes!=None):                     
    
-                        user = authenticate(username=name, password=None)
-                        if user is not None:
-                            if user.is_active:
-                                
-                                login(request, user)
-                                return HttpResponseRedirect( reverse('landing_page') )
-                            else:
-                                HttpResponse("Error2")
+                            user = authenticate(username=name, password=None)
+                            if user is not None:
+                                if user.is_active:
+                                    
+                                    login(request, user)
+                                    return HttpResponseRedirect( reverse('landing_page') )
+                                else:
+                                    HttpResponse("Invalid Credentials")
+
 
                     else:
                                            
@@ -146,7 +123,6 @@ class mastodon_login(object):
                         member = User.objects.get(email=name)
                         Author.create_author(member.id,agency_type='Other')                       
                         author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
-                        author.access_token = access_token
                         author.save()
                         ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
                         user = authenticate(username=name, password=None)
@@ -155,7 +131,7 @@ class mastodon_login(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error2")
+                                HttpResponse("Invalid Credentials")
                 return HttpResponseRedirect( reverse('landing_page') )  
                  
             else:
@@ -167,7 +143,6 @@ class mastodon_login(object):
         else:
           
             return HttpResponse("Invalid Credentials.")
-
 
 # Below class used for overriding defualt authenticate method of django
 class CustomBackendAuthenticationForDjango:

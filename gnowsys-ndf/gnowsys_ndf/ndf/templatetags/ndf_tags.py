@@ -135,6 +135,7 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
+	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
 
 	site_var['LOGIN_WITH_MASTODON'] = LOGIN_WITH_MASTODON
 
@@ -4248,26 +4249,6 @@ def get_header_lang(lang):
     return lang
 
 
-#convert 13 digit number to slash date format 
-
-@get_execution_time
-@register.filter
-def convert_date_string_to_date(your_timestamp):
-
-	date = str(datetime.datetime.fromtimestamp( your_timestamp / 1000))
-
-	temp1 = date[8:10]
-	temp2 = date[5:7]
-	temp3 = date[0:4]
-	date = temp1 + "/"+ temp2 +"/"+ temp3
-
-	return date
-
-
-@get_execution_time
-@register.filter
-def cal_length(string):
-	return len(str(string))
 
 
 
