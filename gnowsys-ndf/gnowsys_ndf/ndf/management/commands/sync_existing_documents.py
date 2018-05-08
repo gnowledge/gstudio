@@ -987,6 +987,6 @@ class Command(BaseCommand):
 
 
 ####Add 'access_token' field to existing auth objects##############
-    author_object = node_collection.find({'_type':'Author'})
-    if author_object:
-        author_object=node_collection.collection.update({'_type':'Author','access_token':{'$exists':False}},{'$set':{'access_token':None}},upsert=False, multi=True)
+    author_cursor = node_collection.find({'_type':'Author'})
+    if author_cursor:
+        author_cursor=node_collection.collection.update({'_type':'Author','access_token':{'$exists':False}},{'$set':{'access_token':None}},upsert=False, multi=True)

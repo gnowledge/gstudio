@@ -24,7 +24,6 @@ class mastodon_login(object):
             Username = request.POST.get('username')
             Password = request.POST.get('password')
            
-            
             ###CHECKING CLIENT CREDENTIALS USING MASTODON API##########
             mastodon_var = mastodon.Mastodon(
                
@@ -40,16 +39,13 @@ class mastodon_login(object):
                 Username,
                 Password,
                 to_file='gnowsys_ndf/gstudio_configs/NROER-access_token.secret',
-               
-               
                 )
                 mastodon_var2 = Mastodon(
                     client_id = 'gnowsys_ndf/gstudio_configs/NROER-client_cred.secret',
                     access_token = access_token,
                     api_base_url = 'https://member.metastudio.org'
                 )
-            except Exception as e:
-                print e
+            except Exception as e: 
                 pass       
                
             name = Username
@@ -81,7 +77,7 @@ class mastodon_login(object):
                                
                                 return HttpResponseRedirect( reverse('landing_page') )
                         else:
-                            HttpResponse("Error1")
+                            HttpResponse("Invalid Credentials")
                     else:
                         ##Creating auth object for user
                         member = User.objects.get(email=name) 
@@ -102,7 +98,7 @@ class mastodon_login(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error1")
+                                HttpResponse("Invalid Credentials")
 
                 else:
                     ##Creating user in django user table 
@@ -121,7 +117,7 @@ class mastodon_login(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error2")
+                                HttpResponse("Invalid Credentials")
 
                     else:
                                            
@@ -138,7 +134,7 @@ class mastodon_login(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error2")
+                                HttpResponse("Invalid Credentials")
                 return HttpResponseRedirect( reverse('landing_page') )  
                  
             else:
@@ -150,7 +146,6 @@ class mastodon_login(object):
         else:
           
             return HttpResponse("Invalid Credentials.")
-
 
 # Below class used for overriding defualt authenticate method of django
 class CustomBackendAuthenticationForDjango:
