@@ -6887,9 +6887,8 @@ input.transcript-toggler {
 
 /* line 7084, ../../../scss/_clix2017.scss */
 .download-report {
-  padding-right: 38px;
+  padding-left: 40px;
   font-size: 20px;
-  float: right;
   margin-top: 5px;
 }
 
