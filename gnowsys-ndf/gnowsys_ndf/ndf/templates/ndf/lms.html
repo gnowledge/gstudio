@@ -48,7 +48,7 @@
 
       {% if is_gstaff %}
       {% if request.author.agency_type != 'Teacher' or "Author" in group_object_member_of_names_list %}
-      <a href="{% url 'unit_detail' group_name %}" title="Edit Structure" style="background-color:#6f0859; border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i></a>{% endif %}{% endif %}
+      <a href="{% url 'unit_detail' group_name %}" class="theme-color" title="Edit Structure" style="border-radius:4px; margin-left:-13px; width:0px;"><i class="fa fa-pencil" style="margin-left:-7px; color:white;"></i></a>{% endif %}{% endif %}
     </li>
 
     <li>  <a href="{% url 'course_raw_material' group_name %}" {% if title == 'raw material' or title == "raw_material_detail"  %}class="selected"{% endif %} tabindex="3" title="Contains useful files such as images, audios, videos etc."><i class="fi-folder "></i> 

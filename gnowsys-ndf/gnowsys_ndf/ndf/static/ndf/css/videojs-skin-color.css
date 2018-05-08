@@ -1,3 +1,8 @@
+:root {
+  --primary-theme: #713558;
+}
+
+
 .vjs-skin-colors-clix {
   color: #fff;
 }
@@ -12,46 +17,46 @@
 }
 .vjs-skin-colors-clix .vjs-big-play-button,
 .vjs-skin-colors-clix .vjs-menu-content {
-  background-color: hsla(316, 88%, 26%, .7);
+  background-color: var(--primary-theme);
 }
 .vjs-skin-colors-clix .vjs-load-progress {
-  background-color: hsla(327, 100%, 45%, 1);
+  background-color: var(--primary-theme);
 }
 .vjs-skin-colors-clix .vjs-play-progress {
-  background-color: hsla(327, 100%, 45%, 1);
+  background-color: var(--primary-theme);
 }
 .vjs-skin-colors-clix .vjs-slider {
-  background-color: hsla(327, 100%, 45%, 1);
+  background-color: var(--primary-theme);
 }
 .vjs-skin-colors-clix .vjs-volume-level {
-  background-color: hsla(327, 100%, 45%, 1);
+  background-color: var(--primary-theme);
 }
 .vjs-skin-colors-clix .vjs-big-play-button,
 .vjs-skin-colors-clix .vjs-big-play-button:focus,
 .vjs-skin-colors-clix:hover .vjs-big-play-button {
-  border-color: hsla(316, 88%, 42%, 1);
+  border-color: #fff;
 }
 .vjs-skin-colors-clix:hover .vjs-big-play-button {
-  background: radial-gradient(hsla(316, 77%, 37%, 1), hsla(316, 88%, 26%, 1));
+  background: radial-gradient(var(--primary-theme), var(--primary-theme));
 }
 .vjs-skin-colors-clix .vjs-menu-button ul li {
-  background-color: hsla(316, 88%, 26%, .3);
+  background-color: rgba(var(--primary-theme), 3);
   color: #fff;
   font-family: 'open_sansregular', Arial, sans-serif;
 }
 .vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected {
-  background: radial-gradient(hsla(316, 77%, 37%, 1), hsla(316, 88%, 26%, 1));
+  background: radial-gradient(var(--primary-theme), var(--primary-theme));
   color: #fff;
 }
 .vjs-skin-colors-clix .vjs-menu-button ul li:focus,
 .vjs-skin-colors-clix .vjs-menu-button ul li:hover,
 .vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:focus,
 .vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:hover {
-  background: radial-gradient(hsla(327, 100%, 45%, 1), hsla(327, 100%, 35%, 1));
+  background: radial-gradient(var(--primary-theme), var(--primary-theme));
 }
 .vjs-skin-colors-clix .vjs-menu-button ul li:active,
 .vjs-skin-colors-clix .vjs-menu-button ul li.vjs-selected:active {
-  background: radial-gradient(hsla(327, 100%, 38%, 1), hsla(327, 100%, 23%, 1));
+  background: radial-gradient(var(--primary-theme), var(--primary-theme));
 }
 
 ::cue {
