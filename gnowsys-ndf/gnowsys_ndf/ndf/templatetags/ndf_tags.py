@@ -4248,26 +4248,6 @@ def get_header_lang(lang):
     return lang
 
 
-#convert 13 digit number to slash date format 
-
-@get_execution_time
-@register.filter
-def convert_date_string_to_date(your_timestamp):
-
-	date = str(datetime.datetime.fromtimestamp( your_timestamp / 1000))
-
-	temp1 = date[8:10]
-	temp2 = date[5:7]
-	temp3 = date[0:4]
-	date = temp1 + "/"+ temp2 +"/"+ temp3
-
-	return date
-
-
-@get_execution_time
-@register.filter
-def cal_length(string):
-	return len(str(string))
 
 
 
