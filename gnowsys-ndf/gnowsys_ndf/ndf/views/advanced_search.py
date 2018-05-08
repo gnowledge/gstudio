@@ -24,10 +24,12 @@ from gnowsys_ndf.ndf.gstudio_es.es import *
 from gnowsys_ndf.ndf.gstudio_es.paginator import Paginator ,EmptyPage, PageNotAnInteger
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_relation_value
 from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
+from django.core.exceptions import PermissionDenied
 
 def search_detail(request,group_id,page_num=1):
 	if GSTUDIO_ELASTIC_SEARCH:
-
+		if not request.user.is_superuser:
+			raise PermissionDenied
 		q = Q('match',name=dict(query='File',type='phrase'))
 		GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 		GST_FILE1 = GST_FILE.execute()
