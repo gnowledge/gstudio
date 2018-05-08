@@ -67,21 +67,38 @@ class mastodon_login(object):
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
                     if(nodes!=None):
-                        nodes.access_token = access_token
-                             
-                        ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
-                        user = authenticate(username=name, password=None)
+                        #nodes.access_token = access_token
+                        if (nodes.access_token!=None): 
 
-                        if user is not None:
-                        
-                            if user.is_active:
-                                user.is_active=True
-                               
-                                login(request,user)
-                               
-                                return HttpResponseRedirect( reverse('landing_page') )
+                        ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
+                            user = authenticate(username=name, password=None)
+
+                            if user is not None:
+                            
+                                if user.is_active:
+                                    user.is_active=True
+                                   
+                                    login(request,user)
+                                   
+                                    return HttpResponseRedirect( reverse('landing_page') )
+                            else:
+                                HttpResponse("Error1")
                         else:
-                            HttpResponse("Error1")
+                            nodes.access_token=access_token
+                        ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
+                            user = authenticate(username=name, password=None)
+
+                            if user is not None:
+                            
+                                if user.is_active:
+                                    user.is_active=True
+                                   
+                                    login(request,user)
+                                   
+                                    return HttpResponseRedirect( reverse('landing_page') )
+                            else:
+                                HttpResponse("Error1")
+
                     else:
                         ##Creating auth object for user
                         member = User.objects.get(email=name) 
