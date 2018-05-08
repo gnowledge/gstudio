@@ -56,7 +56,7 @@ def audioDashboard(request, group_id, audio_id=None):
     search_workspace = request.POST.get("search_workspace",None)
     search_text = request.POST.get("search_text",None)
     template = "ndf/audioDashboard.html"
-    if search_workspace != "default" and search_workspace != None and search_text:
+    if search_workspace != "default" and search_workspace != None:
         group_name, group_id = get_group_name_id(search_workspace)
     if GSTUDIO_ELASTIC_SEARCH:
         if filter_query_dict:
