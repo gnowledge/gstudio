@@ -1,3 +1,6 @@
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+
 # from django.conf import settings
 # from django.core.cache import cache, get_cache
 # from django.utils.importlib import import_module
@@ -54,3 +57,12 @@
 # #                 Session.objects.filter(session_key=visitor.session_key).delete()
 # #                 visitor.user = None
 # #                 visitor.save()
+
+class UserRestrictionMiddleware:
+    """
+    Prevents logged-in User from accessing login form
+    """
+    def process_request(self, request):
+        if request.user.is_authenticated():
+            if request.path_info.startswith('/accounts/login/'):
+                return HttpResponseRedirect(reverse('landing_page'))

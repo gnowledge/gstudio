@@ -4235,6 +4235,13 @@ def get_header_lang(lang):
 @get_execution_time
 @register.assignment_tag
 def get_profile_full_name(user_obj):
+	if isinstance(user_obj, basestring):
+		if user_obj.isdigit():
+			user_obj = int(user_obj)
+		else:
+			user_obj = User.objects.get(username=user_obj)
+	if isinstance(user_obj, int):
+		user_obj = User.objects.get(pk=user_obj)
 	auth_obj = Author.get_author_by_userid(user_obj.pk)
 	list_of_attr = ['first_name', 'last_name']
 	auth_attr = auth_obj.get_attributes_from_names_list(list_of_attr)
