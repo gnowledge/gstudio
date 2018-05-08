@@ -21,9 +21,6 @@ from gnowsys_ndf.ndf.views import rpc_resources
 from gnowsys_ndf.ndf.middleware.oauth_middleware import mastodon_login 
 ################################################
 
-
-#from gnowsys_ndf.ndf.views.esearch import get_search,get_advanced_search_form,advanced_search
-
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
     logout_template = "ndf/landing_page_clix.html"
@@ -249,8 +246,8 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration
-    #################################################
 
+    #####################url for mastodon login####################
     url(r'^accounts/login_test_view/$', login_instance_mastodon.moauth , name='login_view'),
     ################################################
 
