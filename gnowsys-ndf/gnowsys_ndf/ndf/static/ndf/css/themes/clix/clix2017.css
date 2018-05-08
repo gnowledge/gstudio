@@ -6939,6 +6939,7 @@ input.transcript-toggler {
 .rating-widget-container {
   margin-bottom: 6em;
   font-size: 20px;
+  position: relative;
 }
 
 /* line 7130, ../../../scss/_clix2017.scss */
