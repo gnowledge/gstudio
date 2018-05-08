@@ -2271,7 +2271,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
          'group_set': group_obj._id, 'created_by': user_id }).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
-
+    tab = 'all-notes'
     if node_id:
         notebook_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
@@ -2311,7 +2311,6 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     context_variables.update({'user_blogs': user_blogs})
     context_variables.update({'tab': tab})
     context_variables.update({'node': notebook_obj})
-
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
