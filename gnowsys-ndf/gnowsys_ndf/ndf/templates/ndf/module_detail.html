@@ -28,7 +28,7 @@
 		        {% endif %}
 		    </div>
 		</div>
-        <label class="inner">{% trans "Subject:" %} </label> <span class="inner">{{node_attrs.educationalsubject}}</span>
+        <label class="inner">{% trans "Subject:" %} </label> <span class="inner">{{node_attrs.educationalsubject}}</span><br>
         <label class="inner">{% trans "Class / Grade: " %}</label> <span class="inner">{% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}</span>
 	</div>
 
