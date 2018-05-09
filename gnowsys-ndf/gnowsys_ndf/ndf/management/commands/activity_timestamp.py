@@ -35,14 +35,14 @@ def activity_details(username):
         dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
         file_name = GSTUDIO_INSTITUTE_ID + '-' + username+ '-activity-visits-' + dt + '.csv'
 
-        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
+        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'activity-timestamp-csvs'
         GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
 
         if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
             os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
 
         file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
-        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies', 'OutAction']
+        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies', 'OutAction','OutTime']
         f = open(file_name_path, 'w')
         w = csv.DictWriter(f, column_keys_list)
         w.writeheader()
@@ -58,7 +58,7 @@ def activity_details(username):
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'Unit': 'NA', 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA'}
+            row_dict = {'Unit': 'NA', 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA', 'OutTime' : 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -101,7 +101,7 @@ def activity_details(username):
                         end_time = nav_out_obj['last_update']
                         timespent = (end_time-visited_on).total_seconds()
                         print " Time spent: ", timespent, " seconds."
-                        row_dict.update({'Timespent': str(timespent), 'OutAction': nav_out_obj['name']})
+                        row_dict.update({'Timespent': str(timespent), 'OutAction': nav_out_obj['name'], 'OutTime' : end_time})
                     else:
                         print " ## Unable to track time spent on this activity. ##"
                     buddies_obj = Buddy.query_buddy_obj(user_obj.pk, each_visit['session_key'])
@@ -115,7 +115,7 @@ def activity_details(username):
                 w.writerow(row_dict)
         f.close()
     else:
-        print "\n No Group or User found with {0}/{1}".format(group_id, username)
+        print "\n No User found with {0}".format(username)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
