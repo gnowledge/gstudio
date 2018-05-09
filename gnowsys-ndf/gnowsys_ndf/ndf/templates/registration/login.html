@@ -46,6 +46,7 @@ position: relative !important;
 		{% endif %}
 		{% csrf_token %}
 				<!-- Email -->
+			{% if site.SITE_NAME == "NROER" %}
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
 						<label class="left">
@@ -54,6 +55,15 @@ position: relative !important;
 						</label>
 					</div>
 				</div>
+			{% else %}
+				<div class="row">
+					<div class="small-10 medium-8 large-8 columns end">
+						<label class="left">
+							E-mail or {{ form.username.label }} 
+						</label>
+					</div>
+				</div>
+			{% endif %}
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
 						<!-- {{ form.username }} -->
