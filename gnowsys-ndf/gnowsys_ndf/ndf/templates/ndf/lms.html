@@ -111,7 +111,7 @@
     {% endcomment %}
   {% endif %}
 </ul>
-<ul class="nav_menu_1 authoring-tab" style="width:50%; display:inline">
+<!-- <ul class="nav_menu_1 authoring-tab" style="width:50%; display:inline">
   
     {% if is_gstaff %}
     <li>
@@ -137,7 +137,7 @@
   {% endif %}
 
    
-  </ul>
+  </ul> -->
 </div>
 <div class="small-2 medium-2 large-2 columns" style="border-bottom: 1px solid #00000029; background-color:#ffffff; height: 50px;">
   {% if is_gstaff %}
@@ -159,6 +159,7 @@
                   {% trans "Stats" %}{% else %}{% trans "Progress Report" %}
                 {% endif %}</a>
             </li>
+                <li>
                   <a href="{% url 'unit_detail' groupid %}" class="fi-pencil"> {% trans "Edit Structure" %} </a>
 
 
@@ -202,8 +203,33 @@
                         <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
                         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                     </div>
+
+            {% if is_gstaff %}
+            <li>
+              {% if site.SITE_NAME == 'NROER' %}
+                  <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Pages" %}</a>
+              {% else %}
+                <a href="{% url 'course_pages' group_id %}"  {% if title == 'course_pages' or title == 'create_course_pages' %}class="selected"{% endif %}><i class="fi-page-filled "></i> {% trans "Activities" %}</a>
+              {% endif %}
+              {% comment %}
+              <a href="{% url 'gtask' group_id  %}" {% if title == "Task" %} class="selected"  {% endif %} tabindex="7" > <i class="fa fa-list-alt"></i> {% trans "Task" %}</a>
+              {% endcomment %}
+            </li>
+            <li>
+              {% if site.SITE_NAME == 'NROER' %}
+                  <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {% trans "Asset Collection" %}</a>
+              {% else %}
+                <a href="{% url 'asset_list' group_id %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {% trans "Assets" %}</a>
+              {% endif %}
+            </li>
+            <li>
+                <a href="https://interx.metastudio.org/wp-admin/admin.php?page=h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
+            </li>
+          {% endif %}                   
               </ul>
           </div>
+
+
   {% else %}
   <div class="small-9 medium-4 large-4 columns enroll-unit" >
     {% if request.user.is_authenticated %}

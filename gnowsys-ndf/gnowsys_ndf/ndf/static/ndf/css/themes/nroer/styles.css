@@ -31871,3 +31871,8 @@ svg {
   margin-top: 0px;
   margin-bottom: -2px;
 }
+
+/* line 8396, ../../../scss/_app_styles.scss */
+#course-settings-drop {
+  width: 181px;
+}
