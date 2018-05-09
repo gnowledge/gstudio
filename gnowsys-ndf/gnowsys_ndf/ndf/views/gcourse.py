@@ -3120,7 +3120,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 @login_required
 @get_execution_time
 def course_analytics_admin(request, group_id):
-
+    print "\n hello: "
     cache_key = u'course_analytics_admin' + unicode(slugify(group_id))
     cache_result = cache.get(cache_key)
     # if cache_result:
@@ -3226,8 +3226,8 @@ def course_analytics_admin(request, group_id):
     response_dict["students_data_set"] = admin_analytics_data_list
     response_dict['max_points_dict'] = max_points_dict
     context_variables["response_dict"] = json.dumps(response_dict)
+    print "\n admin_analytics_data_list === ",response_dict
     cache.set(cache_key, response_dict, 60*10)
-    # print "\n admin_analytics_data_list === ",admin_analytics_data_list
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)

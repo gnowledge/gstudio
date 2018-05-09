@@ -19,6 +19,11 @@ except Exception, e:
     from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID, GSTUDIO_INSTITUTE_ID_SECONDARY, GSTUDIO_INSTITUTE_NAME
 
 def activity_details(username):
+    '''
+    For particular user, fetches all benchmarks records that satisfies the url match.
+    Parses the records to get information about the page/activity details (name/altnames/id)
+        and context (group-id aka unit-id)
+    '''
     user_obj = None
     username = unicode(username.strip())
     try:
