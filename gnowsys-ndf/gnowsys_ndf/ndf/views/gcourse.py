@@ -3217,7 +3217,7 @@ def course_analytics_admin(request, group_id):
         ("users_points", "Total Points"),
         ("files_points", "Files"),
         ("notes_points", "Notes"),
-        ("quiz_points", "Quiz"),
+        ("quiz_points", "Assessments"),
         ("interactions_points", "Interactions"),
     ]
     response_dict = {}
