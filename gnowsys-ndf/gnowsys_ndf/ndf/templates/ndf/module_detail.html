@@ -32,7 +32,7 @@
         <label class="inner">{% trans "Class / Grade: " %}</label> <span class="inner">{% for each_attr in node_attrs.educationallevel %}{{each_attr|slice:"5:"}}{% if not forloop.last %}, {%endif %} {% endfor %}</span>
 	</div>
 
-	<div class="small-9 medium-9 large-10 columns" style="border-left: 2px solid #713558;">
+	<div class="small-9 medium-9 large-10 columns module-partition">
 		<div class="small-12 columns">
 			<div class="small-9 columns" style="margin-left: -14px; width: 90%">
 				<h4 class="mcard-title"> {% firstof node.altnames node.name %}</h4>
