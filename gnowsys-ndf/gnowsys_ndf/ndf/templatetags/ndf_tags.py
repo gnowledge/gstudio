@@ -4267,3 +4267,8 @@ def get_name_by_node_id(node_id):
         return node.name
     else:
         return None
+
+@get_execution_time
+@register.assignment_tag
+def get_institute_name():
+	return GSTUDIO_INSTITUTE_NAME

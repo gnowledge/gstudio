@@ -6892,7 +6892,7 @@ input.transcript-toggler {
   margin-top: 5px;
 }
 
-/* line 7091, ../../../scss/_clix2017.scss */
+/* line 7090, ../../../scss/_clix2017.scss */
 .unit_under_mod_lbl {
   position: relative;
   color: #713558;
@@ -6903,12 +6903,12 @@ input.transcript-toggler {
   margin-top: 1em;
   margin-bottom: 1em;
 }
-/* line 7100, ../../../scss/_clix2017.scss */
+/* line 7099, ../../../scss/_clix2017.scss */
 .unit_under_mod_lbl a {
   color: #713558;
 }
 
-/* line 7105, ../../../scss/_clix2017.scss */
+/* line 7104, ../../../scss/_clix2017.scss */
 .mcard-title {
   display: block;
   color: #713558;
@@ -6918,23 +6918,23 @@ input.transcript-toggler {
   font-size: 1.4vw;
 }
 
-/* line 7114, ../../../scss/_clix2017.scss */
+/* line 7113, ../../../scss/_clix2017.scss */
 .short-mtext {
   overflow: hidden;
   height: 7em;
 }
 
-/* line 7118, ../../../scss/_clix2017.scss */
+/* line 7117, ../../../scss/_clix2017.scss */
 .full-mtext {
   height: auto;
 }
 
-/* line 7121, ../../../scss/_clix2017.scss */
+/* line 7120, ../../../scss/_clix2017.scss */
 .mod-detail-container {
   margin-left: 3.3%;
 }
 
-/* line 7125, ../../../scss/_clix2017.scss */
+/* line 7124, ../../../scss/_clix2017.scss */
 .rating-widget-container {
   margin-bottom: 6em;
   font-size: 20px;
@@ -7011,4 +7011,9 @@ input.transcript-toggler {
 .site-pages {
   padding-left: 200px;
   padding-right: 100px;
+}
+
+/* line 7194, ../../../scss/_clix2017.scss */
+.uname-to-icon {
+  border-bottom: 2px solid #713557;
 }
