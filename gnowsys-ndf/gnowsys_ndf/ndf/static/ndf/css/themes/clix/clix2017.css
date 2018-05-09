@@ -7011,3 +7011,8 @@ input.transcript-toggler {
   padding-left: 200px;
   padding-right: 100px;
 }
+
+/* line 7194, ../../../scss/_clix2017.scss */
+.uname-to-icon {
+  border-bottom: 2px solid #713557;
+}
