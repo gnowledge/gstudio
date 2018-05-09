@@ -12,14 +12,11 @@ from django.shortcuts import render
 from django.contrib import messages
 ########################################
 
-
 class mastodon_login(object):
     def moauth(self,request):
        
-        if request.method == 'POST':
-               
+        if request.method == 'POST':    
             #form = mform(request.POST)
-
             ###GET username and password from user#####
             Username = request.POST.get('username')
             Password = request.POST.get('password')
@@ -68,12 +65,9 @@ class mastodon_login(object):
                             user = authenticate(username=name, password=None)
 
                             if user is not None:
-                            
                                 if user.is_active:
                                     user.is_active=True
-                                   
                                     login(request,user)
-                                   
                                     return HttpResponseRedirect( reverse('landing_page') )
                             else:
                                 HttpResponse("Invalid Credentials")
@@ -84,8 +78,7 @@ class mastodon_login(object):
                         Author.create_author(member.id,agency_type='Other')
                         
                         ##Fetch auth object using email
-                        author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
-                        
+                        author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})   
                         author.save()
                             
                         #By default layer and customise layer of authentication
@@ -110,7 +103,6 @@ class mastodon_login(object):
                             user = authenticate(username=name, password=None)
                             if user is not None:
                                 if user.is_active:
-                                    
                                     login(request, user)
                                     return HttpResponseRedirect( reverse('landing_page') )
                                 else:
@@ -124,6 +116,7 @@ class mastodon_login(object):
                         Author.create_author(member.id,agency_type='Other')                       
                         author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
                         author.save()
+                        
                         ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
                         user = authenticate(username=name, password=None)
                         if user is not None:
