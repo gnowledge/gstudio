@@ -35,7 +35,7 @@ def activity_details(username):
         dt = "{:%Y%m%d-%Hh%Mm}".format(datetime.datetime.now())
         file_name = GSTUDIO_INSTITUTE_ID + '-' + username+ '-activity-visits-' + dt + '.csv'
 
-        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'gstudio-exported-users-analytics-csvs'
+        GSTUDIO_EXPORTED_CSVS_DIRNAME = 'activity-timestamp-csvs'
         GSTUDIO_EXPORTED_CSVS_DIR_PATH = os.path.join('/data/', GSTUDIO_EXPORTED_CSVS_DIRNAME)
 
         if not os.path.exists(GSTUDIO_EXPORTED_CSVS_DIR_PATH):
