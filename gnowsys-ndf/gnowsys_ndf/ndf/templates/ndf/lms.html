@@ -124,6 +124,11 @@
         <a href="https://assessments-clix.tiss.edu/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
     {% endif %}
+    {% if group_object.agency_type == 'School' %}
+    <li>
+        <a href="/h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
+    </li>
+    {% endif %}
   {% endif %}
   {% endif %}
 

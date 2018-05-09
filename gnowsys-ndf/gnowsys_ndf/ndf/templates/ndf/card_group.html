@@ -25,6 +25,8 @@
                 <div class="card-legend">{{prior_node_name}}</div>
             {% elif "Author" in node.member_of_names_list %}
                 <div class="card-legend">{% trans "My Workspace" %}</div>
+            {% elif "School" in node.agency_type %}
+                <div class="card-legend">{% trans "School's Workspace" %}</div>
             {% endif %}
         {% endif %}
         <div class="unit_header" >
