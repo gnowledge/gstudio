@@ -194,16 +194,6 @@
               <li>
                   <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% if 'Author' in group_object_member_of_names_list %} {% trans "Edit Profile" %} {% else %} {% trans "Edit Metadata" %} {% endif %}</a>
               </li>
-              <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
-              <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
-                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
-                        <br/>
-                        {% trans "Are you sure want to delete this unit?" %}
-                        <br/>
-                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
-                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
-                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                    </div>
 
             {% if is_gstaff %}
             <li>
@@ -226,7 +216,18 @@
             <li>
                 <a href="https://interx.metastudio.org/wp-admin/admin.php?page=h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
             </li>
-          {% endif %}                   
+          {% endif %}
+
+            <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
+              <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
+                    <h3>{% trans "Delete Unit:" %} {% firstof group_object.altnames group_object.name  %} ?</h3>
+                        <br/>
+                        {% trans "Are you sure want to delete this unit?" %}
+                        <br/>
+                        <a href="#" class="button tiny success">{% trans "Cancel" %}</a>
+                        <a href="{% url 'delete_group_url_redirect' group_object.pk 'explore_basecourses' %}" class="button tiny alert">{% trans "Yes" %}</a>
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                    </div>                   
               </ul>
           </div>
 
