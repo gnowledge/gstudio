@@ -383,39 +383,6 @@
 
     <div class="content contents panel" id="panel-metadata" style="width:100%; display:none;" >
       	<div class="row">
-
-		    <div class="small-12 large-8 small-centered large-centered columns">
-				<div class="panel callout radius">
-				  <h4 align="center">Metadata</h4>
-				  <h5>TIME REQUIRED:{{node.timerequired}}</h5>
-				  <h5>INTERACTIVITY TYPE:{{node.interactivitytype}}</h5>
-				    <h5>READING LEVEL:{{node.readinglevel}}</h5>
-				  <h5>CURRICULAR:{{node.curricular}}</h5>
-				    <h5>EDUCATIONAL SUBJECT: {{node.educationalsubject}}</h5>
-				  <h5>EDUCATIONAL ALIGNMENT:{{node.educationalalignment}}</h5>
-				    <h5>BASED ON URL:{{node.basedonurl}}</h5>
-				  <h5>SOURCE: {{node.source}}</h5>
-				  <h5>COPYRIGHT:{{node.legal.copyright}}</h5>
-				  	
-				<!--   {% get_copyright as copyright %}
-				  	<h5>COPYRIGHT:
-				  	{% for each_copyright in copyright %}
-				  		{% if not forloop.first %}, {% endif %}
-				    	{% if each_copyright == node.copyright %}
-	        				<span style="font-size: 9px;">{{each_copyright}}</span>
-	        			{% else %}
-	        			 	<span style="font-size: 9px;">{{each_copyright}}</span>
-	        			{% endif %}
-					{% endfor %}
-					</h5> -->
-				  				
-				  <h5>AGE RANGE:{{node.age_range}}</h3>
-				  <h5>EDUCATIONAL LEVEL:{{node.educationallevel | join:", " }}</h5>
-				  <h5>EDUCATIONAL USE:{{node.educationaluse}}</h5>
-				  <h5>TEXT COMPLEXITY:{{node.textcomplexity}}</h5>
-				  <h5>TARGET AUDIENCE:{{node.audience | join:", " }}</h5>
-				</div>
-			</div>
 		  	<div class="small-12 large-12 columns"><h4>{% trans "Please add or edit Metadata" %} </h4></div>
 		  	<!-- Educational Language is Removed from ndf tags and here  __ Saurabh -->
 		  	{% get_metadata_values as metadata %}
