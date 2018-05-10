@@ -5031,6 +5031,10 @@ ul.nav_menu_1 {
     background-color: $nav_menu_1_bg_color;
     >li {
             display: inline-block;
+            margin-left: -38px;
+            @media only screen and (max-width: 40em) {
+              margin-left: 0px;
+            }
 
         >a{
             list-style-type: none;
@@ -5041,7 +5045,6 @@ ul.nav_menu_1 {
             font-size: 18px;
             letter-spacing: 0.8px;
             border-bottom: 3px solid transparent;
-        
 
             &.selected, &:hover{
                 border-bottom: 3px solid $nav_menu_1_tab_border;
@@ -8392,3 +8395,8 @@ svg {
 .searchbar{
 
 }
+
+#course-settings-drop{
+  width:181px;
+}
+
