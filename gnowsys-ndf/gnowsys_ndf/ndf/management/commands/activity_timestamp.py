@@ -42,7 +42,7 @@ def activity_details(username):
             os.makedirs(GSTUDIO_EXPORTED_CSVS_DIR_PATH)
 
         file_name_path = os.path.join(GSTUDIO_EXPORTED_CSVS_DIR_PATH, file_name)
-        column_keys_list = ['Unit', 'VisitedOn', 'Language','Lesson', 'Activity', 'Timespent', 'Buddies', 'OutAction','OutTime']
+        column_keys_list = ['Unit','Lesson', 'Activity', 'Language', 'VisitedOn', 'OutTime', 'OutAction','TimeSpentInSec', 'Buddies']
         f = open(file_name_path, 'w')
         w = csv.DictWriter(f, column_keys_list)
         w.writeheader()
@@ -58,7 +58,7 @@ def activity_details(username):
         
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
-            row_dict = {'Unit': 'NA', 'VisitedOn': 'NA', 'Language': 'NA', 'Lesson': 'NA', 'Activity': 'NA', 'Timespent': 'NA', 'Buddies': 'NA', 'OutAction': 'NA', 'OutTime' : 'NA'}
+            row_dict = {'Unit' : 'NA','Lesson' : 'NA', 'Activity' : 'NA', 'Language' : 'NA', 'VisitedOn' : 'NA', 'OutTime' : 'NA', 'OutAction' : 'NA','TimeSpentInSec' : 'NA', 'Buddies' : 'NA'}
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -81,6 +81,8 @@ def activity_details(username):
                     unit_name = unit_node.name
                     if unit_node.altnames:
                         unit_name = unit_node.altnames
+                    if activity_node.altnames:
+                        activity_name = activity_node.altnames
                     row_dict.update({'Unit': slugify(unit_name), 'Lesson': slugify(lesson_name), 
                         'Activity': slugify(activity_name)})
 
@@ -101,7 +103,7 @@ def activity_details(username):
                         end_time = nav_out_obj['last_update']
                         timespent = (end_time-visited_on).total_seconds()
                         print " Time spent: ", timespent, " seconds."
-                        row_dict.update({'Timespent': str(timespent), 'OutAction': nav_out_obj['name'], 'OutTime' : end_time})
+                        row_dict.update({'TimeSpentInSec': str(timespent), 'OutAction': nav_out_obj['name'], 'OutTime' : end_time})
                     else:
                         print " ## Unable to track time spent on this activity. ##"
                     buddies_obj = Buddy.query_buddy_obj(user_obj.pk, each_visit['session_key'])
