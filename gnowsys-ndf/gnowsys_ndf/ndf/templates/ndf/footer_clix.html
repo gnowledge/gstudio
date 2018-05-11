@@ -29,19 +29,17 @@
 <hr>
 <div style="background-color:#71355808; margin-top:-20px;">
     <div class="small-7 medium-9 large-10 columns" style="margin-left:122px;">
-                {% comment %}
           <div class="row">
-                <div class="small-2 columns">
-                    <p>Seeded By</p>
-                </div>
                 <div class="small-4 columns">
-                    <p>Founding Partner</p>
+                    <p></p>
                 </div>
-                <div class="small-3 columns" style="margin-left:-36px;">
-                    <p>Technology Partner</p>
+                <div class="small-4 columns" style="font-size: 14px;margin-left: 50px;margin-top: 10px;font-style: normal;">
+                    <p style="font-size:12px;">Led By</p>
+                </div>
+                <div class="small-3 columns">
+                    <p></p>
                 </div>
                  </div>
-                {% endcomment %}
           <div class="row" style="width:100%;">
                 <div class="small-3 columns">
                     <a href="http://tatatrusts.org/" target="_blank">
@@ -67,7 +65,8 @@
                 {% endcomment %}
           </div>
     </div>
-    <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:37px;">
+
+    <div class="small-3 medium-3 large-2 columns nav-legal" style="margin-top:53px;">
         <ol>
             <li>
                 <a href="{% url 'site_about' %}" style="font-size: 14px!important; " target="_blank">About</a>
@@ -87,28 +86,32 @@
         </ol>
     </div>
     <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
     <div class="row">
         <hr>
-        <div class="small-5 columns coyright-links">
-            <p style="font-size: 10px">Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license <img src="/static/ndf/images/80x15cclogo.png" /></p>
+        <div class="small-6 columns">
+            <p style="font-size: 12px;">© 2018 Tata Institute of Social Science</p>
         </div>
-            <div class="small-1 columns coyright-links">
-                
-            </div>
         <div class="small-6 columns coyright-links">
             {% comment %}
                 {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
             {% endcomment %}
-              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="font-size: 13px!important;margin-left:349px;" target="_blank">Powered by gStudio</a>
-            <a href="http://www.hbcse.tifr.res.in/" target="_blank">
-                <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 385px;margin-bottom:10px;" />
-            </a>
+              <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="font-size: 13px!important;     margin-left: 278px;" target="_blank">Powered by gStudio</a><a href="http://www.hbcse.tifr.res.in/" target="_blank">
+                <img src="/static/ndf/images/logos/tifr.png" style="height: 25px;" /></a>
         </div>
+    </div>
+    <div class="row">
+        <div class="small-6 columns coyright-links">
+            <p style="font-size: 11px">Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank"> <img src="/static/ndf/images/80x15cclogo.png" /></a></p>
+        </div>
+        <div class="small-6 columns coyright-links">
+
+                <img width="100px" height="250px" src="/static/ndf/images/logos/Chhatisgarhseal.png"  /></a>
+                <img width="100px" height="250px" src="/static/ndf/images/logos/Mizoramseal.png"  /></a>
+                <img width="100px" height="250px" src="/static/ndf/images/logos/rajasthanseal.png"  /></a>
+                <img width="100px" height="250px" src="/static/ndf/images/logos/Telanganaseal.png"  /></a>
+        </div>
+    </div>
+        
 <br> 
        </div>
     </div>
