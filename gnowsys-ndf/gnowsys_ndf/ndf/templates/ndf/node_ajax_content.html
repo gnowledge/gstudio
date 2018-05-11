@@ -586,7 +586,7 @@ Still keeping for future ref (if needed).
 
             <tr>
               <td width="200">Educational Level</td>
-              <td width="250">{{node.educationallevel | join:", " | lower}}</td>
+              <td width="250">{{node.educationallevel | lower}}</td>
             </tr>
 
             <tr>
@@ -601,21 +601,10 @@ Still keeping for future ref (if needed).
 
             <tr>
               <td width="200">Target Audience</td>
-              <td width="250">{{node.audience | join:"," | lower}}</td>
+              <td width="250">{{node.audience | lower}}</td>
             </tr>
 
           </table>
-        <!--   {% get_copyright as copyright %}
-            <h5>COPYRIGHT:
-            {% for each_copyright in copyright %}
-              {% if not forloop.first %}, {% endif %}
-              {% if each_copyright == node.copyright %}
-                  <span style="font-size: 9px;">{{each_copyright}}</span>
-                {% else %}
-                  <span style="font-size: 9px;">{{each_copyright}}</span>
-                {% endif %}
-          {% endfor %}
-          </h5> -->
       </div>
           {% endif %}
 
