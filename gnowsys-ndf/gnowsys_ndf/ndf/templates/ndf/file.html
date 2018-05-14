@@ -83,7 +83,7 @@ margin-top:5px !important;
           <a href="#view-collection"><i class="fi-page-multiple"></i>
             {% trans "Collections" %}
             <span class="count">
-              {% if GSTUDIO_ELASTIC_SEARCH %}
+              {% if site.GSTUDIO_ELASTIC_SEARCH %}
                 {{ collection_count }}
               {% else %}
                {{ collection.count }}
@@ -98,7 +98,7 @@ margin-top:5px !important;
             <i class="fi-eye"></i>
             {% trans "All files" %}
             <span class="count text-right">
-              {% if GSTUDIO_ELASTIC_SEARCH %}
+              {% if site.GSTUDIO_ELASTIC_SEARCH %}
                 {{ file_pages_count }}
               {% else %}
                {{ file_pages.count }}

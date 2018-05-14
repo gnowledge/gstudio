@@ -358,7 +358,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 									 'collection_count': collection_pages_cur.count(),
 									 'groupid': group_id, 'group_id':group_id,
 									 "datavisual":datavisual,
-									 "GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
+									 #"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 									 "search_text":search_text,
 									 "file_pages_count":all_count.count()
 									 },
@@ -653,7 +653,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
 				"filetype": filetype, "res_type_name": "", "page_info": results,
-				"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
+				#"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 				},
 				context_instance = RequestContext(request))
 		

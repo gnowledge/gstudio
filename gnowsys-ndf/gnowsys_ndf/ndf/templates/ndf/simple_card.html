@@ -47,7 +47,7 @@
 {% endif %}
 <div class="scard-image" title="{% firstof resource.altnames resource.name %}">
     
-    {% if GSTUDIO_ELASTIC_SEARCH != True %}
+    {% if site.GSTUDIO_ELASTIC_SEARCH != True %}
       {% get_dict_from_list_of_dicts resource.attribute_set as attr_set_dict %}  
       {% get_relation_value resource.pk 'has_thumbnail' as grel_dict %}
     {% else %}
@@ -70,7 +70,7 @@
       <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="">
     {% elif resource.fs_file_ids.1 %}
       <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="">
-    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or "File" in member_of or 'Page' in member_of or 'Jsmol' in member_of %}
+    {% elif "File" in resource.member_of_names_list or "Page" in resource.member_of_names_list or "File" in member_of or 'Page' in member_of or 'Jsmol' in member_of or "interactive_page" in member_of %}
       {% if resource.collection_set  %}
         <i class="collection"></i>
       {% elif attr_set_dict.educationaluse %}
@@ -87,7 +87,7 @@
       {% endif %}
     {% elif "Group" in resource.member_of_names_list or "Group" in member_of or has_logo == True or has_prof_pic == True %}
       {% if "Course" in resource.member_of_names_list or 'Course' in member_of or has_logo == True %}
-        {% if GSTUDIO_ELASTIC_SEARCH != True %}
+        {% if site.GSTUDIO_ELASTIC_SEARCH != True %}
         {% get_relation_value resource.pk 'has_logo' as grel_dict %}
         {% else %}
         {% get_relation_value resource.id 'has_logo' as grel_dict %}
@@ -99,7 +99,7 @@
         {% endif %}
 
       {% else %}
-        {% if GSTUDIO_ELASTIC_SEARCH != True %}
+        {% if site.GSTUDIO_ELASTIC_SEARCH != True %}
         {% get_relation_value resource.pk 'has_profile_pic' as grel_dict %}
         {% else %}
         {% get_relation_value resource.id 'has_profile_pic' as grel_dict %}
@@ -145,7 +145,7 @@
      <a style="margin-left:2px" href="{% url 'dashboard' resource.created_by %}" title="{{resource.created_by|get_username}}" target="_blank">
       {{resource.created_by|get_username|truncatechars:"10"}}</a>
      {% endif %}
-        {% if GSTUDIO_ELASTIC_SEARCH != True %}
+        {% if site.GSTUDIO_ELASTIC_SEARCH != True %}
           <i style="float:right">{{resource.created_at|date:"d-m-Y"}}</i>
         {% elif resource.created_at|cal_length == 13 %}
           <i style="float:right">{{resource.created_at|convert_date_string_to_date|slice:"10"}}</i>     
