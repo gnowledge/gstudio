@@ -119,9 +119,24 @@ def activity_details(username):
     else:
         print "\n No User found with {0}".format(username)
 
+
 class Command(BaseCommand):
+
     def handle(self, *args, **options):
+        username = ''
+
         if args and len(args) == 1:
-            activity_details(args[0])
+            username = args[0]
         else:
-            print "\n Please enter username"
+            while not username.strip():
+                username = raw_input("\n Please enter username: ")
+
+        if username:
+            print "\n====: Processing for username: {} :====".format(username)
+            from timeit import default_timer
+            start_time = default_timer()
+            activity_details(username)
+            end_time = default_timer()
+            print "\n\n", ("=" * 50)
+            print "Time Required to process: {} Minutes".format((end_time - start_time)/60)
+            print "=" * 50, "\n\n"
