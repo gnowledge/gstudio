@@ -1,5 +1,6 @@
 from base_imports import *
-
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH_IN_BENCHMARK_CLASS
+from gnowsys_ndf.ndf.gstudio_es.es import *
 @connection.register
 class Benchmark(DjangoDocument):
 
@@ -32,5 +33,9 @@ class Benchmark(DjangoDocument):
   def identity(self):
     return self.__unicode__()
 
+  def save(self, *args, **kwargs):
+    super(Benchmark, self).save(*args, **kwargs)
+    if GSTUDIO_ELASTIC_SEARCH_IN_BENCHMARK_CLASS:
+      esearch.save_to_es(self)
 
 benchmark_collection= db["Benchmarks"]
