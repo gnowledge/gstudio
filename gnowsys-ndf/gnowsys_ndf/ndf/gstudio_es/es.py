@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import *
-from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH ,GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX
+from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH ,GSTUDIO_ELASTIC_SEARCH_PROTOCOL,GSTUDIO_ELASTIC_SEARCH_SUPERUSER,GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD,GSTUDIO_ELASTIC_SEARCH_ALIAS,GSTUDIO_ELASTIC_SEARCH_PORT,GLITE_RCS_REPO_DIRNAME,GSTUDIO_ELASTIC_SEARCH_INDEX,TESTING_VARIABLE_FOR_ES
 from gnowsys_ndf.ndf.models.base_imports import *
 from gnowsys_ndf.ndf.models.history_manager import HistoryManager
 #from gnowsys_ndf.ndf.models.node import *
@@ -9,7 +9,7 @@ from bson.json_util import loads, dumps
 from gnowsys_ndf.ndf.models.models_utils import NodeJSONEncoder
 
 #es = Elasticsearch("http://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT, timeout=100, retry_on_timeout=True)
-
+#GSTUDIO_ELASTIC_SEARCH_ALIAS = "localhost"
 es = Elasticsearch(GSTUDIO_ELASTIC_SEARCH_PROTOCOL+"://"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER+":"+GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD+"@"+GSTUDIO_ELASTIC_SEARCH_ALIAS+":"+GSTUDIO_ELASTIC_SEARCH_PORT,timeout=100, retry_on_timeout=True)
 
 class esearch:
@@ -79,8 +79,6 @@ class esearch:
                     
                     break
 
-        document_type
-
         if document_type == "GSystem":
             es.index(index=index, doc_type="gsystem", id=document["id"], body=document)
             #file_name.write(document["id"] + '\n')
@@ -102,7 +100,6 @@ class esearch:
             es.index(index="gsystem", doc_type=doc_type, id=document["id"], body=document)
             
         else:
-            
             es.index(index=index, doc_type=document_type.lower(), id=document["id"], body=document)
         
 
@@ -148,3 +145,60 @@ class esearch:
                                 temp_dict[key]=value
                                 lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
         return lists
+
+    @staticmethod
+    def save_to_es(django_document):
+        try:
+            print "called to save_to_es method"
+            with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/gstudio_configs/req_body.json") as req_body:
+                request_body = json.load(req_body)
+            with open("/home/docker/code/gstudio/gnowsys-ndf/gnowsys_ndf/gstudio_configs/benchmarks.json") as benchmarks_body:
+                benchmarks_body = json.load(benchmarks_body)
+            doc = json.dumps(django_document,cls=NodeJSONEncoder)
+
+            django_document = json.loads(doc)
+            print django_document
+
+            django_document["id"] = django_document.pop("_id")
+            django_document["type"] = django_document.pop("_type")
+
+            index = None
+
+            for k in GSTUDIO_ELASTIC_SEARCH_INDEX:
+                for v in GSTUDIO_ELASTIC_SEARCH_INDEX[k]:
+                    if django_document["type"] in v:
+                        index = k
+                        index = index.lower()
+                        break
+
+            print django_document["type"]
+            if django_document["type"] == "GSystem":
+                print django_document["id"]
+                es.index(index=index, doc_type="gsystem", id=django_document["id"], body=django_document)
+                #file_name.write(document["id"] + '\n')
+                if django_document["type"]=="GSystem":
+                    if('if_file' in django_document.keys()):
+                        if(django_document["if_file"]["mime_type"] is not None):
+                            data = django_document["if_file"]["mime_type"].split("/")
+                            doc_type = data[0]
+                        else:
+                            doc_type = "notmedia"
+                    else:
+                        doc_type = "notmedia"
+
+                else:
+                    doc_type = "dontcare"
+
+                if (not es.indices.exists("gsystem")):
+                    res = es.indices.create(index="gsystem", body=request_body)
+                es.index(index="gsystem", doc_type=doc_type, id=django_document["id"], body=django_document)
+
+            else:
+                print django_document["id"]
+                if (not es.indices.exists("benchmarks")):
+                    res = es.indices.create(index="benchmarks", body=benchmarks_body)
+
+                es.index(index=index, doc_type=django_document["type"].lower(), id=django_document["id"], body=django_document)
+
+        except Exception as e:
+            print "Error while saving data to ES: "+str(e)
