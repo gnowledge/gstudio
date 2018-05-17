@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.views import rpc_resources
 #Middleware for login with mastodon oauth
 from gnowsys_ndf.ndf.middleware.oauth_middleware import test 
 ################################################
-
+from gnowsys_ndf.ndf.views.es_analytics import get_analytics
 
 #from gnowsys_ndf.ndf.views.esearch import get_search,get_advanced_search_form,advanced_search
 
@@ -57,7 +57,7 @@ urlpatterns = patterns('',
     
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
-
+    url(r'^popular', get_analytics, name="get_analytics"),
     # Elastic Search
     # url(r'^esearch/advanced/?', get_triples, name="get_triples"),
     #url(r'^esearch/?', get_search, name="get_search"),
