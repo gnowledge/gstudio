@@ -63,8 +63,9 @@
     {% if request.user.is_authenticated %}
       <li>
         <a {% if is_gstaff %} href="{% url 'course_analytics_admin' group_name %}" {% else %} href="{% url 'course_analytics' group_id request.user.pk %}" {% endif %}{% if title == 'course_analytics' %} class="selected" {% endif %} tabindex="6" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> 
-            {% if 'Group' in group_object_member_of_names_list %}
-              {% trans "Stats" %}{% else %}
+            {% if 'Group' in group_object_member_of_names_list or 'Author' in group_object_member_of_names_list %}
+              {% trans "Stats" %}
+            {% else %}
               {% if is_gstaff %}
                 {% trans "Group Progress" %}
               {% else %}
@@ -89,12 +90,12 @@
     <li>
         <a href="{% url 'asset_list' group_name %}" {% if title == 'asset_list' or title == 'asset_detail' or title == 'asset_content_detail'%}class="selected"{% endif %}><i class="fi-folder-lock"></i> {%trans "Assets" %}</a>
     </li>
-    {% if group_object.agency_type != 'School' %}
+    {% if group_object.agency_type != 'School' and "Author" not in group_object_member_of_names_list  %}
     <li>
         <a href="https://assessments-clix.tiss.edu/" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
     {% endif %}
-    {% if group_object.agency_type == 'School' %}
+    {% if group_object.agency_type == 'School' or "Author" in group_object_member_of_names_list %}
     <li>
         <a href="/h5p" target="_blank" {% if title == 'Assessments' %}class="selected"{% endif %}><i class="fi-graph-trend"></i> {% trans "Assessments" %}</a>
     </li>
