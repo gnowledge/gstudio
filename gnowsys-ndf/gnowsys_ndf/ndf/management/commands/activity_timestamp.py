@@ -93,11 +93,11 @@ def activity_details(username):
                     activity_disp_name = activity_node.name
                     if activity_node.altnames:
                         activity_disp_name = activity_node.altnames
-                    print "\n {0}. Unit: ".format(ind), unit_name
-                    print " Lesson Name: ", lesson_name
-                    print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)
-                    print " Visited On: {0}".format(visited_on)
-                    print " Language: ", locale
+                    # print "\n {0}. Unit: ".format(ind), unit_name
+                    # print " Lesson Name: ", lesson_name
+                    # print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)
+                    # print " Visited On: {0}".format(visited_on)
+                    # print " Language: ", locale
 
                     nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
                         '_id': {'$ne': each_visit['_id']}, 'user': username, 'session_key': each_visit['session_key'],
