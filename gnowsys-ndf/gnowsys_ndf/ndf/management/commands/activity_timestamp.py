@@ -78,11 +78,13 @@ def activity_details(username):
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
                     lesson_name = lesson_node.name
                     activity_name = activity_node.name
-                    unit_name = unit_node.name
-                    if unit_node.altnames:
-                        unit_name = unit_node.altnames
-                    if activity_node.altnames:
-                        activity_name = activity_node.altnames
+                    if unit_node:
+                        unit_name = unit_node.name
+                        if unit_node.altnames:
+                            unit_name = unit_node.altnames
+                    if activity_node:
+                        if activity_node.altnames:
+                            activity_name = activity_node.altnames
                     row_dict.update({'Unit': slugify(unit_name), 'Lesson': slugify(lesson_name), 
                         'Activity': slugify(activity_name)})
 
