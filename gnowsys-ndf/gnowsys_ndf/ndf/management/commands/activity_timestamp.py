@@ -76,11 +76,11 @@ def activity_details(username):
                     unit_node = get_group_name_id(unit_id, get_obj=True)
                     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
-                    if lesson_node:
+                    if lesson_node and lesson_id:
                         lesson_name = lesson_node.name
-                    if activity_node:
+                    if activity_node and activity_id:
                         activity_name = activity_node.name
-                    if unit_node:
+                    if unit_node and unit_id:
                         unit_name = unit_node.name
                         if unit_node.altnames:
                             unit_name = unit_node.altnames
