@@ -52,7 +52,7 @@ def activity_details(username):
         #activity_out_regex_pattern = '^/'+group_id+'/course.*|.*my-desk.*|.*explore.*|.*tools/tool-page.*|.*course/content.*'
 
         all_visits = benchmark_collection.find({'calling_url': {'$regex': activity_in_regex_pattern,
-         '$options': "i"}, 'user': username}).sort('last_update', -1)
+         '$options': "i"}, 'user': username},timeout=False).sort('last_update', -1)
         
         print "\nTotal activity-player visits: {0}".format(all_visits.count())
         
@@ -76,8 +76,10 @@ def activity_details(username):
                     unit_node = get_group_name_id(unit_id, get_obj=True)
                     lesson_node = node_collection.one({'_id': ObjectId(lesson_id)})
                     activity_node = node_collection.one({'_id': ObjectId(activity_id)})
-                    lesson_name = lesson_node.name
-                    activity_name = activity_node.name
+                    if lesson_node:
+                        lesson_name = lesson_node.name
+                    if activity_node:
+                        activity_name = activity_node.name
                     if unit_node:
                         unit_name = unit_node.name
                         if unit_node.altnames:
@@ -99,7 +101,7 @@ def activity_details(username):
 
                     nav_out_action_cur = benchmark_collection.find({'last_update': {'$gte': each_visit['last_update']}, 
                         '_id': {'$ne': each_visit['_id']}, 'user': username, 'session_key': each_visit['session_key'],
-                        'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }}).sort('last_update', 1)
+                        'calling_url': {'$regex': activity_out_regex_pattern, '$options': 'i' }},timeout=False).sort('last_update', 1)
                     if nav_out_action_cur.count():
                         nav_out_obj = nav_out_action_cur[0]
                         end_time = nav_out_obj['last_update']
