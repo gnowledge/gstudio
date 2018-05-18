@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load ndf_tags %}
+{% load get_latest_git_hash from simple_filters %}
+
 {% block body_content %}
 
 
@@ -102,9 +104,7 @@
             <a href="{% url 'site_privacypolicy' %}" style="font-size: 13px!important">Privacy Policy</a>
         </div>
         <div class="small-3 columns coyright-links">
-            {% comment %}
-                {% get_latest_git_hash as git_commit_hash %}  // kindly uncooment once you check it and put in footer_clix
-            {% endcomment %}
+              {% get_latest_git_hash as git_commit_hash %}
               <a href="https://gitlab.com/gnowledge/gstudio/tree/{{git_commit_hash}}" style="font-size: 13px!important;margin-left:97px;" target="_blank">Powered by gStudio</a>
             <a href="http://www.hbcse.tifr.res.in/" target="_blank">
                 <img src="/static/ndf/images/logos/tifr.png" style="height: 30px;margin-left: 136px;margin-bottom:10px;" />
