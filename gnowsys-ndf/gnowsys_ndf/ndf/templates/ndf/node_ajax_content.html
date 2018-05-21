@@ -530,87 +530,91 @@ Still keeping for future ref (if needed).
             {% endif %}
             {% endwith %}
           </div>
+          {% if node.if_file.original.relurl and not is_group %}
+          <a href="#metadata_info" id="more_info">{% trans "more info" %}</a>
           <div class="small-12 large-8 small-centered large-centered columns">
-        <div class="panel callout radius">
+        <div class="panel callout radius" id="metadata_info" style="display: none;">
           <table class="small-12 large-12 large-centered">
               <caption>Metadata</caption>
             <tr>
-              <td width="200">Time Required</td>
+              <td width="200">{% trans "Time Required" %}</td>
               <td width="250">{{node.timerequired | lower}}</td>
             </tr>
             <tr>
-              <td width="200">Interactivity Type</td>
-              <td width="250">{{node.interactivitytype|lower}}</td>
+              <td width="200">{% trans "Interactivity Type" %}</td>
+              <td width="250">{{node.interactivitytype |lower}}</td>
             </tr>
             <tr>
-              <td width="200">Reading Level</td>
-              <td width="250">{{node.readinglevel}}</td>
+              <td width="200">{% trans "Reading Level" %}</td>
+              <td width="250">{{node.readinglevel |lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Curricular</td>
+              <td width="200">{% trans "Curricular" %}</td>
               <td width="250">{{node.curricular | lower}}</td>
             </tr>
 
 
             <tr>
-              <td width="200">Educational Subject</td>
+              <td width="200">{% trans "Educational Subject" %}</td>
               <td width="250">{{node.educationalsubject | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Educational Alignment</td>
+              <td width="200">{% trans "Educational Alignment" %}</td>
               <td width="250">{{node.educationalalignment | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Based on Url</td>
+              <td width="200">{% trans "Based on Url" %}</td>
               <td width="250">{{node.basedonurl | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Source</td>
+              <td width="200">{% trans "Source<" %}</td>
               <td width="250">{{node.source | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Copyright</td>
+              <td width="200">{% trans "Copyright" %}</td>
               <td width="250">{{node.legal.copyright | lower}}</td>
             </tr>
 
 
             <tr>
-              <td width="200">Age Range</td>
+              <td width="200">{% trans "Age Range" %}</td>
               <td width="250">{{node.age_range | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Educational Level</td>
+              <td width="200">{% trans "Educational Level" %}</td>
               <td width="250">{{node.educationallevel | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Educational Use</td>
+              <td width="200">{% trans "Educational Use" %}</td>
               <td width="250">{{node.educationaluse | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Text Complexity</td>
+              <td width="200">{% trans "Text Complexity" %}</td>
               <td width="250">{{node.textcomplexity | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">Target Audience</td>
+              <td width="200">{% trans "Target Audience" %}</td>
               <td width="250">{{node.audience | lower}}</td>
             </tr>
 
           </table>
       </div>
+      {% endif %}
           {% endif %}
 
 
      {% if not topic and not is_group %}
              <div>
+              <small>License:</small>
              {% if site.SITE_NAME != "NROER" %}
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
@@ -621,6 +625,7 @@ Still keeping for future ref (if needed).
                 <small class="text-gray">
                   [<em>{% trans "Source" %} {{ node.attribute_set.1.source}}</em> ]
                 </small>
+                <img src="/static/ndf/images/cc-by-sa.png" style="margin-left: 60px;">
                 </br>
                 {% endif %}
 
@@ -651,6 +656,7 @@ Still keeping for future ref (if needed).
           {% endcomment %}
        {% endif %}
               </div>
+
        <br>
 
                   {% if social_share == True and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
@@ -1092,5 +1098,23 @@ function add_transcript_func(this_obj){
             });
 
     }
+
+</script>
+
+<script type="text/javascript">
+  $("#more_info").click(function() {
+  
+   var lable = $("#more_info").text().trim();
+
+   if(lable == "Hide info") {
+     $("#more_info").text("more_info");
+     $("#metadata_info").hide();
+   }
+   else {
+     $("#more_info").text("Hide info");
+     $("#metadata_info").show();
+   }
+    
+  });
 
 </script>
