@@ -7,11 +7,22 @@
 <div class="row">
   <div class="medium 12 columns">
 	    <div class="left small-12 medium-6 columns">
-	                <label>{% trans "File name:" %} <b> {{node.name}} </b>
+                  <label>{% trans "File name:" %} <b> {{node.name}} </b>
                   	                    
 	                    <!--<input type="text" placeholder="" name="resource_name" />-->
 	                </label>
                     <label>{% trans "Created By:" %} <b> {{ node.user_details_dict.contributors|join:', ' }} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+                  <label>{% trans "Created At:" %} <b> {{node.created_at}} </b>
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+                  {% if "image" in node.if_file.mime_type %}
+                  <label>{% trans "Dimensions:" %} <b> {{file_obj.if_image_dimensions|default_if_none:"No dimensions available" }}  </b> 
+                      <!--<input type="text" placeholder="" name="resource_name" />-->
+                  </label>
+                  {% endif %}
+                  <label>{% trans "Format:" %} <b> {{file_obj.mime_type}}  </b> 
                       <!--<input type="text" placeholder="" name="resource_name" />-->
                   </label>
                   {% if file_obj.length %}

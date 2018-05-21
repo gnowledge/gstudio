@@ -243,24 +243,19 @@
               </a>
             </li>
             {% if 'CourseEventGroup' in group_obj.member_of_names_list %}
-              {%  if request.user.is_superuser %}
+              {% if is_gstaff %}
                 <li class="tab-title {% ifequal title 'course_quiz_data' %}active{% endifequal %}">
                   <a href="{% url 'course_quiz_data' group_id %}">
                     <i class="fi-photo "></i> <span>{% trans "Quiz" %}</span>
                   </a>
                 </li>
                 <li class="tab-title {% if title == 'course_analytics' %} active  {% endif %}">
-                  <a href="{% url 'course_analytics_admin' group_name %}" > <i class="fa fa-line-chart"></i> 
-                    <span>{% trans "Group Progress" %}</span>
-                  </a>
+                  <a href="{% url 'course_analytics_admin' group_name %}" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i> {% trans "Group Progress" %}</a>
                 </li>
 
               {% else %}
                 <li class="tab-title {% if title == 'course_analytics' %} active  {% endif %}">
-                  <a href="{% url 'course_analytics' group_id request.user.pk %}"> <i class="fa fa-line-chart"></i> 
-                      <span>{% trans "Progress" %}</span>
-                  </a>
-                </li>
+                  <a  href="{% url 'course_analytics' group_id request.user.pk %}" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i>{% trans "Progress" %}</a>
               {% endif %}
             {% endif %}
 

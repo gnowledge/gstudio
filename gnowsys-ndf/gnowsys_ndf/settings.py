@@ -449,7 +449,7 @@ MIDDLEWARE_CLASSES = (
     'gnowsys_ndf.ndf.middleware.SetData.Author',
     'gnowsys_ndf.ndf.middleware.SetData.AdditionalDetails',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
-    # 'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictMiddleware',
+    'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictionMiddleware',
 
     # for profiling methods:
     # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',

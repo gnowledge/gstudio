@@ -2271,7 +2271,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
         user_blogs = node_collection.find({'member_of':page_gst_id, 'type_of': blog_page_gst_id,
          'group_set': group_obj._id, 'created_by': user_id }).sort('created_at', -1)
         # print "\n -- user --",user_blogs.count()
-
+    tab = 'all-notes'
     if node_id:
         notebook_obj = node_collection.one({'_id': ObjectId(node_id)})
         thread_node, allow_to_comment = node_thread_access(group_id, notebook_obj)
@@ -2311,7 +2311,6 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     context_variables.update({'user_blogs': user_blogs})
     context_variables.update({'tab': tab})
     context_variables.update({'node': notebook_obj})
-
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
@@ -2777,7 +2776,6 @@ def course_filters(request, group_id):
 
 # @login_required # commented on-purpose for generating user-csvs
 @get_execution_time
-@auto_enroll
 def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
@@ -2840,8 +2838,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_id    = group_obj._id
     group_name  = group_obj.name
     group_obj_member_of_names_list = group_obj.member_of_names_list
-    if "CourseEventGroup" in group_obj_member_of_names_list:
-        template = "ndf/gcourse_event_group.html"
+    # if "CourseEventGroup" in group_obj_member_of_names_list:
+    #     template = "ndf/gcourse_event_group.html"
 
     if data_points_dict and not isinstance(data_points_dict, dict):
         data_points_dict = json.loads(data_points_dict)
@@ -3219,7 +3217,7 @@ def course_analytics_admin(request, group_id):
         ("users_points", "Total Points"),
         ("files_points", "Files"),
         ("notes_points", "Notes"),
-        ("quiz_points", "Quiz"),
+        ("quiz_points", "Assessments"),
         ("interactions_points", "Interactions"),
     ]
     response_dict = {}

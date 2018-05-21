@@ -32,6 +32,11 @@
                 {% trans "Subject" %}: {{node_attrs.educationalsubject}}
             </span class="card_label">
             <p class="ellipsis"></p>
+            <span class="card_label">
+                <i class="fi-list-thumbnails theme-color"></i>
+                {% trans "No. of Units" %}: {{node.collection_set|length}}
+            </span class="card_label">
+            <p class="ellipsis"></p>
             {% comment %}
             <!--
             <span class="card_label">

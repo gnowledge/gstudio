@@ -1,7 +1,9 @@
 {% load i18n %}
 {% load multiply from simple_filters %}
-{% load get_group_object check_is_gstaff get_site_variables from ndf_tags %}
+{% load get_group_object check_is_gstaff get_profile_full_name get_site_variables get_institute_name from ndf_tags %}
 {% get_site_variables as site %}
+{% get_profile_full_name user_id as req_user_full_name %}
+{% get_institute_name as institute_name %}
 
 <style type="text/css">
   .reveal-modal{
@@ -30,7 +32,7 @@
     <h4 class="text-center"><u><b>PROGRESS REPORT</b></u></h4>
     <div class="small-6 columns">
       <h3 class="inner left-space"> {% firstof group_obj.altnames group_obj.name%} </h3><br/>
-      <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{username}} </h3></h3>
+      <h3 class="inner left-space"> User:  <h3 class="inner left-space"> {{req_user_full_name}} </h3></h3>
     </div>
     <div class="small-6 columns">
       <h4 class="inner">Total points gained:  <h3 class="course-metric-count users_points inner left-space">{{users_points}}</h3></h4>
@@ -446,7 +448,7 @@
                 footer: function() {
                     return { 
                         columns: [ 
-                            "{{site.GSTUDIO_DOC_FOOTER_TEXT}}", 
+                            "{{institute_name}}, {{site.GSTUDIO_DOC_FOOTER_TEXT}}", 
                             { text: datetime_val, alignment: 'right' }
                         ],
                         margin: [10, 0]

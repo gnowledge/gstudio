@@ -21,9 +21,19 @@ if not os.path.exists(csvs_folder_path):
 
 statecode_range_dict = {'mz': (1, 200), 'rj': (1, 300), 'ct': (1, 300), 'tg': (1, 300), 'sp': (1, 300)}
 # statecode_range_dict = {'dl': (1, 50)}
+# statecode_range_dict = {'tg': (301, 500)}  # generated CSVs on 15-may-2018 by Kedar
+# statecode_range_dict = {'mztpd': (1, 10)}  # generated CSVs on 15-may-2018 by Kedar
+# statecode_range_dict = {'rjtpd': (1, 10)}  # generated CSVs on 15-may-2018 by Kedar
+# statecode_range_dict = {'cttpd': (1, 10)}  # generated CSVs on 15-may-2018 by Kedar
+# statecode_range_dict = {'tgtpd': (1, 10)}  # generated CSVs on 15-may-2018 by Kedar
 
 state_startwith_dict = {'mz': 0, 'rj': 200, 'ct': 500, 'tg': 800, 'sp': 1100}
 # state_startwith_dict = {'dl': 1400}
+# state_startwith_dict = {'tg': 1450}  # generated CSVs on 15-may-2018 by Kedar
+# state_startwith_dict = {'mztpd': 1451}  # generated CSVs on 15-may-2018 by Kedar
+# state_startwith_dict = {'rjtpd': 1461}  # generated CSVs on 15-may-2018 by Kedar
+# state_startwith_dict = {'cttpd': 1471}  # generated CSVs on 15-may-2018 by Kedar
+# state_startwith_dict = {'tgtpd': 1481}  # generated CSVs on 15-may-2018 by Kedar
 
 
 # ------ for generating school codes ------
@@ -97,6 +107,7 @@ def create_users_csv(csv_file_name_path, code, start_user_id, last_user_id, user
                 continue
 
         state_code = code[:2]
+        # state_code = code[:5]  # generated CSVs on 15-may-2018 by Kedar
         state_csv_file_path = os.path.join(csvs_folder_path, state_code)
         if not os.path.exists(state_csv_file_path):
             os.makedirs(state_csv_file_path)
@@ -116,6 +127,11 @@ def create_users_csv(csv_file_name_path, code, start_user_id, last_user_id, user
 user_id_creation_order = ['cc', 'mz', 'rj', 'ct', 'tg', 'sp']
 # user_id_creation_order = ['dl']
 # user_id_creation_order = ['cc', 'mz']
+# user_id_creation_order = ['tg']  # generated CSVs on 15-may-2018 by Kedar
+# user_id_creation_order = ['mztpd']  # generated CSVs on 15-may-2018 by Kedar
+# user_id_creation_order = ['rjtpd']  # generated CSVs on 15-may-2018 by Kedar
+# user_id_creation_order = ['cttpd']  # generated CSVs on 15-may-2018 by Kedar
+# user_id_creation_order = ['tgtpd']  # generated CSVs on 15-may-2018 by Kedar
 
 create_users_csv(st_usernames, 'cc', start_user_id=2, last_user_id=1000, user_type='users')
 print "\n\nCreating csv's for : cc"
@@ -139,6 +155,7 @@ for code in user_id_creation_order:
             # print "each_sc: ", each_sc, each_sc[2:], state_startwith_dict[each_sc[:2]]
             # print int(each_sc[2:]) + state_startwith_dict[each_sc[:2]]
             last_user_id = 1000 + (( int(each_sc[2:]) + state_startwith_dict[each_sc[:2]] ) * 1050 )
+            # last_user_id = 1000 + (( int(each_sc[5:]) + state_startwith_dict[each_sc[:5]] ) * 1050 )  # generated CSVs on 15-may-2018 by Kedar
             start_user_id = last_user_id - 1050
             start_user_id += teacher_student_start_perschool[user_type]
             if user_type == "teacher":
