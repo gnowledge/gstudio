@@ -7047,22 +7047,22 @@ input.transcript-toggler {
   padding-right: 100px;
 }
 
-/* line 7223, ../../../scss/_clix2017.scss */
-.uname-to-icon {
+/* line 7224, ../../../scss/_clix2017.scss */
+.uname-to-icon:hover {
   border-bottom: 2px solid #713557;
 }
 
-/* line 7227, ../../../scss/_clix2017.scss */
+/* line 7230, ../../../scss/_clix2017.scss */
 .module-partition {
   border-left: 2px solid #713558;
 }
 
-/* line 7231, ../../../scss/_clix2017.scss */
+/* line 7234, ../../../scss/_clix2017.scss */
 .fetch-analytics {
   cursor: pointer;
 }
 
-/* line 7235, ../../../scss/_clix2017.scss */
+/* line 7238, ../../../scss/_clix2017.scss */
 abs-pos {
   position: absolute;
 }

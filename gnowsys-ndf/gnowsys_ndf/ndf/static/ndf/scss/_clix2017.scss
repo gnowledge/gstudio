@@ -7221,7 +7221,10 @@ font-size:100%; color: $primary-theme-color;
 }
 
 .uname-to-icon{
-    border-bottom: 2px solid #713557;    
+    &:hover{
+        border-bottom: 2px solid #713557;    
+    
+    }
 }
 
 .module-partition{
