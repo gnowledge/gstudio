@@ -538,72 +538,72 @@ Still keeping for future ref (if needed).
               <caption>Metadata</caption>
             <tr>
               <td width="200">{% trans "Time Required" %}</td>
-              <td width="250">{{node.timerequired | lower}}</td>
+              <td width="250">{{node.timerequired | default_if_none:"Not set" | lower}}</td>
             </tr>
             <tr>
               <td width="200">{% trans "Interactivity Type" %}</td>
-              <td width="250">{{node.interactivitytype |lower}}</td>
+              <td width="250">{{node.interactivitytype | default_if_none:"Not set" | lower}}</td>
             </tr>
             <tr>
               <td width="200">{% trans "Reading Level" %}</td>
-              <td width="250">{{node.readinglevel |lower}}</td>
+              <td width="250">{{node.readinglevel | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Curricular" %}</td>
-              <td width="250">{{node.curricular | lower}}</td>
+              <td width="250">{{node.curricular | default_if_none:"Not set" | lower}}</td>
             </tr>
 
 
             <tr>
               <td width="200">{% trans "Educational Subject" %}</td>
-              <td width="250">{{node.educationalsubject | lower}}</td>
+              <td width="250">{{node.educationalsubject | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Educational Alignment" %}</td>
-              <td width="250">{{node.educationalalignment | lower}}</td>
+              <td width="250">{{node.educationalalignment | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Based on Url" %}</td>
-              <td width="250">{{node.basedonurl | lower}}</td>
+              <td width="250">{{node.basedonurl | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
-              <td width="200">{% trans "Source<" %}</td>
-              <td width="250">{{node.source | lower}}</td>
+              <td width="200">{% trans "Source" %}</td>
+              <td width="250">{{node.source | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Copyright" %}</td>
-              <td width="250">{{node.legal.copyright | lower}}</td>
+              <td width="250">{{node.legal.copyright | default_if_none:"Not set" | lower}}</td>
             </tr>
 
 
             <tr>
               <td width="200">{% trans "Age Range" %}</td>
-              <td width="250">{{node.age_range | lower}}</td>
+              <td width="250">{{node.age_range | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Educational Level" %}</td>
-              <td width="250">{{node.educationallevel | lower}}</td>
+              <td width="250">{{node.educationallevel | join_with_commas | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Educational Use" %}</td>
-              <td width="250">{{node.educationaluse | lower}}</td>
+              <td width="250">{{node.educationaluse | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Text Complexity" %}</td>
-              <td width="250">{{node.textcomplexity | lower}}</td>
+              <td width="250">{{node.textcomplexity | default_if_none:"Not set" | lower}}</td>
             </tr>
 
             <tr>
               <td width="200">{% trans "Target Audience" %}</td>
-              <td width="250">{{node.audience | lower}}</td>
+              <td width="250">{{node.audience |join_with_commas | lower }}</td>
             </tr>
 
           </table>
