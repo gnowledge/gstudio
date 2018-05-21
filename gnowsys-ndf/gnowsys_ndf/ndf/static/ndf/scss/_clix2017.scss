@@ -4329,9 +4329,9 @@ $primary-button-background-color: #00a9ee;
     }
 }
 
-$nav_menu_1_color: #ce7869;
+$nav_menu_1_color: #713558;
 $nav_menu_1_bg_color: $complimentary-color;
-$nav_menu_1_tab_border: #ffc14e;
+$nav_menu_1_tab_border: #713558;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
@@ -5469,9 +5469,9 @@ $module-card-lines-to-show: 3;
     
 }
 
-$nav_menu_1_color: #6f0859;
+$nav_menu_1_color: #713558;
 $nav_menu_1_bg_color: $complimentary-color;
-$nav_menu_1_tab_border: #a2238d;
+$nav_menu_1_tab_border: #713558;
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;
@@ -5504,7 +5504,7 @@ ul.authoring-tab{
         display: none;
     }
 
-        background-color:$nav_menu_1_color;
+        background-color:$primary-theme-color;
         margin-bottom: 0px;
         display:inline;
         width:50%;
@@ -5514,7 +5514,7 @@ ul.authoring-tab{
                 >a{
                         list-style-type: none;
                         margin-right:-5px;
-                        background-color:$nav_menu_1_color;
+                        background-color:$primary-theme-color;
                         padding: 12px 12px 9px;
                         cursor: pointer;
                         font-size: 18px;
@@ -6079,7 +6079,7 @@ ul.authoring-tab{
 }
 
 .nav-legal{
-            margin-left:-400px;
+            
                 ol {
                     list-style-type: none;
                     li {
@@ -6099,7 +6099,6 @@ ul.authoring-tab{
                 }
 
             @media screen and (min-width: 968px) and (max-width: 1400px){
-                    margin-left:-200px;
                 ol {
                     list-style-type: none;
                     li {
@@ -6507,6 +6506,9 @@ input.transcript-toggler{
 @media screen and (max-width: 480px) {
   
 }
+
+
+
 
 
 .color-btn{
