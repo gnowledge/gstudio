@@ -4288,3 +4288,23 @@ def get_member_of_list(node_ids):
 		return temp_list
 	else:
 		return None
+
+
+@get_execution_time
+@register.filter
+def join_with_commas(obj_list):
+    """Takes a list of objects and returns their unicode representations,
+    seperated by commas and with 'and' between the penultimate and final items
+    For example, for a list of fruit objects:
+    [<Fruit: apples>,<Fruit: oranges>,<Fruit: pears>] -> 'apples, oranges and pears'
+    """
+    if not obj_list:
+        return ""
+    l=len(obj_list)
+    if l==1:
+        return u"%s" % obj_list[0]
+    else:    
+        return ", ".join(unicode(obj) for obj in obj_list[:l-1]) \
+                + " and " + unicode(obj_list[l-1])
+
+
