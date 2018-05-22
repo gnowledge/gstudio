@@ -1,7 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-
+{% load es_tags %}
 {% get_download_filename node as download_filename %}
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
@@ -414,8 +414,8 @@ Still keeping for future ref (if needed).
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
                   var Book = ePub("{% url 'read_file' group_name_tag node download_filename %}", {
-                    width: 400,
-                    height: false,
+                    // width: 400,
+                    // height: false,
                     restore: true
                   });
                   Book.renderTo("ebook-area");
@@ -629,6 +629,8 @@ Still keeping for future ref (if needed).
                 <a class="button tiny" title="Click here to Download" href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}">
                   Download
                 </a>
+                {% each_file_download_count "read_file" group_name_tag node download_filename as file_download_count %}
+                <span>No. of Downloads : </span>{{file_download_count}}
                 {% endif %}
 
 
