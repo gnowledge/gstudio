@@ -4252,3 +4252,59 @@ def get_header_lang(lang):
         if lang in each_lang:
             return each_lang[1]
     return lang
+
+#convert 13 digit number to slash date format 
+
+@get_execution_time
+@register.filter
+def convert_date_string_to_date(your_timestamp):
+
+	date = str(datetime.datetime.fromtimestamp( your_timestamp / 1000))
+
+	temp1 = date[8:10]
+	temp2 = date[5:7]
+	temp3 = date[0:4]
+	date = temp1 + "/"+ temp2 +"/"+ temp3
+
+	return date
+
+
+@get_execution_time
+@register.filter
+def cal_length(string):
+	return len(str(string))
+
+@get_execution_time
+@register.assignment_tag
+def get_member_of_list(node_ids):
+
+	from gnowsys_ndf.ndf.models.gsystem_type import GSystemType
+	temp_list =[]
+	for each in node_ids:
+		node_obj = node_collection.find_one({"_id":ObjectId(each)})
+		if node_obj:
+			temp_list.append(node_obj.name)
+	if node_obj:
+		return temp_list
+	else:
+		return None
+
+
+@get_execution_time
+@register.filter
+def join_with_commas(obj_list):
+    """Takes a list of objects and returns their unicode representations,
+    seperated by commas and with 'and' between the penultimate and final items
+    For example, for a list of fruit objects:
+    [<Fruit: apples>,<Fruit: oranges>,<Fruit: pears>] -> 'apples, oranges and pears'
+    """
+    if not obj_list:
+        return ""
+    l=len(obj_list)
+    if l==1:
+        return u"%s" % obj_list[0]
+    else:    
+        return ", ".join(unicode(obj) for obj in obj_list[:l-1]) \
+                + " and " + unicode(obj_list[l-1])
+
+
