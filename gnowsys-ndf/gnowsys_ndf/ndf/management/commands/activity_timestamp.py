@@ -59,6 +59,9 @@ def activity_details(username):
         for ind, each_visit in enumerate(all_visits):
             # print each_visit
             row_dict = {'Unit' : 'NA','Lesson' : 'NA', 'Activity' : 'NA', 'Language' : 'NA', 'VisitedOn' : 'NA', 'OutTime' : 'NA', 'OutAction' : 'NA','TimeSpentInSeconds' : 'NA', 'Buddies' : 'NA'}
+            unit_name = 'NA'
+            activity_name = 'NA'
+            lesson_name = 'NA'
             visited_on = each_visit['last_update']
             row_dict['VisitedOn'] = str(visited_on)
             locale = each_visit['locale']
@@ -87,12 +90,11 @@ def activity_details(username):
                     if activity_node:
                         if activity_node.altnames:
                             activity_name = activity_node.altnames
+                    
                     row_dict.update({'Unit': slugify(unit_name), 'Lesson': slugify(lesson_name), 
                         'Activity': slugify(activity_name)})
 
-                    activity_disp_name = activity_node.name
-                    if activity_node.altnames:
-                        activity_disp_name = activity_node.altnames
+                    
                     # print "\n {0}. Unit: ".format(ind), unit_name
                     # print " Lesson Name: ", lesson_name
                     # print " Activity Name ({0}): {1}".format(activity_node._id, activity_disp_name)

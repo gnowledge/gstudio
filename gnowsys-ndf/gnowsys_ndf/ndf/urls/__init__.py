@@ -130,7 +130,7 @@ urlpatterns = patterns('',
     url(r'^about.html/','gnowsys_ndf.ndf.views.site.site_about',name='site_about'),    
     url(r'^credits.html/','gnowsys_ndf.ndf.views.site.site_credits',name='site_credits'),    
     url(r'^contact.html/','gnowsys_ndf.ndf.views.site.site_contact',name='site_contact'),    
-    url(r'^termsofuse.html/','gnowsys_ndf.ndf.views.site.site_termsofuse',name='site_termsofuse'),    
+    url(r'^termsofservice.html/','gnowsys_ndf.ndf.views.site.site_termsofuse',name='site_termsofuse'),    
     url(r'^privacypolicy.html/','gnowsys_ndf.ndf.views.site.site_privacypolicy',name='site_privacypolicy'),    
     # --end meeting app
 
