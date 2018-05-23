@@ -13,7 +13,8 @@ class Author(Group):
         'preferred_languages': dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
         'group_affiliation': basestring,
 	'language_proficiency':list,
-	'subject_proficiency':list
+	'subject_proficiency':list,
+    'access_token':unicode 
     }
 
     use_dot_notation = True

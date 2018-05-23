@@ -20,6 +20,9 @@ from gnowsys_ndf.ndf.views import rpc_resources
 #Middleware for login with mastodon oauth
 from gnowsys_ndf.ndf.middleware.oauth_middleware import mastodon_login 
 ################################################
+from gnowsys_ndf.ndf.views.es_analytics import get_analytics
+
+#from gnowsys_ndf.ndf.views.esearch import get_search,get_advanced_search_form,advanced_search
 
 if GSTUDIO_SITE_NAME.lower() == 'clix':
     login_template = 'registration/login_clix.html'
@@ -28,7 +31,6 @@ else:
     login_template = 'registration/login.html'
     logout_template = 'registration/logout.html'
     login_instance_mastodon=mastodon_login()
-    
 
 urlpatterns = patterns('',
     (r'^i18n/', include('django.conf.urls.i18n')),
@@ -54,6 +56,16 @@ urlpatterns = patterns('',
     
     url(r'^$', homepage, {"group_id": "home"}, name="homepage"),
     url(r'^welcome/?', landing_page, name="landing_page"),
+    url(r'^popular', get_analytics, name="get_analytics"),
+    # Elastic Search
+    # url(r'^esearch/advanced/?', get_triples, name="get_triples"),
+    #url(r'^esearch/?', get_search, name="get_search"),
+    #url(r'^advanced_form/?', get_advanced_search_form, name="get_advanced_search_form"),
+    #url(r'^advanced_search/?', advanced_search, name="advanced_search"),
+    
+    # url(r'^esearch//?',advanced_search,name='advanced_search')
+    # url(r'^esearch/get_mapping_json/(?P<json_type>[^/]+)/?$', '', name=''),
+    # --END of Elastic Search
 
     # Elastic Search
     # url(r'^esearch/advanced/?', get_triples, name="get_triples"),
@@ -70,8 +82,7 @@ urlpatterns = patterns('',
     (r'^', include('gnowsys_ndf.ndf.urls.captcha')),
 
     # advanced search using ES
-
-    # (r'^(?P<group_id>[^/]+)/advanced_search/', include('gnowsys_ndf.ndf.urls.advanced_search')),
+    (r'^(?P<group_id>[^/]+)/advanced_search', include('gnowsys_ndf.ndf.urls.advanced_search')),
 
     # all main apps
 
@@ -246,6 +257,10 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration_email.backends.default.urls')),
 
    # --end of django-registration
+    #################################################
+
+    url(r'^accounts/login_test_view/$', some_instance.moauth , name='login_view'),
+    ################################################
 
     #####################url for mastodon login####################
     url(r'^accounts/login_test_view/$', login_instance_mastodon.moauth , name='login_view'),

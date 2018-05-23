@@ -1,0 +1,94 @@
+{
+    "settings": {
+	"index.mapping.total_fields.limit": 10000, 
+	"number_of_shards": 5,
+	"number_of_replicas": 2,
+        "index.mapping.ignore_malformed": true,
+	"analysis": {
+	    "analyzer": {
+		"trigram": {
+		    "type": "custom",
+		    "tokenizer": "standard",
+		    "stopwords": "_english_",
+		    "filter": [
+			"standard",
+			"lowercase",
+			"shingle"
+			],
+		    "char_filter": ["html_strip"]
+		    }
+		},
+	    "filter": {
+		"shingle": {
+		    "type": "shingle",
+		    "min_shingle_size": 2,
+		    "max_shingle_size": 3
+		    }
+		}
+	    }
+	},
+    "mappings" : {
+      "benchmark" : {
+        "properties" : {
+          "action" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "function_output_length" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "group" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "last_update" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "name" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "parameters" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "size_of_parameters" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "time_taken" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "type" : {
+            "type" : "text",
+            "fielddata" : true
+          },
+          "user" : {
+	          "type": "string",
+            "index": "not_analyzed"
+          },
+	     "calling_url":{
+		     "type": "string",
+            "index": "not_analyzed"
+		 },          
+	    "has_data" : {
+            "properties" : {
+              "GET" : {
+                "type" : "text",
+		  "fielddata" : true
+              },
+              "POST" : {
+                "type" : "text",
+		  "fielddata" : true
+              }
+            }
+          }
+	    
+        }
+      }
+    }
+  }
+

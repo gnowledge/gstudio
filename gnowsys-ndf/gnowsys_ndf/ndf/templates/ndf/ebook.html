@@ -4,7 +4,7 @@
 {% load ndf_tags %}
 {% load simple_filters %}
 
-{% block title %} Repository {% endblock %}
+{% block title %} {{ title }}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/slick-carousel/slick/slick.css"/>
@@ -59,7 +59,11 @@ margin-top:5px;
                 {% trans "eBooks" %}
             <span class="count">
                {% if all_ebooks %}
-                  {{all_ebooks.count}}
+                  {% if GSTUDIO_ELASTIC_SEARCH %}
+                    {{all_ebooks_count}}
+                  {% else %}
+                    {{all_ebooks.count}}
+                  {% endif %}
                {% endif %}
             </span>
         </dd>
@@ -95,7 +99,6 @@ margin-top:5px;
 <!-- {#% get_preferred_lang request page_nodes "Page" as page_nodes %#} -->
 
   {% group_type_info groupid request.user as grouptype %}
-
   <!-- Existing card list-->
   {% for node in all_ebooks %}
 
@@ -115,16 +118,18 @@ margin-top:5px;
 
 {% endblock %}
 {% endcomment %}
-{# ===================================== #}
+{# =================================================================================================================#}
 
 {% block body_content %}
+
 <a href="{% url 'e-book' group_name_tag %}" title="Click to go to ebooks">
     <div class="large-4 columns repository-title top-gap" >
-      {% if ebook_gst.altnames and ebook_gst.altnames != "None" %}
-        {{ebook_gst.altnames}}
-      {% else %}
-        {{ebook_gst.name}}
-      {% endif%}
+
+        {% if ebook_gst.altnames and ebook_gst.0.altnames != "None" %}
+          {{ebook_gst.altnames}}
+        {% else %}
+          {{ebook_gst.name}}
+        {% endif%}
     </div>
   </a>
   <div class="large-8 columns repository-desc top-gap">{{ebook_gst.content_org|default_if_none:""|safe}}</div>
@@ -132,7 +137,7 @@ margin-top:5px;
   {% get_filters_data "E-Book" as filter_dict %}
   {% include "ndf/filters.html" with filter_dict=filter_dict %}
 
-    <div style="margin-top:13px">{% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info %}</div>
+    <div style="margin-top:13px">{% include "ndf/file_list_tab.html" with resource_type=all_ebooks detail_urlname="page_details" filetype="ebook" res_type_name="" page_info=page_info title="eBooks"%}</div>
 
 {% endblock body_content %}
 
@@ -140,7 +145,7 @@ margin-top:5px;
 {% block script %}
 // <script type="text/javascript">
   
-function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}"); } }
+function applyFilter() { if (updateFilterUrl){ updateFilterUrl("{% url 'e-book' group_name_tag %}","True"); } }
 
 var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
 for (var i = pageAnchors.length - 1; i >= 0; i--) {

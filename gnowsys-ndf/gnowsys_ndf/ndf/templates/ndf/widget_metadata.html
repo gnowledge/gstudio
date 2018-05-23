@@ -79,9 +79,9 @@
                 {# <option value="{{each_copyright}}"  #}
                 {% if each_copyright == node.legal.copyright %}
                   <option selected>{% trans node.legal.copyright %}</option>
-                {% else %}>
+                {% else %}
                   <option data-opts = "{{each_copyright}}">{% trans each_copyright %}</option>
-                {% endif %}>
+                {% endif %}
           {% endfor %}
         </select>
       </div>

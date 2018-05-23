@@ -53,7 +53,6 @@ class mastodon_login(object):
                
                 ###check whether given email is present in user table or not####
                 user_email = User.objects.filter(email=name).exists()
-                   
                 if user_email:
              
                     ##Fetch auth object using email
@@ -71,7 +70,6 @@ class mastodon_login(object):
                                     return HttpResponseRedirect( reverse('landing_page') )
                             else:
                                 HttpResponse("Invalid Credentials")
-                        
                     else:
                         ##Creating auth object for user
                         member = User.objects.get(email=name) 

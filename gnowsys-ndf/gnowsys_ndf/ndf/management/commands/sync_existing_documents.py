@@ -985,8 +985,8 @@ class Command(BaseCommand):
           print "\n Replaced member_of field from 'activity' to'Page' in " + activity_gs_mem_update_res['n'].__str__() + " instances."
 
 
-
 ####Add 'access_token' field to existing auth objects##############
     author_cursor = node_collection.find({'_type':'Author'})
     if author_cursor:
         author_cursor=node_collection.collection.update({'_type':'Author','access_token':{'$exists':False}},{'$set':{'access_token':None}},upsert=False, multi=True)
+

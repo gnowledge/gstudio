@@ -4,15 +4,16 @@
 
 {% get_pages "Info page" as infopages %}
 
-<footer>
+
+<footer style="margin-top: 80px;">
     <div id="myfooter" class="myfooter">
         <div class="footer-section container content-section">
             <div class="row">
 
                 <div class="small-12 medium-12 columns">
-                    <div class="small-3 medium-3 columns">
+                    <div class="small-4 medium-3 columns">
                         <div class="footer_link_cont">
-                            <h4>Quick Links</h4>
+                            <span class="flinks">{% trans "Quick Links" %}</span>
                             <!-- <div class="links_collapse"> -->
                             <div>    
                                 <ul>
@@ -23,9 +24,8 @@
                                     <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
                                     <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
                                     <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
-                                    
                                     <li><a href="https://gitlab.com/gnowledge/gstudio/issues">{% trans "Issues" %}</a></li>
-                                    <li><a href="{% url 'sitemap' %}">Sitemap</a></li>
+                                    <li><a href="{% url 'sitemap' %}">{% trans "sitemap" %}</a></li>
                                     <li><a href="{{site.ISSUES_PAGE}}">{% trans "Feedback" %}</a></li>
 
                                 </ul>
@@ -34,18 +34,18 @@
                         </div>
                     </div>
 
-                    <div class="small-3 medium-3 columns">
+                    <div class="small-4 medium-3 columns">
                         <div class="footer_link_cont">
-                            <h4>Other Links</h4>
+                            <span class="flinks">{% trans "Other Links" %}</span>
                             <!-- <div class="links_collapse"> -->
                             <div>    
                                 <ul>
-                                    <li><a href="http://ncert.nic.in">NCERT</a></li>
-                                    <li><a href="http://ciet.nic.in">CIET</a></li>
-                                    <li><a href="http://epathshala.nic.in">Epathshala</a></li>
-                                    <li><a href="http://ictcurriculum.gov.in">ICT Curriculum</a></li>
-                                    <li><a href="http://swayam.nic.in">SWAYAM</a></li>
-                                    <li><a href="http://ncert.org.in/ictschools/index.php/cyber-security/">Cyber Security</a></li>
+                                    <li><a href="http://ncert.nic.in">{% trans "NCERT" %}</a></li>
+                                    <li><a href="http://ciet.nic.in">{% trans "CIET" %}</a></li>
+                                    <li><a href="http://epathshala.nic.in">{% trans "Epathshala" %}</a></li>
+                                    <li><a href="http://ictcurriculum.gov.in">{% trans "ICT Curriculum" %}</a></li>
+                                    <li><a href="http://swayam.nic.in">{% trans "SWAYAM" %}</a></li>
+                                    <li><a href="http://ncert.org.in/ictschools/index.php/cyber-security/">{% trans "Cyber Security" %}</a></li>
                                     <!-- <li><a href="http://ncert.org.in/ictschools/index.php/links/">See all</a></li> -->
                                 </ul>
                             </div>
@@ -55,7 +55,7 @@
 
                     <div class="small-6 medium-6 columns">
                         <div class="footer_link_cont">
-                            <h4>Connect With Us</h4>
+                            <span class="flinks">{% trans "Connect With Us" %}</span>
         
                             <div class="social_links">
                                 <a href="https://www.facebook.com/National-Council-of-Educational-Research-and-Training-NCERT-1603463793208763/"><i class="fi-social-facebook"  "></i></a>
@@ -81,14 +81,13 @@
                                     <li><a href="http://www.tiss.edu/" target="_blank">
                                         <img src="/static/ndf/images/logos/tiss-logo-text.svg" style="height:60px;"/></a></li>
    <!--                                  <li><a href="https://data.gov.in/" target="_blank"><img src="/static/ndf/images/tata-trusts-logo.svg" style="height:50px; width:90px;" /></a></li> -->    
-                                    <li><a href="http://www.mit.edu/" target="_blank">
-                                        <img src="/static/ndf/images/mit-logo.svg" style="height:50px; width:110px;"></a></li>
+                                    <!-- <li><a href="http://www.mit.edu/" target="_blank">
+                                        <img src="/static/ndf/images/mit-logo.svg" style="height:50px; width:110px;"></a></li> -->
                                 </ul>                               
                             </div>
                         </div>
                     </div>
                 </div>
-
                     
                    
                 <hr class="footerlogo-divider">
@@ -97,7 +96,7 @@
                     <ul id="footerlogo">
                         <li><a href="http://mhrd.gov.in/" target="_blank"><img src="/static/ndf/images/logos/ministry_logos/mhrd.png" style="height:60px;"></a></li>
                         <li><a href="http://digitalindia.gov.in/" target="_blank">
-                            <img src="/static/ndf/images/logos/ministry_logos/digital_india.png"/></a></li>
+                            <img src="/static/ndf/images/logos/ministry_logos/digital_india.png" style="height:60px;"/></a></li>
                         <li><a href="http://www.ncert.nic.in/" target="_blank">
                             <img src="/static/ndf/images/logos/ncert-logo.png" style="height:60px;"></a></li>
                         <li><a href="https://india.gov.in/" target="_blank">
@@ -105,7 +104,10 @@
                         <li><a href="http://mygov.in/" target="_blank">
                             <img src="/static/ndf/images/logos/ministry_logos/my_gov_logo.png"/></a></li>
                         <li><a href="https://data.gov.in/" target="_blank">
-                            <img src="/static/ndf/images/logos/ministry_logos/datagov_logo.png"/></a></li>                             
+                            <img src="/static/ndf/images/logos/ministry_logos/datagov-logo.png" style="height:35px;"/></a></li> 
+                        <li>
+                            <img src="/static/ndf/images/ccbysa.png" style="margin-left: 110px; height: 20px;">
+                        </li>                                
                     </ul>
                 </div>
             </div>

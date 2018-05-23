@@ -1,0 +1,370 @@
+<input type="hidden" name="filters" value="{{filters}}" id="filters">
+<script type="text/javascript">
+   
+      var url;
+      var filters = $('#filters').val();
+      console.log(filters)
+      if (filters == "image" ){
+        url = "{% url 'image' groupid %}";
+      }
+      else if(filters == "audio"){
+        url = "{% url 'audio' groupid %}";
+      }
+      else if(filters == "video"){
+        url = "{% url 'video' groupid %}";
+      }
+
+    $(document).on("click", "#search_button", function(event) {
+      event.preventDefault();
+      var search_text  = $('#search_text').val();
+      // if (search_text == null || search_text == '') {  
+      //     alert('Please Enter a text')
+      //     return false  
+      // }
+      // var a= "'{% url";
+      // var b=" 'image' ";
+      // var c="groupid %}'";
+      // var url = "{% url 'image' groupid %}";
+      // var temp = a.concat(b);
+      // var url=temp.concat(c);
+      // console.log(url)
+      $.ajax({
+        url:url,
+        type:"POST",
+        datatype: "html",
+        data:{
+          search_text : $('#search_text').val(),
+          search_workspace: $('#show_all_workspace option:selected').val(),
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success:function(data){
+          var $response=$(data);
+          var a = $response.filter('.Collection');
+          $(".Collection").empty()
+          $(".Collection").append(a)
+          // $("#image_search_form").empty()
+          // $("h4").empty()
+          if (filters == "image" ){
+            $(".card-image-wrapper").click(function(event){
+            var imageURL = $(this).children('img').attr("data-image-src");
+            var imageTitle = $(this).attr("title");
+            // var locationURL = 'http://' + location.host;
+            var locationURL = window.location.origin
+            var completeURL = imageURL
+            var width = prompt("Please enter width in px",'600');
+            if(width == null)
+            {
+                return false;
+            }
+            CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="'+  width + '"src=' + completeURL + ' '+ 'alt=' + imageTitle + '>' + '</img>');
+            $('#group_imgs_on_modal').foundation('reveal', 'close');
+            });
+          }
+          else if(filters == "audio"){
+            $(".audio-caption").click(function(event){
+               var audio_player_url = "/{{groupid}}/ajax/get_audio_player";
+               this_obj  = this;
+               var datasrc = this_obj.attributes['data-audio-id'].value
+
+            $.ajax({
+                        type: "GET",
+                        url: audio_player_url,
+                        datatype: "html",
+                        data:{
+                            datasrc:datasrc
+                        },
+                        success: function(data) {
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml(data);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                        }
+                });
+
+
+          });
+          }
+          else if(filters == "video"){
+            $(".card-image-wrapper").click(function(event){
+                            var video_player_url = "/{{groupid}}/ajax/get_video_player";
+                            var datasrc = $(this).children('img').attr("data-image-id");
+
+                            $.ajax({
+                                        type: "GET",
+                                        url: video_player_url,
+                                        datatype: "html",
+                                        data:{
+                                            datasrc:datasrc
+                                        },
+                                        success: function(data) {
+                                            CKEDITOR.instances['ckeditor_textarea'].insertHtml(data);
+                                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                                        }
+                                });
+
+
+             });
+          }
+
+        },
+        failure:function(data){
+          alert('GOT AN ERROR');
+        }
+      });
+    });
+
+    $(document).on('change','.filenode',function(){
+
+        var checked = $('.filenode:checked').length;
+        if (checked){
+          $(".coll_label").css("display", "block");          
+        }
+        else{
+          $(".coll_label").css("display", "none");          
+        }
+        
+    });
+
+    // pagination ajax  
+    $('ul.pagination a').click(function(e)
+    {
+        e.preventDefault();
+        populateFileList(this);    
+    });
+
+    isFilterChanged = false;
+
+  function ddLHSBindEvents(){
+
+    $("dl.tabs dd").click(function(e){
+
+
+      var tabDivId = $(this).children("a").attr("href");
+
+      // if((tabDivId != "#view-collection") && (tabDivId != "view-pandora-video"))
+      if(tabDivId != "view-pandora-video")
+      {
+        var pageAnchor = $(tabDivId).children("a.first-load")[0];
+        // console.log(pageAnchor);
+        if(! pageAnchor)
+        {
+          var pageAnchor = $(tabDivId).find("ul.pagination > li > a:first")[0];
+        }
+        if(pageAnchor)
+        {
+          populateFileList(pageAnchor);
+        }
+      }
+
+      // check the origin of click. Via filter-triggered or normal-click.
+      if(!e.originalEvent && e.isTrigger)   // filter-triggered
+      {
+        isFilterChanged = true;
+      }
+      else                                  // normal-click.
+      {
+        isFilterChanged = false;
+      }
+      $(this).off("click");
+    });
+
+  }
+  
+  ddLHSBindEvents();
+
+  function populateFileList(pageAnchor)
+  {
+
+    var filetype = pageAnchor.href.split("/")[5],
+        page_no = pageAnchor.text.trim(),
+        no_of_objs_pp = 24,
+        url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
+
+    // getting already added filers as an array of objects, holding entire properties of it.
+    {% if title == "E-Library" %}
+      var filtersObjArr = {};
+      if (getFiltersObjsInAndOrFormat){
+        filtersObjArr = JSON.stringify(getFiltersObjsInAndOrFormat());
+      }
+    {% endif %}
+
+    var tabContainerDiv = $(pageAnchor).closest("div.content");
+
+    $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+
+        title: "{{title}}",
+        filetype: filetype,
+        page_no: page_no,
+        no_of_objs_pp: no_of_objs_pp,
+  
+        // {% if title == "E-Library" %}
+          filters: filtersObjArr,
+        // {% endif %}
+  
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+        
+        $(tabContainerDiv).html(data);
+
+        // making newly loaded html pagination <a> non clickable and bind with populateFileList()
+        $(tabContainerDiv).find("ul.pagination a").click(function(e){
+
+          e.preventDefault();
+          populateFileList(this);
+
+          });
+          
+          var pageAnchors = document.querySelectorAll('ul.pagination > li > a');
+          for (var i = pageAnchors.length - 1; i >= 0; i--) {
+            pageAnchors[i].href += location.search; 
+          }
+
+          if(isFilterChanged) { updateLHSpanelCounters(); }
+        }
+      });
+    }
+
+    // providing function to handle filtering part
+    function applyFilter(filtersArr)
+    {
+      //if (updateFilterUrl){ updateFilterUrl("{% url 'e-library' group_name_tag %}","True"); }
+      //$(".small-block-grid-1").empty()
+      // $("h4").empty()
+      //var url;
+      if (updateFilterUrl){ filterurl = updateFilterUrl("{% url 'image' groupid %}","False"); }
+        $.ajax({
+          type:'POST',
+          //url:"{% url 'image' groupid %}",
+          url:url,
+          data:{
+            // filters: '[{"or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"}]}]',
+            filters: filterurl,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            search_text : $('#search_text').val(),
+            search_workspace: $('#show_all_workspace option:selected').val()
+          },
+          success: function(data){
+            var $response=$(data);
+            var a = $response.filter('.Collection');
+            $(".Collection").empty()
+            $(".Collection").append(a)
+            if (filters == "image"){
+              $(".card-image-wrapper").click(function(event){
+              var imageURL = $(this).children('img').attr("data-image-src");
+              var imageTitle = $(this).attr("title");
+              // var locationURL = 'http://' + location.host;
+              var locationURL = window.location.origin
+              var completeURL = imageURL
+              var width = prompt("Please enter width in px",'600');
+              if(width == null)
+              {
+                  return false;
+              }
+              CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="'+  width + '"src=' + completeURL + ' '+ 'alt=' + imageTitle + '>' + '</img>');
+              $('#group_imgs_on_modal').foundation('reveal', 'close');
+              });
+            }
+            else if(filters == "audio"){
+            $(".audio-caption").click(function(event){
+               var audio_player_url = "/{{groupid}}/ajax/get_audio_player";
+               this_obj  = this;
+               var datasrc = this_obj.attributes['data-audio-id'].value
+
+            $.ajax({
+                        type: "GET",
+                        url: audio_player_url,
+                        datatype: "html",
+                        data:{
+                            datasrc:datasrc
+                        },
+                        success: function(data) {
+                            CKEDITOR.instances['ckeditor_textarea'].insertHtml(data);
+                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                        }
+                });
+          });
+          }
+          else if(filters == "video"){
+            $(".card-image-wrapper").click(function(event){
+                            var video_player_url = "/{{groupid}}/ajax/get_video_player";
+                            var datasrc = $(this).children('img').attr("data-image-id");
+
+                            $.ajax({
+                                        type: "GET",
+                                        url: video_player_url,
+                                        datatype: "html",
+                                        data:{
+                                            datasrc:datasrc
+                                        },
+                                        success: function(data) {
+                                            CKEDITOR.instances['ckeditor_textarea'].insertHtml(data);
+                                            $('#group_imgs_on_modal').foundation('reveal', 'close');
+
+                                        }
+                                });
+             });
+          }
+          },
+        failure:function(data){
+          alert('GOT AN ERROR');
+        }    
+        });
+       
+      // var url = html = "";
+
+      // {% if title == "E-Library" %}
+      //   href = '{% url "elib_paged_file_objs" group_name_tag "replace-this" 1 %}';
+      //   urlHtml = "<a href="+href+" class='first-load'>1</a>";
+      // {% else %}
+      //   href = '{% url "paged_file_objs" group_name_tag "replace-this" 1 %}';
+      //   urlHtml = "<a href="+href+" class='first-load'>1</a>";
+      // {% endif %}
+      // // console.log(url);
+
+      $("div.tabs-content.gallery > div.content").each(function(){
+
+        var tempFiletype = this.getAttribute("data-filetype");
+        $(this).html(urlHtml.replace("replace-this", tempFiletype));
+
+    });
+    ddLHSBindEvents();
+    $("dl.tabs dd:first a").trigger("click")
+
+  }
+
+  function updateLHSpanelCounters()
+  {
+    var educationaluse_stats = $("div[data-educationaluse-stats]").attr("data-educationaluse-stats")
+
+    // console.log("innnn : " + educationaluse_stats);
+
+    educationaluse_stats = JSON.parse(educationaluse_stats);
+
+    $("dl.tabs dd").each(function(){
+      
+      var c = this.getAttribute("data-filetype");
+
+      if(educationaluse_stats.hasOwnProperty(c)){
+        $(this).find("a > span.count:visible").text(educationaluse_stats[c]);
+      }
+      else
+      {
+        $(this).find("a > span.count:visible").text("0");
+      }
+
+    });
+  }
+
+  {% if is_video %}
+    alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+  {% endif %}
+
+
+// </script>
