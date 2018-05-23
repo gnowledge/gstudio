@@ -90,11 +90,13 @@
                 
             </ul>
             <ul class="right show-for-medium-up top-right-menu">
+                {% comment %}
                 {% if groupid %}
                 <li class=""><a title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
                 {% elif group_id %}
                     <li class=""><a title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' group_id %}"> <i class="fa fa-bell-o"></i></a></li>
                 {% endif %}
+                {% endcomment %}
                 {% if help_oid %}
                     <li class=""><a title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
