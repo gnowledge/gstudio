@@ -32086,3 +32086,8 @@ div.card.show div.flap1 {
 div.card.show div.flap2 {
   transition: all 0.3s 0.2s ease-out;
 }
+
+/* line 8605, ../../../scss/_app_styles.scss */
+.accordion .content {
+  overflow: hidden;
+}

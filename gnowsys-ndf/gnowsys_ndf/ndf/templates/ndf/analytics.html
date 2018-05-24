@@ -17,7 +17,9 @@
 
 {% block body_content %}
 
-<ul class="tabs" data-tab role="tablist" id="all-tabs">
+
+<div class="large-12 medium-12 small-4 medium-centered columns">
+  <ul class="tabs tabs vertical" data-tab role="tablist" id="all-tabs">
   <li class="tab-title active" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">{% trans "Top Users" %}</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">{% trans "Top Downloads" %}</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3">{% trans "Top Resources" %}</a></li>
@@ -26,7 +28,6 @@
   <li class="tab-title" role="presentation"><a href="#panel2-6" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-4">Top Audios</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-7" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-4">Top Images</a></li>
 </ul>
-<div class="large-12 medium-12 small-12 medium-centered columns">
     <div class="cards">
 <div class="tabs-content" style="background-color: #fff;">
   <section class="content active" id="panel2-1">
@@ -223,10 +224,9 @@
 </div>
 </div>
 
-
-
-
-
+<script type="text/javascript">
+  $(document).foundation();
+</script>
 <script type="text/javascript">
   
   $(document).ready(function(){
@@ -273,31 +273,6 @@
     
   });
 });
-</script>
-
-<script type="text/javascript">
-  var target = document.getElementById("all-tabs");
-var options = {}; //Define options e.g. "option1" : "value1", etc.                  
-
-var elem = new Foundation.Tabs($(target), options);
-
-$('.tabs-title').on("mouseover", function() {
-  //Find the associated panel id.
-  var panelId = $(this).find("a").attr("href").substring(1);
-  var tabContents = document.getElementById(panelId);
-  //Use the "tabs" object to select the associated panel.
-  elem.selectTab($(tabContents));
-  //Show the tab contents.
-  $(tabContents).show();
-}).on("mouseout", function() {
-  var panelId = $(this).find("a").attr("href").substring(1);
-  $(this).find("a").attr("aria-selected", "false");
-  var tabContents = document.getElementById(panelId);
-  //Hide the tab contents.
-  $(tabContents).hide();
-});
-
-
 </script>
 
 {% endblock %}
