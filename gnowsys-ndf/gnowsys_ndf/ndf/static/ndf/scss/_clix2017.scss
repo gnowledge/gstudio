@@ -2613,7 +2613,7 @@ ul.jqtree-tree .jqtree-toggler {
       // display: none;
       //color: #000000;
       margin-left: 15px;
-      width:70%;
+      //width:70%;
       background-color: $complimentary-color;
       //padding-bottom: 30px;
       .group_sections_content{
@@ -2627,6 +2627,7 @@ ul.jqtree-tree .jqtree-toggler {
       .note-toolbar {
         padding: 1.8em 1.2em 0em;
         margin: 0em;
+        height:auto;
         background-color: $complimentary-color;
 
         .note-creator {
@@ -3523,7 +3524,7 @@ ul.jqtree-tree .jqtree-toggler {
         /*background-color:#ddd;*/
         margin-left: 48px;
         margin-top: 10px;
-        padding-bottom:0em;
+        padding-bottom:2em;
         border-top: 1px solid #B1B1B1;
         //background-color:  #e6e6e6;
         width: 80%;
