@@ -100,42 +100,60 @@ def landing_page(request):
     group_name, group_id = get_group_name_id('home')
 
 
-    group_count = node_collection.find({"_type":"Group"}).count()
+    # group_count = node_collection.find({"_type":"Group"}).count()
 
-    author_count = node_collection.find({"_type":"Author"}).count()
+    # author_count = node_collection.find({"_type":"Author"}).count()
 
-    GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
-    GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
-    GST_IPAGE = node_collection.one({"_type":"GSystemType","name":"interactive_page"})
+    # GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
+    # GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+    # GST_IPAGE = node_collection.one({"_type":"GSystemType","name":"interactive_page"})
 
-    if GSTUDIO_ELASTIC_SEARCH:
+    if GSTUDIO_ELASTIC_SEARCH and TESTING_VARIABLE_FOR_ES:
+        q = Q('match',name=dict(query='announced_unit',type='phrase'))
+        announced_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+        q = Q('match',name=dict(query='base_unit',type='phrase'))
+        base_unit = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+
+        groups = Q('bool', must=[Q('match', type="group"), Q('match',status='published'), Q('match',access_policy='public')])
+        groups_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(groups).count()
+
         q = Q('match',name=dict(query='Jsmol',type='phrase'))
-        GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-        GST_JSMOL1 = GST_JSMOL.execute()
-
+        GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
         q = Q('match',name=dict(query='interactive_page',type='phrase'))
-        GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-        GST_IPAGE1 = GST_IPAGE.execute()
-
+        GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
         q = Q('match',name=dict(query='File',type='phrase'))
-        GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
-        GST_FILE1 = GST_FILE.execute()
+        GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
 
         files = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
-                    should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+                    should=[Q('match',member_of=GST_FILE.hits[0].id),Q('match',member_of=GST_IPAGE.hits[0].id),Q('match',member_of=GST_JSMOL.hits[0].id)],
                     minimum_should_match=1)
-        files_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(files)
+        files_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(files).count()
 
-        files_count=files_count.count()
+        q = Q('match',type=dict(query='Author',type='phrase'))
+        authors_count = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).count()
+
+        q = Q('match',name=dict(query='Reply',type='phrase'))
+        discussion = Search(using=es, index="nodes",doc_type="gsystemtype").query(q).execute()
+
+        q = Q('bool',must=[Q('match',member_of=discussion.hits[0].id)])
+        discussion_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).count()
     else:
+        GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
+        GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"}) 
+        announced_unit = node_collection.one({"_type":"GSystemType","name":"announced_unit"}) 
+        GST_IPAGE = node_collection.one({"_type":"GSystemType","name":"interactive_page"}) 
+
+        groups_count = node_collection.find({"_type":"Group"}).count()
+        authors_count = node_collection.find({"_type":"Author"}).count()
+
         files_count = node_collection.find({
                                     'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id,GST_IPAGE._id]},
                                     'group_set': {'$all': [group_id]},
                                     'attribute_set.educationaluse': {'$in':['Images','Audios','Videos','Interactives','Documents','eBooks']}
                                     }).sort("last_update", -1).count()
 
-    discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
-    discussion_count = node_collection.find({"member_of":ObjectId(discussion._id)}).count()
+        discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
+        discussion_count = node_collection.find({"member_of":ObjectId(discussion._id)}).count()
     
 
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
@@ -144,8 +162,8 @@ def landing_page(request):
                                 {
                                     "group_id": "home", 'groupid':"home",
                                     'landing_page': 'landing_page',
-                                    'group_count':group_count,
-                                    'author_count':author_count,
+                                    'groups_count':groups_count,
+                                    'authors_count':authors_count,
                                     'files_count':files_count,
                                     'discussion_count':discussion_count
                                 },
