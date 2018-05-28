@@ -66,6 +66,7 @@
             {% endif%}
             
             {% if request.user.is_authenticated  %}            
+                {% if 'raw@material' not in asset_obj.tags %}
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 <!--
                 {% if 'raw@material' in asset_obj.tags and is_gstaff and title == "raw_material_detail"  %}
@@ -78,6 +79,7 @@
                 <button type="button" class="orange-button add-asset-content right"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 {% endif %}
                 -->
+                {% endif %}
             {% endif %}
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
             
