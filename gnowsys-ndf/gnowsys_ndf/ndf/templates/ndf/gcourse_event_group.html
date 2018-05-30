@@ -256,8 +256,10 @@
                 </li>
 
               {% else %}
+                {% if user.is_authenticated %}
                 <li class="tab-title {% if title == 'course_analytics' %} active  {% endif %}">
                   <a  href="{% url 'course_analytics' group_id request.user.pk %}" title="See how you have done, how many comments have you received." > <i class="fa fa-line-chart"></i>{% trans "Progress" %}</a>
+                 {% endif %}
               {% endif %}
             {% endif %}
 
