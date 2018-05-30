@@ -127,6 +127,7 @@
                 </span>
                 <ul id="course-settings-drop" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                   {% with group_obj.member_of_names_list.0 as sg_type %}
+                  {% if request.author.agency_type != 'Teacher' or "Author" in group_object_member_of_names_list or group_object.agency_type == 'School' %}
                     <li><a href="{% if sg_type != 'CourseEventGroup' %}{% url 'edit_event_group' groupid 'ProgramEventGroup' %}{% else %}{% url 'edit_event_group' groupid sg_type %}{% endif %}" class="tiny radius"><i class="fi-page-edit"></i> {% trans "Edit " %}{% if sg_type == "CourseEventGroup" %}{% trans "eCourse" %}{% else %}{% trans "Event" %}{% endif %}</a></li>
                   <li><a class="tiny radius" href="{% url 'create_course_struct' group_id group_obj.pk %}"> <i class="fi-clipboard-notes"></i> 
                   {% if group_obj.collection_set %} 
@@ -140,6 +141,7 @@
                   <li>
                     <a href="{% url 'create_event_group' group_id 'CourseEventGroup' %}?cnode_id={{group_id}}" class="fi-volume"> Announce</a>
                   </li>
+                  {% endif %}
                   <li>
                     <a id="subscr_users" class="fi-torsos" data-reveal-id="inviteusers" title="View/Subscribe Users">{% if sg_type == "CourseEventGroup" %}{% trans ' Add Students' %} {% else %} {% trans ' Add Members' %} {% endif %} </a>
                     {% include "ndf/invite_users.html" with no_subscribe_btn=True node=group_obj%}
