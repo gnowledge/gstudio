@@ -225,7 +225,7 @@
               url: "{% url 'course_analytics' group_id 'user_id' %}".replace("user_id", user_id),
               type: "GET",
               dataType: "html",
-              data: {'data_points_dict': dataPointsDict},
+              data: {'data_points_dict': dataPointsDict,"ajax_request" : "True"},
               success: function(data){
                 $(".userAnalyticsData").html(data)
                 $("#userAnalyticsModal").foundation('reveal', 'open');

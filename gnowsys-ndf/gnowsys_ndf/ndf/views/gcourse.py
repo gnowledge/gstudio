@@ -2818,6 +2818,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     template = "ndf/lms.html"
 
+    ajax_request = request.GET.get("ajax_request",'')
     if request:
         # let's keep all get calls from request in this block.
         # so that we can use this method for api calls
@@ -2838,8 +2839,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     group_id    = group_obj._id
     group_name  = group_obj.name
     group_obj_member_of_names_list = group_obj.member_of_names_list
-    if "CourseEventGroup" in group_obj_member_of_names_list:
-        template = "ndf/gcourse_event_group.html"
+    # if "CourseEventGroup" in group_obj_member_of_names_list:
+    #     template = "ndf/gcourse_event_group.html"
 
     if data_points_dict and not isinstance(data_points_dict, dict):
         data_points_dict = json.loads(data_points_dict)
@@ -2854,7 +2855,8 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
     analytics_data['total_quizitems'] = 0
 
-    if "CourseEventGroup" in group_obj_member_of_names_list:
+    if "CourseEventGroup" in group_obj_member_of_names_list and not ajax_request:
+        template = "ndf/gcourse_event_group.html"
         # Modules Section
         all_modules= analytics_instance.get_total_modules_count()
         # TO IMPROVE
