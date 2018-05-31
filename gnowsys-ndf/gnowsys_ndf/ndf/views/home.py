@@ -19,6 +19,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_LANDING_PAGE, GSTUDIO_SITE_NAME, GSTUDIO_SITE_LANDING_TEMPLATE
 from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.gstudio_es.es import *
+
 
 ###################################################
 #   V I E W S   D E F I N E D   F O R   H O M E   #
@@ -93,12 +95,59 @@ def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
     '''
+    is_video = request.GET.get('is_video', "")
+
+    group_name, group_id = get_group_name_id('home')
+
+
+    group_count = node_collection.find({"_type":"Group"}).count()
+
+    author_count = node_collection.find({"_type":"Author"}).count()
+
+    GST_FILE = node_collection.one({'_type':'GSystemType', 'name': "File"})
+    GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
+    GST_IPAGE = node_collection.one({"_type":"GSystemType","name":"interactive_page"})
+
+    if GSTUDIO_ELASTIC_SEARCH:
+        q = Q('match',name=dict(query='Jsmol',type='phrase'))
+        GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+        GST_JSMOL1 = GST_JSMOL.execute()
+
+        q = Q('match',name=dict(query='interactive_page',type='phrase'))
+        GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+        GST_IPAGE1 = GST_IPAGE.execute()
+
+        q = Q('match',name=dict(query='File',type='phrase'))
+        GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+        GST_FILE1 = GST_FILE.execute()
+
+        files = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+                    should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+                    minimum_should_match=1)
+        files_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(files)
+
+        files_count=files_count.count()
+    else:
+        files_count = node_collection.find({
+                                    'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id,GST_IPAGE._id]},
+                                    'group_set': {'$all': [group_id]},
+                                    'attribute_set.educationaluse': {'$in':['Images','Audios','Videos','Interactives','Documents','eBooks']}
+                                    }).sort("last_update", -1).count()
+
+    discussion = node_collection.find_one({'_type':'GSystemType',"name":"Reply"})
+    discussion_count = node_collection.find({"member_of":ObjectId(discussion._id)}).count()
+    
+
     if (GSTUDIO_SITE_LANDING_PAGE == "home") and (GSTUDIO_SITE_NAME == "NROER"):
         return render_to_response(
                                 "ndf/landing_page_nroer.html",
                                 {
                                     "group_id": "home", 'groupid':"home",
-                                    'landing_page': 'landing_page'
+                                    'landing_page': 'landing_page',
+                                    'group_count':group_count,
+                                    'author_count':author_count,
+                                    'files_count':files_count,
+                                    'discussion_count':discussion_count
                                 },
                                 context_instance=RequestContext(request)
                             )
@@ -195,3 +244,5 @@ def help_page_view(request,page_name):
                                         },
                                         context_instance=RequestContext(request)
                                     )
+
+

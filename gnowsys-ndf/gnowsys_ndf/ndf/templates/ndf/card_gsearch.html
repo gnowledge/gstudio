@@ -1,0 +1,42 @@
+{% load i18n %}
+{% load ndf_tags %}
+
+<a href="{% url 'node_detail' first_arg second_arg %}">
+<div class="unit_card">
+
+    <div class="unit_header">
+
+    {% get_relation_value node.id 'has_thumbnail' as grel_dict %}
+    {% get_relation_value node.id 'has_banner_pic' as grel_dict_banner %}
+    {% if grel_dict_banner.grel_node.if_file.thumbnail.relurl  %}
+        <img src="{{MEDIA_URL}}{{grel_dict_banner.grel_node.if_file.mid.relurl}}" style="height:50px ;width:50px">
+    {% elif grel_dict.grel_node.if_file.thumbnail.relurl and 'video' or "File" in node.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" style="height:50px ;width:50px" >
+    {% elif node.if_file.thumbnail.relurl and 'video' in node.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{node.if_file.thumbnail.relurl}}" style="height:50px ;width:50px" >
+    {% elif node.if_file.mid.relurl %}
+        <img src="{{MEDIA_URL}}{{node.if_file.mid.relurl}}" style="height:50px ;width:50px" >
+    {% elif node.if_file.original.relurl and 'image' in node.if_file.mime_type %}
+        <img src="{{MEDIA_URL}}{{node.if_file.original.relurl}}" style="height:50px ;width:50px" >
+    {% elif node.fs_file_ids.2 and not 'video' in node.mime_type %}
+      <img src="{% url 'get_mid_size_img' first_arg second_arg %}" alt="" style="height:50px ;width:50px" >
+    {% elif node.fs_file_ids.1 %}
+      <img src="{% url 'getImageThumbnail' first_arg second_arg %}" alt="" style="height:50px ;width:50px" >
+    {% else%}
+      <img src="/static/ndf/images/metaStudio-profile.svg"  class="img-height" style="height:50px ;width:50px" >
+    {% endif %}
+
+    <span class="unit_title">{{node.name|truncatechars:20}}</span>
+    </div>
+
+    <div class="unit_desc">
+        {{node.content|safe}}
+    </div>
+    
+    <div class="unit_actions">
+        <span></span>
+    </div> 
+
+ </div>
+ </a>
+ 

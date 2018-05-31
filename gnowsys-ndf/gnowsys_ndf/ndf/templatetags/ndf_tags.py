@@ -37,7 +37,7 @@ from django.core.cache import cache
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS
+from gnowsys_ndf.settings import GAPPS as setting_gapps, GSTUDIO_DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE,GSTUDIO_DEFAULT_EXPLORE_URL,GSTUDIO_EDIT_LMS_COURSE_STRUCTURE,GSTUDIO_WORKSPACE_INSTANCE,GSTUDIO_SITE_LANDING_PAGE_LOGO,GSTUDIO_SITE_LANDING_PAGE_TEXT, GSTUDIO_SITE_LANDING_PAGE_BG, GSTUDIO_SITE_LOGIN_PAGE_LOGO,GSTUDIO_FOOTER_LINKS, LOGIN_WITH_MASTODON
 
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
@@ -60,6 +60,8 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 from django_mailbox.models import Mailbox
 import itertools
+from gnowsys_ndf.ndf.gstudio_es.es import *
+
 
 register = Library()
 at_apps_list = node_collection.one({
@@ -134,7 +136,11 @@ def get_site_variables():
 	site_var['ENABLE_USER_DASHBOARD'] = GSTUDIO_ENABLE_USER_DASHBOARD
 	site_var['BUDDY_LOGIN'] = GSTUDIO_BUDDY_LOGIN
 	site_var['INSTITUTE_ID'] = GSTUDIO_INSTITUTE_ID
-	site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+
+	#site_var['HEADER_LANGUAGES'] = HEADER_LANGUAGES
+	site_var['GSTUDIO_ELASTIC_SEARCH'] = GSTUDIO_ELASTIC_SEARCH
+	site_var['TESTING_VARIABLE_FOR_ES'] = TESTING_VARIABLE_FOR_ES
+	site_var['LOGIN_WITH_MASTODON'] = LOGIN_WITH_MASTODON
 
 	cache.set('site_var', site_var, 60 * 30)
 
@@ -1908,7 +1914,7 @@ def get_group_type(group_id, user):
                 # If Group is not found with either given ObjectId or name in the database
                 # Then compare with a given list of names as these were used in one of the urls
                 # And still no match found, throw error
-                if g_id not in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore"]:
+                if g_id not in ["popular","online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta", "welcome", "explore"]:
                     error_message = "\n Something went wrong: Either url is invalid or such group/user doesn't exists !!!\n"
                     raise Http404(error_message)
 
@@ -3261,8 +3267,9 @@ def get_sg_member_of(group_id):
 	sg_member_of_list = []
 	# get all underlying groups
 	group_obj = get_group_name_id(group_id, get_obj=True)
-	group_id = group_obj._id
-	group_name = group_obj.name
+	if group_obj:
+		group_id = group_obj._id
+		group_name = group_obj.name
 	# Fetch post_node of group
 	if group_obj:
 		if "post_node" in group_obj:
@@ -3885,11 +3892,11 @@ def get_download_filename(node, file_size_name='original'):
 		name = node.altnames if node.altnames else node.name
 		name = name.split('.')[0]
 		file_name = slugify(name)
-
+		name = name.encode('utf-8')
 		if extension:
-			file_name += extension
+			name += extension
 
-		return file_name
+		return name
 
 	else:
 		name = node.altnames if node.altnames else node.name
@@ -4242,3 +4249,59 @@ def get_header_lang(lang):
         if lang in each_lang:
             return each_lang[1]
     return lang
+
+#convert 13 digit number to slash date format 
+
+@get_execution_time
+@register.filter
+def convert_date_string_to_date(your_timestamp):
+
+	date = str(datetime.datetime.fromtimestamp( your_timestamp / 1000))
+
+	temp1 = date[8:10]
+	temp2 = date[5:7]
+	temp3 = date[0:4]
+	date = temp1 + "/"+ temp2 +"/"+ temp3
+
+	return date
+
+
+@get_execution_time
+@register.filter
+def cal_length(string):
+	return len(str(string))
+
+@get_execution_time
+@register.assignment_tag
+def get_member_of_list(node_ids):
+
+	from gnowsys_ndf.ndf.models.gsystem_type import GSystemType
+	temp_list =[]
+	for each in node_ids:
+		node_obj = node_collection.find_one({"_id":ObjectId(each)})
+		if node_obj:
+			temp_list.append(node_obj.name)
+	if node_obj:
+		return temp_list
+	else:
+		return None
+
+
+@get_execution_time
+@register.filter
+def join_with_commas(obj_list):
+    """Takes a list of objects and returns their unicode representations,
+    seperated by commas and with 'and' between the penultimate and final items
+    For example, for a list of fruit objects:
+    [<Fruit: apples>,<Fruit: oranges>,<Fruit: pears>] -> 'apples, oranges and pears'
+    """
+    if not obj_list:
+        return ""
+    l=len(obj_list)
+    if l==1:
+        return u"%s" % obj_list[0]
+    else:    
+        return ", ".join(unicode(obj) for obj in obj_list[:l-1]) \
+                + " and " + unicode(obj_list[l-1])
+
+
