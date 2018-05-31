@@ -187,11 +187,73 @@ $("#btnUploadCancel").click(function() {
                     </div>
   <br> <br>
 {% endcomment %}
-<h4>Select Image</h4>
-<form id = "image_search_form"  action="" name="image_search_form" method="POST" >
-  <div class="large-11 small-10 columns">
+  <h4>Select Image</h4>
+  {% if GSTUDIO_ELASTIC_SEARCH %}
+  <form id = "search_form"  name="image_search_form" method="POST" >
+  <div class="row columns">
+      {% get_filters_data "File" "home" as filter_dict %}
+      {% include "ndf/filters.html" with filter_dict=filter_dict %}
     {% csrf_token %}
-     <select id="show_all_workspace">
+    <div class="columns small-5 large-4">
+    <select id="show_all_workspace">
+    <option value="default">--- Select Workspace ---</option>
+                {% for each_workspace in all_workspaces %}
+                <option value="{{ each_workspace.id }}">
+                  {{ each_workspace.name }}
+                </option>
+                {% endfor %}
+    </select>
+    </div>
+    <div class="columns small-5 large-4">
+    <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
+    </div>
+    <div class="columns small-5 large-4">
+    <button type="submit" class="tiny button" value="" id="search_button" class="checked">
+    <i class="fi-magnifying-glass"></i>
+    </button>
+  </div>
+  </div>
+  </form>
+  <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+    {% for each in imageCollection %}
+    <li class="card-image-wrapper row" title="{{each.name}}">
+            <img  class="gallery-image" style="width:60%;" data-image-id="{{each.id}}" 
+              "{% if 'svg' in each.if_file.mime_type   %}"
+              src="{{MEDIA_URL}}{{each.if_file.original.relurl}}"
+              "{% else %}"
+              src="{{MEDIA_URL}}{{each.if_file.thumbnail.relurl}}"
+              "{% endif %}"
+              data-image-src="{{MEDIA_URL}}{{each.if_file.original.relurl}}" >
+            <figcaption style="cursor:pointer" title="{{each.name}}">{{each.name|truncatechars:10}}</figcaption>
+
+    </li>
+    {% endfor %}
+  </ul>
+<!--
+  <ul class="clearing-thumbs" data-clearing   style="height:100px;width:100px;z-index:-1">
+  {% for image in imageCollection %}
+  <li  class="clearing-featured-img">
+    <a href="{% url 'getImageThumbnail' group_name_tag image.id %}">
+      <img src="{% url 'getImageThumbnail' group_name_tag image.id %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name_tag image.id %}'>{{image.name}}</a> <script type='text/javascript'>
+                         var angle = 0;
+                         $('.img_rotate').on('click', function() {
+                         angle += 90;
+                         $('.visible-img img').rotate(angle);
+                         });
+                         </script>" >
+      </img>
+    </a>
+  </li>
+  {% endfor %}
+  </ul>-->
+
+{% else %}
+  <form id = "search_form"  name="image_search_form" method="POST" >
+  <div class="large-11 small-10 columns">
+      {% get_filters_data "File" "home" as filter_dict %}
+      {% include "ndf/filters.html" with filter_dict=filter_dict %}
+    {% csrf_token %}
+    <select id="show_all_workspace">
     <option value="default">--- Select Workspace ---</option>
                 {% for each_workspace in all_workspaces %}
                 <option value="{{ each_workspace.pk }}">
@@ -201,11 +263,11 @@ $("#btnUploadCancel").click(function() {
     </select>
     <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} ' autocomplete="off" required />
   </div>
-  <button type="submit" class="tiny button" value="" id="image_search-submit" class="checked">
+  <button type="submit" class="tiny button" value="" id="search_button" class="checked">
   <i class="fi-magnifying-glass"></i>
   </button>
-</form>
-  <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
+  </form>
+  <ul class="Collection small-block-grid-1 medium-block-grid-3 large-block-grid-4" >
     {% for each in imageCollection %}
     
     <li class="card-image-wrapper row" title="{{each.name}}">
@@ -238,45 +300,6 @@ $("#btnUploadCancel").click(function() {
   </li>
   {% endfor %}
 </ul>
-
-<script type="text/javascript">
-    $(document).on("click", "#image_search-submit", function(event) {
-      event.preventDefault();
-      $.ajax({
-        url:"{% url 'image' groupid %}",
-        type:"GET",
-        datatype: "html",
-        data:{
-          search_text : $('#search_text').val(),
-          search_workspace: $('#show_all_workspace option:selected').val()
-        },
-        success:function(data){
-          $(".small-block-grid-1").empty()
-          $(".small-block-grid-1").append(data)
-
-          $("#image_search_form").empty()
-          $("h4").empty()
-          $(".card-image-wrapper").click(function(event){
-          var imageURL = $(this).children('img').attr("data-image-src");
-          var imageTitle = $(this).attr("title");
-          // var locationURL = 'http://' + location.host;
-          var locationURL = window.location.origin
-          var completeURL = imageURL
-          var width = prompt("Please enter width in px",'600');
-          if(width == null)
-          {
-              return false;
-          }
-          CKEDITOR.instances['ckeditor_textarea'].insertHtml('<img width="'+  width + '"src=' + completeURL + ' '+ 'alt=' + imageTitle + '>' + '</img>');
-          $('#group_imgs_on_modal').foundation('reveal', 'close');
-          });
-        },
-        failure:function(data){
-          alert('GOT AN ERROR');
-        }
-      });
-    });
-
-</script>
-
+{% endif %}
+{% include  "ndf/ImageAudioVideoFilterSearch.html" with filters="image"%}
 {% endblock %}

@@ -51,7 +51,7 @@
  			display: inline-block;
 	 		vertical-align: top;
 	 		margin-bottom: 0px;
- 			width: 330px;
+ 			width: 90px;
  		}
 
 
@@ -127,7 +127,7 @@
 					<div class="filter-body">
 						<div class="filter-button" id="filter_button">
 							<i class="fi-filter small" aria-hidden="true"></i>
-							<span>Add Filter</span>
+							<span>{% trans "Add Filter" %}</span>
 						</div>
 						<select name="filter-field-name">
 							<option value="initial-select"> -- {% trans 'Select' %} -- </option>
@@ -160,7 +160,7 @@
 
 						</select>
 						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}"  style="width:65px!important" id="filter-btn">
-						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn" style="width:65px!important">
+						<input type="button" class="button radius tiny" value="{% trans 'Clear' %}" id="filter-clear-btn" style="width:65px!important">
 					</div>
 				</div>
 			</div>
@@ -363,7 +363,7 @@
 		return filtersObjAndOrArr;
 	}
 
-	function updateFilterUrl(url)
+	function updateFilterUrl(url,url_in_addressbar)
 	{
 		var filters = getFiltersObjsInAndOrFormat();
 		// alert(filters);
@@ -374,8 +374,13 @@
 
 			url = url + 'filter?selfilters=' + filters;
 		}
-
-		window.location.href = url;
+		if (url_in_addressbar == "True"){
+			window.location.href = url;
+		}
+		else{
+			return filters;
+		}
+		return url
 	}
 
 	function getQueryVariable(variable)

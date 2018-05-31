@@ -259,7 +259,10 @@ class Triple(DjangoDocument):
     #end of data_type_check
 
     super(Triple, self).save(*args, **kwargs)
+    self.rcs_function(self,is_new,**kwargs)
 
+  @task
+  def rcs_function(self,is_new,**kwargs):
     history_manager = HistoryManager()
     rcs_obj = RCS()
     if is_new:

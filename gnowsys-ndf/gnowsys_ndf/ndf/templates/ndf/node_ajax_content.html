@@ -1,7 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% load cache %}
-
+{% load es_tags %}
 {% get_download_filename node as download_filename %}
 {% get_schema node as schema %}
 {% get_group_name groupid as group_name_tag %}
@@ -360,7 +360,7 @@ Still keeping for future ref (if needed).
                   <input type="button" class="tiny button radius "  value="{% trans 'Cancel' %}">
                 </div>
               {% elif 'html' in node.if_file.mime_type %}
-                <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
+                <iframe id="html-res-iframe" width="100%" height="580px;" seamless="seamless" src="{{MEDIA_URL}}{{node.if_file.original.relurl}}">
                   <p>{% trans 'Your browser does not support the audio element' %} </p>
                 </iframe>
               {% elif 'pdf' in node.if_file.mime_type %}
@@ -414,8 +414,8 @@ Still keeping for future ref (if needed).
                 <script>
                   // var Book = ePub("{% url 'read_file' group_name_tag node grid_fs_obj.filename %}");
                   var Book = ePub("{% url 'read_file' group_name_tag node download_filename %}", {
-                    width: 400,
-                    height: false,
+                    // width: 400,
+                    // height: false,
                     restore: true
                   });
                   Book.renderTo("ebook-area");
@@ -530,11 +530,91 @@ Still keeping for future ref (if needed).
             {% endif %}
             {% endwith %}
           </div>
+          {% if node.if_file.original.relurl and not is_group %}
+          <a href="#metadata_info" id="more_info">{% trans "more info" %}</a>
+          <div class="small-12 large-8 small-centered large-centered columns">
+        <div class="panel callout radius" id="metadata_info" style="display: none;">
+          <table class="small-12 large-12 large-centered">
+              <caption>Metadata</caption>
+            <tr>
+              <td width="200">{% trans "Time Required" %}</td>
+              <td width="250">{{node.timerequired | default_if_none:"Not set" | lower}}</td>
+            </tr>
+            <tr>
+              <td width="200">{% trans "Interactivity Type" %}</td>
+              <td width="250">{{node.interactivitytype | default_if_none:"Not set" | lower}}</td>
+            </tr>
+            <tr>
+              <td width="200">{% trans "Reading Level" %}</td>
+              <td width="250">{{node.readinglevel | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Curricular" %}</td>
+              <td width="250">{{node.curricular | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+
+            <tr>
+              <td width="200">{% trans "Educational Subject" %}</td>
+              <td width="250">{{node.educationalsubject | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Educational Alignment" %}</td>
+              <td width="250">{{node.educationalalignment | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Based on Url" %}</td>
+              <td width="250">{{node.basedonurl | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Source" %}</td>
+              <td width="250">{{node.source | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Copyright" %}</td>
+              <td width="250">{{node.legal.copyright | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+
+            <tr>
+              <td width="200">{% trans "Age Range" %}</td>
+              <td width="250">{{node.age_range | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Educational Level" %}</td>
+              <td width="250">{{node.educationallevel | join_with_commas | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Educational Use" %}</td>
+              <td width="250">{{node.educationaluse | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Text Complexity" %}</td>
+              <td width="250">{{node.textcomplexity | default_if_none:"Not set" | lower}}</td>
+            </tr>
+
+            <tr>
+              <td width="200">{% trans "Target Audience" %}</td>
+              <td width="250">{{node.audience |join_with_commas | lower }}</td>
+            </tr>
+
+          </table>
+      </div>
+      {% endif %}
           {% endif %}
 
 
      {% if not topic and not is_group %}
              <div>
+              <small>License:</small>
              {% if site.SITE_NAME != "NROER" %}
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
@@ -545,6 +625,7 @@ Still keeping for future ref (if needed).
                 <small class="text-gray">
                   [<em>{% trans "Source" %} {{ node.attribute_set.1.source}}</em> ]
                 </small>
+                <img src="/static/ndf/images/cc-by-sa.png" style="margin-left: 60px;">
                 </br>
                 {% endif %}
 
@@ -566,6 +647,9 @@ Still keeping for future ref (if needed).
                       Download as mp4
                     </a>
                   {% endif %}
+
+                {% each_file_download_count "read_file" group_name_tag node download_filename as file_download_count %}
+                <span>No. of Downloads : </span>{{file_download_count}}
                 {% endif %}
 
 
@@ -588,6 +672,7 @@ Still keeping for future ref (if needed).
           {% endcomment %}
        {% endif %}
               </div>
+
        <br>
 
                   {% if social_share == True and "Group" not in node.member_of_names_list and "PartnerGroup" not in node.member_of_names_list %}
@@ -1029,5 +1114,23 @@ function add_transcript_func(this_obj){
             });
 
     }
+
+</script>
+
+<script type="text/javascript">
+  $("#more_info").click(function() {
+  
+   var lable = $("#more_info").text().trim();
+
+   if(lable == "Hide info") {
+     $("#more_info").text("more_info");
+     $("#metadata_info").hide();
+   }
+   else {
+     $("#more_info").text("Hide info");
+     $("#metadata_info").show();
+   }
+    
+  });
 
 </script>

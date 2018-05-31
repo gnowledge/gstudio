@@ -34,7 +34,7 @@ GSTUDIO_ALTERNATE_SIZE = {'image':['100px','1048px'],'video':['144px','720px'],'
 GSTUDIO_DEFAULT_GROUP = u'desk'
 GSTUDIO_EDUCATIONAL_SUBJECTS_AS_GROUPS = False
 
-LANGUAGES = (('en', 'English'), ('hi', 'Hindi'), ('te', 'Telugu'))
+LANGUAGES = (('en', 'English'), ('hi', 'Hindi'))
 HEADER_LANGUAGES = (('en', 'English'), ('hi', u'\u0939\u093f\u0902\u0926\u0940'),('te', u'\u0c24\u0c46\u0c32\u0c41\u0c17\u0c41'))
 GSTUDIO_DEFAULT_LANGUAGE = ('en', 'English')
 GSTUDIO_WORKSPACE_INSTANCE = False
@@ -747,7 +747,7 @@ GSTUDIO_RESOURCES_AUDIENCE = ["Teachers", "Students", "Teacher educators"]
 
 GSTUDIO_RESOURCES_TEXT_COMPLEXITY = ["Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard"]
 
-GSTUDIO_RESOURCES_LANGUAGES = ["English", "Gujarati", "Hindi", "Manipuri", "Marathi", "Mizo", "Telugu"]
+GSTUDIO_RESOURCES_LANGUAGES = ["Assamese","English", "Gujarati", "Hindi", "Malayalam","Manipuri", "Marathi", "Mizo", "Telugu"]
 
 GSTUDIO_RESOURCES_AGE_RANGE = ["5-10", "11-20", "21-30", "31-40", "41 and above"]
 
@@ -1087,8 +1087,10 @@ GSTUDIO_ELASTIC_SEARCH_ALIAS = 'gsearch'
 GSTUDIO_ELASTIC_SEARCH_SUPERUSER = ''
 GSTUDIO_ELASTIC_SEARCH_SUPERUSER_PASSWORD = ''
 GSTUDIO_ELASTIC_SEARCH_PORT = '9200'
+TESTING_VARIABLE_FOR_ES = False
 GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS = False
 GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS= False
+GSTUDIO_ELASTIC_SEARCH_IN_BENCHMARK_CLASS = False
 # --- End of Elastic Search
 
 GLITE_RCS_REPO_DIRNAME = "glite-rcs-repo"

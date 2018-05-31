@@ -5,7 +5,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 # from django.core.urlresolvers import reverse
 from mongokit import paginator
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 try:
 	from bson import ObjectId
@@ -25,7 +24,7 @@ from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
 from gnowsys_ndf.ndf.gstudio_es.es import *
 
 
-if GSTUDIO_ELASTIC_SEARCH == True:
+if GSTUDIO_ELASTIC_SEARCH :
 	q = Q('bool', must=[Q('match', name='e-book')])
 	ebook_gst =Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 	ebook_gst = ebook_gst.execute()
@@ -88,60 +87,7 @@ if GSTUDIO_ELASTIC_SEARCH == True:
 			GST_PAGE_ID = a.id
 
 		if selfilters:
-			print "sel filtrers"
-
-			i=-1
-			strconcat=""
-			endstring=""
-			temp_dict={}
-			lists = []
-
-			for each in list(query_dict):
-				for temp in each.values():
-					for a in temp:
-						for key,value in a.items():
-							if isinstance(value, dict): 
-								#print value["$in"][0]
-								if value["$in"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									print t
-									print "-----------------------------"
-									temp_dict[t]=value["$in"][0]
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-									#Q('match',name=dict(query="e-book", type="phrase"))
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
-								elif value["$or"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									print t
-									print "------------------------"
-									temp_dict[t]=value["$or"][0]
-									#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
-							elif isinstance(value, tuple):
-								temp_dict["language"]= value[1]	
-								#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
-								strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
-								lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
-							else:
-								if key != "source":
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									temp_dict[t]=value
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
-								else:
-									temp_dict[key]=value
-									#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
-									lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
+			lists = esearch.es_filters(query_dict)
 
 			strconcat1 = ""
 			for value in lists:
@@ -213,11 +159,10 @@ if GSTUDIO_ELASTIC_SEARCH == True:
 		return render_to_response("ndf/ebook.html", {
 									"all_ebooks": all_ebooks, "ebook_gst": ebook_gst,
 									"page_info": results, "title": "eBooks",
-									"group_id": group_id, "groupid": group_id,"all_ebooks1_count":all_ebooks.count(),
+									"group_id": group_id, "groupid": group_id,"all_ebooks_count":all_ebooks.count(),
 									"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 									}, context_instance = RequestContext(request))
 else:
-
 	ebook_gst = node_collection.one({'_type':'GSystemType', 'name': u"E-Book"})
 	GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
 	GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})

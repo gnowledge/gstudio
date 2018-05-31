@@ -106,6 +106,7 @@ def module_detail(request, group_id, node_id,title=""):
     group_name, group_id = Group.get_group_name_id(group_id)
 
     module_obj = Node.get_node_by_id(node_id)
+    print module_obj.name
 
     # module_detail_query = {'member_of': gst_base_unit_id,
     #           '_id': {'$nin': module_unit_ids},
@@ -121,8 +122,8 @@ def module_detail(request, group_id, node_id,title=""):
     #           ]})
 
     search_text = request.GET.get("search_text",None)
-    
-
+    PARTNER_LIST = ['Arvind Gupta','Vigyan Prasar','Azim Premji University','CCRT','CIET, NCERT','DAE','GIET, Gujarat','Gandhi Darshan','SCERT Bihar','SCERT, UP','SIET Hyderabad','SIET, Kerala','Vidya Online']
+    partner_present = False
     has_search = False
     if search_text:
         has_search = True
@@ -202,7 +203,7 @@ def module_detail(request, group_id, node_id,title=""):
         
 
         
-        if not gstaff_access:
+        if not gstaff_access and module_obj.agency_type != "Partner":
             module_detail_query.update({'$or': [
             {'$and': [
                 {'member_of': gst_base_unit_id},
@@ -262,7 +263,8 @@ def module_detail(request, group_id, node_id,title=""):
                                 'card': 'ndf/event_card.html', 'card_url_name': 'groupchange',
                                 'search_text':search_text,
                                 'units_under_module_count':units_under_module_count,
-                                'has_search':has_search
+                                'has_search':has_search,
+                                'PARTNER_LIST':PARTNER_LIST
 
                             })
     return render_to_response(template, req_context)

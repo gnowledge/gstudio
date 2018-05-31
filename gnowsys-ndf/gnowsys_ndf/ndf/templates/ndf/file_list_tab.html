@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load ndf_tags %}
-
+{% get_site_variables as site %}
 {% if searching and resource_type.count > 0 %}
   <div class="row">
     <div class="small-12 columns end">
@@ -24,7 +24,7 @@
     <!-- #{#%# get_grid_fs_object each_res as grid_fs_obj %} -->
     <li class="card-image-wrapper" > 
     <!--old card-view > card.html &&  new card-view > simple_card.html  -->
-    {% if GSTUDIO_ELASTIC_SEARCH %}
+    {% if site.GSTUDIO_ELASTIC_SEARCH %}
       {% if notebook_filter %}
         {% include 'ndf/simple_card.html' with  has_contributor=True resource=each_res url_name='course_notebook_tab_note' first_arg=group_name second_arg="all-notes" third_arg=each_res.id %}
       {% else %}

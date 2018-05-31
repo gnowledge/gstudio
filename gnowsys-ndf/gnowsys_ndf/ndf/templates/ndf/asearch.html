@@ -65,9 +65,9 @@
 		</div>
 		{% if has_next and if_teaches != True %}
 		  <span class="infinite-more-link" href="?page_no={{page_no}}&field_list={{field_list}}&chk_advanced_search={{chk_advanced_search}}"></span>
+		{% else %}
+			  {% include 'ndf/pagination.html' with urlname="pagination_for_advanced_search" first_arg=group_name_tag second_arg="" third_arg="" %}
 		{% endif %}
-
-		
 
 	<hr>
 

@@ -62,25 +62,25 @@ if GSTUDIO_ELASTIC_SEARCH:
 	q = Q('match',name=dict(query='Jsmol',type='phrase'))
 	GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 	GST_JSMOL1 = GST_JSMOL.execute()
+
+	q = Q('match',name=dict(query='interactive_page',type='phrase'))
+	GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+	GST_IPAGE1 = GST_IPAGE.execute()
+
+	print GST_IPAGE1.hits[0].id
 	##############################################################################
 	@get_execution_time
 	def resource_list(request, group_id="home", app_id=None, page_no=1):
-
-		print request.get_full_path()
-
 
 		is_video = request.GET.get('is_video', "")
 
 		search_text = request.GET.get('search_text', "")
 		
 		#if search_text != None:
-		with open("Output.txt", "w") as text_file:
-			text_file.write(search_text)
-			text_file.close()
-		print search_text
-		print "-------------------------------"
+		#with open("Output.txt", "w") as text_file:
+		#	text_file.write(search_text)
+		#	text_file.close()
 
-		print GST_FILE1
 		try:
 			group_id = ObjectId(group_id)
 		except:
@@ -88,8 +88,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		if app_id is None:
 			app_id = app1.hits[0].id
-			print app_id
-
 
 		title = e_library_GST1.hits[0].name
 		
@@ -107,64 +105,8 @@ if GSTUDIO_ELASTIC_SEARCH:
 			query_dict = get_filter_querydict(selfilters)
 
 		#query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
-		i=-1
-		strconcat=""
-		endstring=""
-		temp_dict={}
-		lists = []
-		#print query_dict
+		lists = esearch.es_filters(query_dict)
 
-		for each in list(query_dict):
-			for temp in each.values():
-				for a in temp:
-					for key,value in a.items():
-						if isinstance(value, dict): 
-							#print value["$in"][0]
-							if value["$in"]:
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								print t
-								print "-----------------------------"
-								temp_dict[t]=value["$in"][0]
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-								#Q('match',name=dict(query="e-book", type="phrase"))
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
-							elif value["$or"]:
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								print t
-								print "------------------------"
-								temp_dict[t]=value["$or"][0]
-								#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
-						elif isinstance(value, tuple):
-							temp_dict["language"]= value[1]	
-							#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
-							strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
-							lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
-						else:
-							if key != "source":
-								key = list(key)
-								key[13]='__'
-								t="".join(key)
-								temp_dict[t]=value
-								#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-								#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
-								lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
-							else:
-								temp_dict[key]=value
-								#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-								#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
-								lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
-
-		print temp_dict
-		#strconcat=strconcat
-		print strconcat
-		print lists
 		#files = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										#'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
@@ -205,21 +147,25 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 			if search_text in (None,'',""):
 
-				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),"+strconcat1[:-1]+"],must_not=[Q('match', attribute_set__educationaluse ='ebooks')],should=[Q('match', member_of=GST_PAGE1.hits[0].id)])")
+				q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),"+strconcat1[:-1]+"],must_not=[Q('match', attribute_set__educationaluse ='ebooks')],"
+					+"should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)])")
 
 				collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
-									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-									+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)")
+									+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
+									+ "minimum_should_match=1)")
 
-				q_images_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='images'),"+strconcat1[:-1]+"])")
-				q_audios_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),"+strconcat1[:-1]+"])")
-				q_videos_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),"+strconcat1[:-1]+"])")
-				q_intercatives_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),"+strconcat1[:-1]+"])")
-				q_applications_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),"+strconcat1[:-1]+"])")
-				q_ebooks_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),"+strconcat1[:-1]+"])")
-				q_all_count = eval("Q('bool', must=["+strconcat1[:-1]+"],"
-									+"should=[Q('match', attribute_set__educationaluse='documents'),Q('match', attribute_set__educationaluse='images'),Q('match', attribute_set__educationaluse='videos'),"
-									"Q('match', attribute_set__educationaluse='interactives')])")
+				q_images_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='images'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)")
+				q_audios_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)")
+				q_videos_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)")
+				q_intercatives_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)")
+				q_applications_count = eval("Q('bool', must=[Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match', attribute_set__educationaluse='documents'),Q('match', attribute_set__educationaluse='ebooks'),Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=2)")
+				q_ebooks_count = eval("Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)")
+				q_all_count = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),"+strconcat1[:-1]+"],"
+									+"should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],"
+									+"minimum_should_match=1)")
+				# q_all_count = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+				# 	should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+				# must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 
 			else:
 
@@ -241,12 +187,14 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		else:
 			if search_text in (None,'',""):
+
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
-				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
+					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+					minimum_should_match=1)
+
 			else:
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
-				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], 
+				should=[Q('match',member_of=GST_FILE1.hits[0].id)], 
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 
 
@@ -262,14 +210,21 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 		temp111 = ""
 		if selfilters in (None,'',"") and search_text in (None,'',""):
-			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
+			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))]
+				,should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)
+			q_audios_count = Q('bool', must=[Q('match', attribute_set__educationaluse='audios'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))]
+				,should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)
+			q_videos_count = Q('bool', must=[Q('match', attribute_set__educationaluse='videos'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))]
+				,should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)
+			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))]
+				,should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=1)
+			q_applications_count = Q('bool', must=[Q('match', access_policy='public'),Q('match', group_set=str(group_id))]
+				,should=[Q('match', attribute_set__educationaluse='documents'),Q('match', attribute_set__educationaluse='ebooks'),Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id) ],minimum_should_match=2)
 			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', access_policy='public'),Q('match', group_set=str(group_id))])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','maps','audio','select','teachers','page','pages'])])
-
+			#q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives'])])
+			q_all_count = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+				    minimum_should_match=1)
 
 		elif selfilters in (None,'',"") and search_text is not None:
 			q_images_count = Q('bool', must=[Q('match', attribute_set__educationaluse='images'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags'])])
@@ -278,8 +233,10 @@ if GSTUDIO_ELASTIC_SEARCH:
 			q_intercatives_count = Q('bool', must=[Q('match', attribute_set__educationaluse='interactives'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags'])])
 			q_applications_count = Q('bool', must=[Q('match', attribute_set__educationaluse='documents'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags'])])
 			q_ebooks_count = Q('bool', must=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', access_policy='public'),Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags'])])
-			q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','maps','audio','select','teachers','page','pages']),Q('multi_match', query=search_text, fields=['content','name','tags'])])
-
+			#q_all_count=  Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','maps','audio','select','teachers','page','pages']),Q('multi_match', query=search_text, fields=['content','name','tags'])])
+			q_all_count = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 
 		images_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_images_count)
 		audios_count =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q_audios_count)
@@ -305,7 +262,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 			if set(eu_list):
 				if len(set(eu_list)) > 1:
 					educationaluse_stats = dict((x, eu_list.count(x)) for x in set(eu_list))
-					print educationaluse_stats
+					
 				elif len(set(eu_list)) == 1:
 					educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 				educationaluse_stats["all"] = files.count()
@@ -320,7 +277,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 				result_pages = paginator.page(1)
 			except EmptyPage:
 				result_pages = paginator.page(paginator.num_pages)
-			# print educationaluse_stats
+			
 			#result_paginated_cur = files1_temp
 			#result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)
 			#result_paginated_cur = tuple(files1_temp)
@@ -331,17 +288,14 @@ if GSTUDIO_ELASTIC_SEARCH:
 		else:
 			if search_text in (None,'',""):
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
-				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-				must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)
+				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],
+				minimum_should_match=1)
 				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			else:
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
-				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
+				should=[Q('match',member_of=GST_FILE1.hits[0].id) ],
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)
 				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-
-
-		#print collection_pages_cur.to_dict()
 
 		if int(page_no)==1:
 			collection_pages_cur=collection_pages_cur[0:24]
@@ -352,7 +306,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 		paginator = Paginator(collection_pages_cur, 24)
 
 
-		#page_no = request.GET.get('page_no')
 		try:
 			results = paginator.page(page_no)
 		except PageNotAnInteger:
@@ -360,9 +313,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 		except EmptyPage:
 			results = paginator.page(paginator.num_pages)
 
-		#	print collection_pages_cur1
-
-		#coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 		coll_page_count = collection_pages_cur.count() if collection_pages_cur else 0
 
 
@@ -408,8 +358,9 @@ if GSTUDIO_ELASTIC_SEARCH:
 									 'collection_count': collection_pages_cur.count(),
 									 'groupid': group_id, 'group_id':group_id,
 									 "datavisual":datavisual,
-									 "GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
-									 "search_text":search_text
+									 #"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
+									 "search_text":search_text,
+									 "file_pages_count":all_count.count()
 									 },
 
 	        context_instance=RequestContext(request)
@@ -423,11 +374,9 @@ if GSTUDIO_ELASTIC_SEARCH:
 		#search_text = request.GET.get("search_text", None)
 
 		if request.method == "POST":
-			with open("Output.txt", "r") as text_file:
-				search_text = text_file.read()
-				text_file.close()
-
-			print search_text
+			#with open("Output.txt", "r") as text_file:
+			#	search_text = text_file.read()
+			#	text_file.close()
 			
 			group_name, group_id = get_group_name_id(group_id)
 
@@ -452,67 +401,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 			#query_dict.append({'attribute_set.educationaluse': {'$ne': u'eBooks'}})
 			detail_urlname = "file_detail"
-			i=-1
-			strconcat=""
-			endstring=""
-			temp_dict={}
-			lists = []
-			#print query_dict
-
-			for each in list(query_dict):
-				for temp in each.values():
-					for a in temp:
-						for key,value in a.items():
-							if isinstance(value, dict): 
-								#print value["$in"][0]
-								if value["$in"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									print t
-									print "-----------------------------"
-									temp_dict[t]=value["$in"][0]
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value["$in"][0]+"'),"
-									#Q('match',name=dict(query="e-book", type="phrase"))
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$in"][0]+"',type='phrase'))")
-								elif value["$or"]:
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									print t
-									print "------------------------"
-									temp_dict[t]=value["$or"][0]
-									#strconcat=strconcat+"Q('match',"+t+"='"+value["$or"][0]+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value["$or"][0]+"',type='phrase'))")
-							elif isinstance(value, tuple):
-								temp_dict["language"]= value[1]	
-								#strconcat=strconcat+"Q('match',"+key+"='"+value[1]+"') "
-								strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))$$"
-								lists.append("Q('match',"+key+"=dict(query='"+value[1]+"',type='phrase'))")
-							else:
-								if key != "source":
-									key = list(key)
-									key[13]='__'
-									t="".join(key)
-									temp_dict[t]=value
-									#strconcat=strconcat+"Q('match',"+ t+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+t+"=dict(query='"+value+"',type='phrase'))$$"
-									lists.append("Q('match',"+t+"=dict(query='"+value+"',type='phrase'))")	
-								else:
-									temp_dict[key]=value
-									#strconcat=strconcat+"Q('match',"+ key+"='"+value+"') "
-									#strconcat=strconcat+"Q('match',"+key+"=dict(query='"+value+"',type='phrase'))$$"	
-									lists.append("Q('match',"+key+"=dict(query='"+value+"',type='phrase'))")
-
-			print temp_dict
-			#strconcat=strconcat
-			print strconcat
-			print lists
-
-
-			
+			lists = esearch.es_filters(query_dict)
 			#if filetype != "all":
 				
 
@@ -524,13 +413,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 					#query_dict.append({"attribute_set.educationaluse": filetype})
 			#		pass
 
-			
-
-			#GST_FILE_temp=[]
-			#for a in GST_FILE['hits']['hits']:
-			#temp1=ObjectId(a['_source']['id'])
-			#	temp1=a['_source']['id']
-			#	GST_FILE_temp.append(temp1)
 			#files = node_collection.find({
 			#								'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
 											# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -553,7 +435,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 			strconcat1 = ""
 			for value in lists:
-				print value
+				
 				strconcat1 = strconcat1+'eval(str("'+ value +'")),'
 
 			if filetype != "all":
@@ -561,38 +443,56 @@ if GSTUDIO_ELASTIC_SEARCH:
 				filetype = str(filetype)
 				if filters:
 
-					
-					if search_text in (None,'',""):
-
-						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse=filetype),"+strconcat1[:-1]+"])")
+					if filetype == "Documents":
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)),"+strconcat1[:-1]+"],"
+							+"  should=[Q('match', attribute_set__educationaluse='ebooks'),Q('match', attribute_set__educationaluse=filetype),Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],"
+							+"  minimum_should_match=2	)")
 
 						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
-											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-											+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
+
+					
+					elif search_text in (None,'',""):
+
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match', attribute_set__educationaluse=filetype),"+strconcat1[:-1]+"],"
+							+"  should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],"
+							+"  minimum_should_match=1	)")
+						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
 					else:
-						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse=filetype),Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"])")
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('match', attribute_set__educationaluse=filetype),Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"],"
+							+"should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],minimum_should_match=1)")
 
 						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"],"
-											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-											+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
 
 
 				else:
-					if search_text in (None,'',""):
-					
+					if filetype == "Documents":
+						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match', attribute_set__educationaluse ="ebooks"),Q('match', attribute_set__educationaluse =filetype)],minimum_should_match=2)
+
+						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse ="ebooks"),Q('exists',field='collection_set')],
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],minimum_should_match=1)
+					elif search_text in (None,'',""):
+
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype)],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], minimum_should_match=1)
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+						minimum_should_match=1)
 					
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-						must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)	
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],
+						minimum_should_match=1)
 					else:
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('match', attribute_set__educationaluse =filetype),Q('multi_match', query=search_text, fields=['content','name','tags'])],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)], minimum_should_match=1)
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)], minimum_should_match=1)
 					
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-						must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)	
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],
+						minimum_should_match=1)
 
 					
 
@@ -604,51 +504,67 @@ if GSTUDIO_ELASTIC_SEARCH:
 					files1=files1[temp:temp+24]
 		
 			else:
-				if filters:
-					if search_text in (None,'',""):
 
-						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']),"+strconcat1[:-1]+"])")
+				if filters:
+					if filetype == "all":
+						#q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+						#	should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+						#	must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),"+strconcat1[:-1]+"],"
+							+"should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],"
+							+"minimum_should_match=1)")
 
 						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
-											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-											+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
+
+					elif search_text in (None,'',""):
+
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),"+strconcat1[:-1]+"])")
+
+						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
 
 					else:
 
-						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos']),Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"])")
+						q = eval("Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',member_of=GST_FILE1.hits[0].id),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives']),Q('multi_match', query=search_text, fields=['content','name','tags']),"+strconcat1[:-1]+"])")
 
 						collection_query = eval("Q('bool', must=[Q('match', group_set=str(group_id)),Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags']),Q('exists',field='collection_set'),"+strconcat1[:-1]+"],"
-											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],"
-											+ "must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)")
+											+ "should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ],"
+											+ "minimum_should_match=1)")
 
 
 
 				else:
-					if search_text in (None,'',""):
+					if filetype == "all":
+						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id)],
+							minimum_should_match=1)
+
+					elif search_text in (None,'',""):
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
-							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],minimum_should_match=1
+							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],minimum_should_match=1
 						)
 						
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
-							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-							must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id) ])
 					else:
 						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('multi_match', query=search_text, fields=['content','name','tags']),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
-						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],minimum_should_match=1
+						should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],minimum_should_match=1
 						)
 						
 						collection_query = Q('bool', must=[Q('match', group_set=str(group_id)),Q('multi_match', query=search_text, fields=['content','name','tags']), Q('match',access_policy='public'),Q('exists',field='collection_set')],
-							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
-							must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
+							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)])
 
 
-				files1 =Search(using=es, index="gsystem",doc_type="image,video,audio,application").query(q)
+				files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 				if int(page_no)==1:
 					files1=files1[0:24]
 				else:
 					temp=( int(page_no) - 1) * 24
 					files1=files1[temp:temp+24]
-				print files1.count()
+	
 				
 
 			educationaluse_stats = {}
@@ -689,7 +605,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 
 			if filetype == "Collections":
-				print "collections if block"
 				detail_urlname = "page_details"
 					#result_cur = node_collection.find({
 					#					'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
@@ -721,7 +636,6 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 				result_paginated_cur = result_cur
 
-				print result_cur
 				paginator = Paginator(result_paginated_cur, 24)
 					#page = request.GET.get('page')
 				
@@ -739,7 +653,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 				'title': "E-Library", "educationaluse_stats": json.dumps(educationaluse_stats),
 				"resource_type": result_paginated_cur, "detail_urlname": detail_urlname,
 				"filetype": filetype, "res_type_name": "", "page_info": results,
-				"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
+				#"GSTUDIO_ELASTIC_SEARCH":GSTUDIO_ELASTIC_SEARCH,
 				},
 				context_instance = RequestContext(request))
 		
@@ -774,10 +688,9 @@ else:
 
 		try:
 			group_id = ObjectId(group_id)
-			#print group_id
+
 		except:
 			group_name, group_id = get_group_name_id(group_id)
-			print group_name
 
 		if app_id is None:
 			app_id = str(app._id)
@@ -831,7 +744,6 @@ else:
 			query_dict = get_filter_querydict(selfilters)
 
 		query_dict.append({'attribute_set.educationaluse': {'$ne': 'eBooks'}})
-		print query_dict
 
 		# files = node_collection.find({
 		# 								'member_of': ObjectId(GST_FILE._id),
@@ -866,7 +778,7 @@ else:
 												}
 											]
 										}).sort("last_update", -1)
-		print "8888888888888888888888",files.count()
+		
 		pages = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										'member_of': {'$in': [GST_PAGE._id]},
@@ -1095,7 +1007,6 @@ else:
 											}).sort("last_update", -1)
 			pages_count	 = None
 			if filetype == "Pages":
-				print "pages*******************************",GST_PAGE._id,query_dict
 				files = node_collection.find({
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 										'member_of': {'$in': [GST_PAGE._id]},
@@ -1122,7 +1033,6 @@ else:
 			# 	filter_result = "True" if (result_cur.count() > 0) else "False"
 			# else:
 			if files:# and not result_pages:
-				# print "=======", educationaluse_stats
 
 				eu_list = []  # count
 				collection_set_count = 0
@@ -1145,6 +1055,7 @@ else:
 
 			filter_result = "True" if (files.count() > 0) else "False"
 
+			
 			if filetype == "Collections":
 					detail_urlname = "page_details"
 					result_cur = node_collection.find({
@@ -1161,7 +1072,6 @@ else:
 	                                    ],
 	                                    'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 	                                }).sort("last_update", -1)
-					# print "=====================", result_cur.count()
 
 					result_paginated_cur = result_cur
 					result_pages = paginator.Paginator(result_paginated_cur, page_no, no_of_objs_pp)

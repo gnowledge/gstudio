@@ -359,6 +359,14 @@ class Filehive(DjangoDocument):
 
         super(Filehive, self).save(*args, **kwargs)
 
+        self.rcs_function(self,is_new,**kwargs)
+        # data save into ES...
+        if GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS == True:
+            esearch.save_to_es(self)
+
+        # --- END of storing Filehive JSON in RSC system ---
+    @task
+    def rcs_function(self,is_new,**kwargs):
         # storing Filehive JSON in RSC system:
         history_manager = HistoryManager()
         rcs_obj = RCS()
@@ -398,13 +406,6 @@ class Filehive(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", str(self.md5), ") can't be updated!!!\n"
                 raise RuntimeError(err)
-
-        # data save into ES...
-        if GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS == True:  
-            esearch.inject(fp)
-
-        # --- END of storing Filehive JSON in RSC system ---
-
 
 
 filehive_collection = db["Filehives"].Filehive

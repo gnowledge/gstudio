@@ -143,7 +143,7 @@ article.columns{
     </article>
     {% endcomment %}
 <!--     <div class="small-12 medium-12 large-12 columns"> -->
-    <div id="landing-slider-container" class="small-12 medium-12 large-12 medium-centered small-centered columns">
+    <div id="landing-slider-container">
         <!-- <div>
             <img src="static/ndf/images/landing_pg_slides/Slider1.png" style="width:100%;">
         </div>
@@ -153,19 +153,48 @@ article.columns{
         <div>
             <img src="static/ndf/images/landing_pg_slides/Slider3.png" style="width:100%;">
         </div> -->
-        <div>
-            <img src="static/ndf/images/landing_pg_slides/photo_2018-04-10_18-11-51.jpg" style="width:100%;">
+        <div class="slider-item">
+            <img src="static/ndf/images/landing_pg_slides/photo_2018-05-07_18-03-44.jpg" style="width:100%;">
         </div>
-        <div>
-            <img src="static/ndf/images/landing_pg_slides/3-01-01.jpg" style="width:100%;">
+        <div class="slider-item">
+            <img src="static/ndf/images/landing_pg_slides/photo_2018-05-07_18-22-23.jpg" style="width:100%;">
         </div>
-        <div>
-            <img src="static/ndf/images/landing_pg_slides/slider_1a-01.jpg" style="width:100%;">
+        <div class="slider-item">
+            <img src="static/ndf/images/landing_pg_slides/photo_2018-05-07_18-20-38.jpg" style="width:100%;">
         </div>
-        <div>
-            <img src="static/ndf/images/landing_pg_slides/slider_1b-01.png" style="width:100%;">
+        <div class="slider-item">
+            <img src="static/ndf/images/landing_pg_slides/photo_2018-05-07_18-04-14.jpg" style="width:100%;">
         </div>
+        <div class="slider-nav-container">
+            <div class="slider-nav"></div>
+        </div>    
+
     </div>
+    <style type="text/css">
+        .slider-nav-container { 
+            position: absolute; 
+            bottom: 130px; 
+            left: 0; 
+            right: 0; 
+            z-index: 3; 
+            text-align: center; 
+            > .slider-nav { display: inline-block; 
+                .slick-dots { 
+                    margin: 0 10px; 
+                    position: relative; 
+                    top: 4px; 
+                    bottom: auto; 
+                    width: auto; 
+                    height: 10px; 
+                    display: inline-block;
+                }
+            }
+            li { position: relative; top: -10px; button { background-color: #ffffff; } &.slick-active { button { background-color: #fcb813; } }} 
+        }
+
+        .slick-prev, .slick-next { position: relative; left: auto; background-color: #968c8c66; ;right: auto; display: inline-block; color: #ffffff; &:hover:before { color: #fcb813; } } } } 
+
+    </style>
 
 
 <!--     <div class="text-left" style="background:#444;color:#aeaeae;"> -->
@@ -197,12 +226,12 @@ article.columns{
     <div class="analytics-blog" style="margin-top: 50px;">
         <div class="large-8 medium-7 medium-centered columns" style="background: #d8dbdc;">
           <div class="row">
-            <span><h3 class="analytics" align="center">Analytics</h3></span>
+            <span><h3 class="analytics" align="center">{% trans "Analytics" %}</h3></span>
                 <div class="medium-3 columns" >
-                    <div class="panel" style="background-color: #ff8080">
+                    <div class="panel" style="background-color: #ff8080; font-size: 16px;">
                         <div align="center">    
-                            <h3>Workspaces</h3>
-                            <h3>{{group_count}}</h3>
+                            <a href="{% url 'nroer_groups' 'home' 'Groups' %}" style="font-size: 16px;">{% trans "Workspaces" %}</a>
+                            <h4>{{groups_count}}</h4>
                         </div>    
                     </div>
                 </div>    
@@ -216,24 +245,24 @@ article.columns{
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #ffffb3;">
                     <div align="center">  
-                        <h3>Discussion</h3>
-                        <h3>{{ discussion_count }}</h3>
+                        <h4 style="font-size: 16px;">{% trans "Discussion" %}</h4>
+                        <h4>{{ discussion_count }}</h4>
                     </div>    
                 </div>
             </div>
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #d5ff80;">
                     <div align="center">  
-                        <h3>eResourses</h3>
-                        <h3>{{ files_count }}</h3>
+                        <a href="{% url 'e-library' group_id %}" style="font-size: 16px;">{% trans "eResourses" %}</a>
+                        <h4>{{ files_count }}</h4>
                     </div>    
                 </div>
             </div>
             <div class="medium-3 columns">
                 <div class="panel" style="background-color: #ffaa80">
                     <div align="center">    
-                        <h3>Users</h3>
-                        <h3>{{author_count}}</h3>
+                        <h4 style="font-size: 16px;">{% trans "Registered Users" %}</h4>
+                        <h4>{{authors_count}}</h4>
                     </div>    
                 </div>
             </div> 
@@ -318,19 +347,25 @@ article.columns{
             // adaptiveHeight: true,
             // speed: 300,
             // fade: true,
+            slide: '.slider-item',
+            // dots: true,
             autoplaySpeed: 3000,
             autoplay: true,
-            arrows: false,
+            arrows: true,
+
+            prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fa fa-angle-left' aria-hidden='true'></i></button>",
+            nextArrow:"<button type='button' class='slick-next pull-right'><i class='fa fa-angle-right' aria-hidden='true'></i></button>",
+            appendArrows: '#landing-slider-container .slider-nav', appendDots: '#landing-slider-container .slider-nav' 
         });
 
-        $('.slider-nav').slick({
-           // slidesToShow: 3,
-           // slidesToScroll: 1,
-            centerMode: true,
-            centerPadding: '60px',
-           arrows: false,
-           focusOnSelect: true
-        });
+        // $('.slider-nav').slick({
+        //    // slidesToShow: 3,
+        //    // slidesToScroll: 1,
+        //     centerMode: true,
+        //     centerPadding: '60px',
+        //    arrows: false,
+        //    focusOnSelect: true
+        // });
 
     });
     </script>
