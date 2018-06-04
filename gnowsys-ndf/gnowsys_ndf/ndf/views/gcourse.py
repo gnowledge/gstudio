@@ -2817,8 +2817,10 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
         return analytics_data
 
     template = "ndf/lms.html"
-
-    ajax_request = request.GET.get("ajax_request",'')
+    if request:
+        ajax_request = request.GET.get("ajax_request",'')
+    else:
+        ajax_request = None
     if request:
         # let's keep all get calls from request in this block.
         # so that we can use this method for api calls
