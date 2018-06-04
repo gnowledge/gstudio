@@ -6349,12 +6349,28 @@ def get_visits_count(request, group_id):
 				query = {'calling_url': {'$regex': u"/"+ unicode(get_params)},'name': "collection_nav"}
 
 			# print "\n\nquery", query
-			total_views = benchmark_collection.find(query,{'name':1})
-			response_dict['total_views'] = total_views.count()
-			if request.user.is_authenticated():
-				username = request.user.username
-				user_views = total_views.where("this.user =='"+str(username)+"'")
-				response_dict['user_views'] = user_views.count()
+
+			from gnowsys_ndf.ndf.gstudio_es.mongo_to_es_mapper import Mapper
+			from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
+
+			if GSTUDIO_ELASTIC_SEARCH:
+				q = eval("Q('bool',must=[Q('terms',calling_url="+str(curr_url_other)+")])")
+				total_views = Search(using=es, index="benchmarks",doc_type="benchmark").query(q)
+				#response_dict['total_views'] = q.ESQuery(benchmark=total_views).count()
+				response_dict['total_views'] = total_views.count()
+				if request.user.is_authenticated():
+					username = request.user.username
+					q = eval("Q('bool',must=[Q('terms',calling_url="+str(curr_url_other)+"),Q('match',user='"+username+"')])")
+					user_views = Search(using=es, index="benchmarks",doc_type="benchmark").query(q)
+
+					response_dict['user_views'] = user_views.count()
+			else:
+				total_views = benchmark_collection.find(query,{'name':1})	 
+				response_dict['total_views'] = total_views.count()
+				if request.user.is_authenticated():
+					username = request.user.username
+					user_views = total_views.where("this.user =='"+str(username)+"'")
+					response_dict['user_views'] = user_views.count()
 		response_dict['success'] = True
 		return HttpResponse(json.dumps(response_dict))
 	except Exception as e:
