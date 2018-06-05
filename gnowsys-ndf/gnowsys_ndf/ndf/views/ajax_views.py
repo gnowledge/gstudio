@@ -6759,6 +6759,7 @@ def add_asset(request,group_id):
   except:
       group_name, group_id = get_group_name_id(group_id)
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
+
   topic_gst = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
   topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst._id]}})
   context_variables = {'group_id':group_id, 'groupid':group_id,'edit': False}
@@ -6780,6 +6781,7 @@ def create_edit_asset(request,group_id):
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
+  
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
   # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
@@ -7085,6 +7087,26 @@ def export_to_epub(request, group_id, node_id):
         print "\n export_fail: ", export_fail
         pass
     return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+
+
+
+def export_unit_to_epub(request,group_id):
+
+    from gnowsys_ndf.ndf.views.export_unit_to_epub import *
+    response_dict = {'success': False}
+    try:
+        group_obj = node_collection.one({'_id': ObjectId(group_id)})
+        epub_loc = create_epub(group_obj)
+        print 'hey!'
+        zip_file = open(epub_loc, 'rb')
+        response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+        response['Content-Disposition'] = 'attachment; filename="' + slugify(group_obj.name) + '.epub"'
+        return response
+    except Exception as export_fail:
+        print "\n export_fail: ", export_fail
+        pass
+    return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+
 
 def remove_related_doc(request, group_id):
     node = request.POST.get('node', None)
