@@ -3269,10 +3269,17 @@ def get_sg_member_of(group_id):
 
 	sg_member_of_list = []
 	# get all underlying groups
-	group_obj = get_group_name_id(group_id, get_obj=True)
-	if group_obj:
-		group_id = group_obj._id
-		group_name = group_obj.name
+	# group_obj = get_group_name_id(group_id, get_obj=True)
+	# if group_obj:
+	# 	group_id = group_obj._id
+	# 	group_name = group_obj.name
+	try:
+		group_id = ObjectId(group_id)
+	except:
+		group_id, group_name = get_group_name_id(group_id)
+
+	group_obj = node_collection.one({'_id': ObjectId(group_id)})
+
 	# Fetch post_node of group
 	if group_obj:
 		if "post_node" in group_obj:
@@ -3896,8 +3903,34 @@ def get_download_filename(node, file_size_name='original'):
 		name = name.split('.')[0]
 		file_name = slugify(name)
 		name = name.encode('utf-8')
+
 		if extension:
-			name += extension
+			#name += extension
+			if (node.if_file.original.relurl==node.if_file.mid.relurl):
+				name += extension
+				return name
+
+			elif (node.if_file.mid.relurl == 'None'):
+				name +=extension
+				return name
+			elif (node.if_file.original.relurl.endswith('webm')==True):
+				name_list = []
+				# name_mp4=node.get_file(node.if_file.mid.relurl)
+				# name_webm = node.get_file(node.if_file.original.relurl)
+				name_mp4 = name+extension
+				name_webm = name+".webm"
+				name_list = [name_mp4,name_webm]
+				name = name_list
+				return name
+			else:
+				# name_mp4 = node.get_file(node.if_file.original.relurl)
+				# name_webm = node.get_file(node.if_file.mid.relurl)
+				name_mp4 = name+extension
+				name_webm = name+".webm"
+				name_list = [name_mp4,name_webm]
+				name = name_list
+				
+			return name		
 
 		return name
 
