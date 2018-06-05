@@ -1,4 +1,4 @@
-from gnowsys_ndf.ndf.gstudio_es.node import *
+# from gnowsys_ndf.ndf.gstudio_es.node import *
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.methods import *

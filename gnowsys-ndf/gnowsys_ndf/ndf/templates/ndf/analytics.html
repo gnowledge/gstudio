@@ -17,7 +17,9 @@
 
 {% block body_content %}
 
-<ul class="tabs" data-tab role="tablist">
+
+<div class="large-12 medium-12 small-4 medium-centered columns">
+  <ul class="tabs tabs vertical" data-tab role="tablist" id="all-tabs">
   <li class="tab-title active" role="presentation"><a href="#panel2-1" role="tab" tabindex="0" aria-selected="true" aria-controls="panel2-1">{% trans "Top Users" %}</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-2" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-2">{% trans "Top Downloads" %}</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-3" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-3">{% trans "Top Resources" %}</a></li>
@@ -26,50 +28,251 @@
   <li class="tab-title" role="presentation"><a href="#panel2-6" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-4">Top Audios</a></li>
   <li class="tab-title" role="presentation"><a href="#panel2-7" role="tab" tabindex="0" aria-selected="false" aria-controls="panel2-4">Top Images</a></li>
 </ul>
-<div class="tabs-content panel callout radius">
-  <section role="tabpanel" aria-hidden="false" class="content active" id="panel2-1">
+    <div class="cards">
+<div class="tabs-content" style="background-color: #fff;">
+  <section class="content active" id="panel2-1">
     {% top_users as users %}
         {% for value in users %}
-    <h6><b>{{value.key}}</b></h6>
+   <div class="card">
+    <img src="http://s4c.cymru/temp/wave1.jpg">
+    <div class="card-title">
+      <a href="#" class="toggle-info btn">
+        <span class="left"></span>
+        <span class="right"></span>
+      </a>
+      <h2>
+          {{value.key}}
+      </h2>
+    </div>
+    <div class="card-flap flap1">
+      <div class="card-description">
+        This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+      </div>
+      <div class="card-flap flap2">
+        <div class="card-actions">
+          <a href="#" class="btn">Read more</a>
+        </div>
+      </div>
+    </div>
+   </div>
 
     {% endfor %}
   </section>
-  <section role="tabpanel" aria-hidden="true" class="content" id="panel2-2">
+  <section  class="content" id="panel2-2">
     {% top_downloads as downloads %}
         {% for value in downloads %}
-    <h6><b>{{value.key}}</b></h6>
+           <div class="card">
+    <img src="http://s4c.cymru/temp/wave1.jpg">
+    <div class="card-title">
+      <a href="#" class="toggle-info btn">
+        <span class="left"></span>
+        <span class="right"></span>
+      </a>
+      <h2>
+          {{value.key}}
+      </h2>
+    </div>
+    <div class="card-flap flap1">
+      <div class="card-description">
+        This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+      </div>
+      <div class="card-flap flap2">
+        <div class="card-actions">
+          <a href="#" class="btn">Read more</a>
+        </div>
+      </div>
+    </div>
+   </div>
     {% endfor %}
   </section>
-  <section role="tabpanel" aria-hidden="true" class="content" id="panel2-3">
+  <section class="content" id="panel2-3">
     {% top_resources as resources %}
         {% for value in resources %}
-        <h6><b>{{value.key}}</b></h6>
+      <div class="card">
+        <img src="http://s4c.cymru/temp/wave1.jpg">
+        <div class="card-title">
+          <a href="#" class="toggle-info btn">
+            <span class="left"></span>
+            <span class="right"></span>
+          </a>
+          <h2>
+              {{value.key}}
+          </h2>
+        </div>
+        <div class="card-flap flap1">
+          <div class="card-description">
+            This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+          </div>
+          <div class="card-flap flap2">
+            <div class="card-actions">
+              <a href="#" class="btn">Read more</a>
+            </div>
+          </div>
+        </div>
+       </div>  
     {% endfor %}    
   </section>
-  <section role="tabpanel" aria-hidden="true" class="content" id="panel2-4">
+  <section  class="content" id="panel2-4">
     {% top_pages as pages %}
         {% for value in pages %}
-        <h6><b>{{value.key}}</b></h6>
+    <div class="card">
+      <img src="http://s4c.cymru/temp/wave1.jpg">
+      <div class="card-title">
+        <a href="#" class="toggle-info btn">
+          <span class="left"></span>
+          <span class="right"></span>
+        </a>
+        <h2>
+            {{value.key}}
+        </h2>
+      </div>
+      <div class="card-flap flap1">
+        <div class="card-description">
+          This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+        </div>
+        <div class="card-flap flap2">
+          <div class="card-actions">
+            <a href="#" class="btn">Read more</a>
+          </div>
+        </div>
+      </div>
+     </div>
     {% endfor %}
   </section>
-    <section role="tabpanel" aria-hidden="true" class="content" id="panel2-5">
+    <section  class="content" id="panel2-5">
     {% top_videos as videos %}
         {% for value in videos %}
-        <h6><b>{{value.key}}</b></h6>
+      <div class="card">
+        <img src="http://s4c.cymru/temp/wave1.jpg">
+        <div class="card-title">
+          <a href="#" class="toggle-info btn">
+            <span class="left"></span>
+            <span class="right"></span>
+          </a>
+          <h2>
+              {{value.key}}
+          </h2>
+        </div>
+        <div class="card-flap flap1">
+          <div class="card-description">
+            This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+          </div>
+          <div class="card-flap flap2">
+            <div class="card-actions">
+              <a href="#" class="btn">Read more</a>
+            </div>
+          </div>
+        </div>
+       </div>
     {% endfor %}
   </section>
-    <section role="tabpanel" aria-hidden="true" class="content" id="panel2-6">
+    <section class="content" id="panel2-6">
     {% top_audios as audios %}
         {% for value in audios %}
-        <h6><b>{{value.key}}</b></h6>
+      <div class="card">
+        <img src="http://s4c.cymru/temp/wave1.jpg">
+        <div class="card-title">
+          <a href="#" class="toggle-info btn">
+            <span class="left"></span>
+            <span class="right"></span>
+          </a>
+          <h2>
+              {{value.key}}
+          </h2>
+        </div>
+        <div class="card-flap flap1">
+          <div class="card-description">
+            This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+          </div>
+          <div class="card-flap flap2">
+            <div class="card-actions">
+              <a href="#" class="btn">Read more</a>
+            </div>
+          </div>
+        </div>
+       </div>
     {% endfor %}
   </section>
-    <section role="tabpanel" aria-hidden="true" class="content" id="panel2-7">
+    <section  class="content" id="panel2-7">
     {% top_images as images %}
         {% for value in images %}
-        <h6><b>{{value.key}}</b></h6>
+      <div class="card">
+        <img src="http://s4c.cymru/temp/wave1.jpg">
+        <div class="card-title">
+          <a href="#" class="toggle-info btn">
+            <span class="left"></span>
+            <span class="right"></span>
+          </a>
+          <h2>
+              {{value.key}}
+          </h2>
+        </div>
+        <div class="card-flap flap1">
+          <div class="card-description">
+            This grid is an attempt to make something nice that works on touch devices. Ignoring hover states when they're not available etc.
+          </div>
+          <div class="card-flap flap2">
+            <div class="card-actions">
+              <a href="#" class="btn">Read more</a>
+            </div>
+          </div>
+        </div>
+       </div>
     {% endfor %}
   </section>
 </div>
+</div>
+</div>
+
+<script type="text/javascript">
+  $(document).foundation();
+</script>
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+  var zindex = 10;
+  
+  $("div.card").click(function(e){
+    e.preventDefault();
+
+    var isShowing = false;
+
+    if ($(this).hasClass("show")) {
+      isShowing = true
+    }
+
+    if ($("div.cards").hasClass("showing")) {
+      // a card is already in view
+      $("div.card.show")
+        .removeClass("show");
+
+      if (isShowing) {
+        // this card was showing - reset the grid
+        $("div.cards")
+          .removeClass("showing");
+      } else {
+        // this card isn't showing - get in with it
+        $(this)
+          .css({zIndex: zindex})
+          .addClass("show");
+
+      }
+
+      zindex++;
+
+    } else {
+      // no cards in view
+      $("div.cards")
+        .addClass("showing");
+      $(this)
+        .css({zIndex:zindex})
+        .addClass("show");
+
+      zindex++;
+    }
+    
+  });
+});
+</script>
 
 {% endblock %}

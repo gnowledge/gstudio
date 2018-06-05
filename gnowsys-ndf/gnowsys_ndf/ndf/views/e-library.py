@@ -67,7 +67,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 	GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 	GST_IPAGE1 = GST_IPAGE.execute()
 
-	print GST_IPAGE1.hits[0].id
+	#print GST_IPAGE1.hits[0].id
 	##############################################################################
 	@get_execution_time
 	def resource_list(request, group_id="home", app_id=None, page_no=1):
