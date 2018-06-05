@@ -2615,11 +2615,12 @@ def cross_publish(request, group_id):
     elif request.method == "POST":
         success_flag = True
         target_group_ids = request.POST.getlist("group_ids[]", None)
-
         # print "\ntarget_group_ids:", target_group_ids
         if target_group_ids:
             try:
                 target_group_ids = map(ObjectId, list(set(target_group_ids)))
+                #print list(set(target_group_ids))
+                target_group_ids = list(set(target_group_ids))
                 # if home_obj._id in target_group_ids:
                 #    home_id_index =  target_group_ids.index(ObjectId(home_obj._id))
                 #    target_group_ids.pop(home_id_index)
@@ -2640,6 +2641,7 @@ def cross_publish(request, group_id):
                     for each_child in child_cur:
                         # each_child.group_set = add_to_list(each_child.group_set, target_group_ids)
                         each_child.group_set = target_group_ids
+                        #each_child.group_set = list(set(target_group_ids))
 
                         each_child.save()
                     # if remove_from_curr_grp_flag:
@@ -2663,7 +2665,6 @@ def cross_publish(request, group_id):
                 print "\nError occurred in Cross-Publish", e
                 success_flag = False
                 pass
-
         return HttpResponse(json.dumps(target_group_ids, cls=NodeJSONEncoder))
 
 
