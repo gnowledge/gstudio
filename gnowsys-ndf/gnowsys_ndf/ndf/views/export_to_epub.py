@@ -404,6 +404,7 @@ def create_epub(node_obj):
     zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
     epub_dump(epub_root, zipf)
     zipf.close()
+    shutil.rmtree(epub_root)
     print "Successfully created epub: ", epub_name
     return str(epub_root + '.epub')
 
@@ -451,6 +452,7 @@ def create_unit_epub(group_obj):
     zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
     epub_dump(epub_root, zipf)
     zipf.close()
+    shutil.rmtree(epub_root)
     print "Successfully created epub: ", epub_name
     return str(epub_root + '.epub')
 
