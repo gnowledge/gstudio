@@ -978,7 +978,7 @@ class Node(DjangoDocument):
     def rcs_function(self,is_new,**kwargs):
         history_manager = HistoryManager()
         rcs_obj = RCS()
-        if True:
+        if False:
             if is_new:
                 # Create history-version-file
                 try:
@@ -987,8 +987,11 @@ class Node(DjangoDocument):
                         user_list = User.objects.filter(pk=self.created_by)
                         user = user_list[0].username if user_list else 'user'
                         # user = User.objects.get(pk=self.created_by).username
-                        message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                        if self.created_at:
+                            message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                            rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                        else:
+                            pass
                 except Exception as err:
                     print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be created!!!\n"
                     node_collection.collection.remove({'_id': self._id})
@@ -1007,8 +1010,11 @@ class Node(DjangoDocument):
                             # user = User.objects.get(pk=self.created_by).username
                             user_list = User.objects.filter(pk=self.created_by)
                             user = user_list[0].username if user_list else 'user'
-                            message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                            rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                            if self.created_at:
+                                message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                            else:
+                                pass
 
                     except Exception as err:
                         print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
@@ -1020,8 +1026,11 @@ class Node(DjangoDocument):
                         # user = User.objects.get(pk=self.modified_by).username
                         user_list = User.objects.filter(pk=self.created_by)
                         user = user_list[0].username if user_list else 'user'
-                        message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
-                        rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+                        if self.last_update:
+                            message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
+                            rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+                        else:
+                            pass
 
                 except Exception as err:
                     print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
