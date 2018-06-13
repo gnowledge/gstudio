@@ -72,7 +72,11 @@
           <h3> {% trans "My Workspace" %}</h3>
             <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
               <li class="card-image-wrapper">
+                {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
+                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.id  no_enroll=True %}
+                {% else %}
                 {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk  no_enroll=True %}
+                {% endif %}
               </li>
             </ul>
         </div>
@@ -81,15 +85,22 @@
           <h3>{% trans "Joined Workspaces & Enrolled Courses" %}</h3>
           </br>
         </div>
+        <div id="card_list">
         <div class="small-12 columns lms_explore_back_unit">
           <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
             {% for each_obj in units_cur %}
             <li class="card-image-wrapper">
+              {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+              {% else %}
               {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+              {% endif %}
             </li>
             {% endfor %}
           </ul>
-                </div>
+          {% include 'ndf/pagination.html' with urlname="my_desk_paged" first_arg=request.user.id second_arg="" %}
+        </div>
+        </div>
 
             <section class="empty-dashboard-message">
               
@@ -105,7 +116,11 @@
         <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
           {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
+            {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+            {% else %}
             {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+            {% endif %}
           </li>
 
           {% endfor %}
@@ -128,7 +143,11 @@
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
+        {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
+        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+        {% else %}
         {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
+        {% endif %}
       </li>
       {% empty %}
       <section class="empty-dashboard-message">
@@ -170,4 +189,66 @@
 
   </script>
   {% endif %}
+  <script type="text/javascript">
+    $('ul.pagination a').click(function(e)
+    {
+      e.preventDefault();
+      
+      // alert($(this).attr("class"));
+      populateFileList(this); 
+
+    });
+    function populateFileList(pageAnchor)
+    {
+      console.log("pagination block execut")
+      var page_no = pageAnchor.text.trim(),
+      url = pageAnchor.href.substr(pageAnchor.href.search(pageAnchor.host)+pageAnchor.host.length);
+      var tabContainerDiv = $(pageAnchor).closest("div#card_list");
+      console.log(url)
+      $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+        title: "{{title}}",
+        page_no: page_no,
+        no_of_objs_pp: 20,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data,result){
+        var $response=$(data);
+        // console.log(tabContainerDiv);
+        // console.log(data['group_id'])
+        var a=$response.find("#card_list");
+        $(tabContainerDiv).empty()
+        $(tabContainerDiv).append(a)
+        $(tabContainerDiv).find("ul.pagination a").click(function(e){
+
+          e.preventDefault();
+          populateFileList(this);
+
+          });
+        //   var $response=$(data);
+          // console.log("1111111122222222222222222222")
+          // console.log($response)
+          // var a = $response.filter('.group_sections_content #card_list');
+          // console.log(a)
+          // $("#card_list").empty()
+          // $("#card_list").append(a)
+        // // $(tabContainerDiv).find("ul.pagination a").click(function(e){
+
+        // //   e.preventDefault();
+        // //   populateFileList(this);
+
+        // //   })
+      console.log(data);
+        },
+        error: function(xhr, errmsg, err){
+         console.log("error")
+         console.log(error_data)
+        }
+      });
+    }
+  </script>
   {% endblock  %}
