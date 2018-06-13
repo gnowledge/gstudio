@@ -571,7 +571,7 @@ class Node(DjangoDocument):
                         # print "=== removed ", each_invalid_field, ' : ',
 
 
-        except Exception, e:
+        except Exception as e:
             print e
             pass
 
@@ -615,7 +615,7 @@ class Node(DjangoDocument):
                 for each_invalid_field in invalid_fields:
                     if each_invalid_field in self_keys:
                         self.pop(each_invalid_field)
-        except Exception, e:
+        except Exception as e:
             print "\nError while processing invalid fields: ", e
             pass
 
