@@ -798,6 +798,7 @@ def my_desk(request, group_id,page_no=1):
             my_units_page_cur = paginator.page(paginator.num_pages)
 
     else:
+        from mongokit import paginator
         my_units = node_collection.find(
                     {'member_of':
                         {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
