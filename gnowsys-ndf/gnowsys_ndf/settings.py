@@ -1024,8 +1024,8 @@ CACHES = {
 
 #####################MASTODON########################
 if LOGIN_WITH_MASTODON:
-    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.oauth_middleware.test',)
-    AUTHENTICATION_BACKENDS = ('gnowsys_ndf.ndf.middleware.oauth_middleware.MyCustomBackend',)
+    MIDDLEWARE_CLASSES += ('gnowsys_ndf.ndf.middleware.oauth_middleware.mastodon_login',)
+    AUTHENTICATION_BACKENDS = ('gnowsys_ndf.ndf.middleware.oauth_middleware.CustomBackendAuthenticationForDjango',)
 
 # Captcha settings
 CAPTCHA_CHALLENGE_FUNCT =  'captcha.helpers.random_char_challenge'
