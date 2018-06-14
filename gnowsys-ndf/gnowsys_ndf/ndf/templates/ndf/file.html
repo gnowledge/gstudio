@@ -270,13 +270,19 @@ margin-top:5px !important;
 
       <div class="coll_label row" style="display:none;">
         <span class="small-12 columns">Create Collection</span>
-        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><a class="create_coll"><span class="fi-check" style="color:green;"></span></a>
+        <div class="small-11 columns"><input type="text" class="coll_value" placeholder="Enter collection name" name="coll_name"/></div><!-- <a class="create_coll"><span class="fi-check" style="color:green;"></span></a> -->
 
+         <div class="small-11 create_coll columns">
+                <a class="tiny button radius right-btn">{% trans 'Create Collection' %}</a>
+        </div>
+
+        {% comment %}
         {% if group_obj.created_by == request.user.id or user.is_superuser %}
         <div class="small-11 columns">
                 <a class="tiny button radius right-btn delete-multiple-files" title="Delete  {{node.member_of_names_list.0}}">{% trans 'Delete Files' %}</a>
         </div>
         {% endif %}
+        {% endcomment %}
         
       </div>
     </ul>
