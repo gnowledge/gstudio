@@ -3903,7 +3903,6 @@ def get_download_filename(node, file_size_name='original'):
 		name = name.split('.')[0]
 		file_name = slugify(name)
 		name = name.encode('utf-8')
-		print name
 
 	if extension:
 		name+=extension
