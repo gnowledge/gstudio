@@ -18,7 +18,7 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 from gnowsys_ndf.ndf.views import rpc_resources
 ################################################
 #Middleware for login with mastodon oauth
-from gnowsys_ndf.ndf.middleware.oauth_middleware import test 
+from gnowsys_ndf.ndf.middleware.oauth_middleware import mastodon_login 
 ################################################
 from gnowsys_ndf.ndf.views.es_analytics import get_analytics
 
@@ -30,7 +30,8 @@ if GSTUDIO_SITE_NAME.lower() == 'clix':
 else:
     login_template = 'registration/login.html'
     logout_template = 'registration/logout.html'
-    some_instance=test()
+    login_instance_mastodon=mastodon_login()
+
     
 
 urlpatterns = patterns('',
@@ -251,7 +252,7 @@ urlpatterns = patterns('',
    # --end of django-registration
     #################################################
 
-    url(r'^accounts/login_test_view/$', some_instance.moauth , name='login_view'),
+    url(r'^accounts/login_test_view/$', login_instance_mastodon.moauth , name='login_view'),
     ################################################
 
    (r'^status/cache/$', 'gnowsys_ndf.ndf.views.cache.cache_status'),
