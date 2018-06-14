@@ -531,7 +531,7 @@ Still keeping for future ref (if needed).
             {% endwith %}
           </div>
           {% if node.if_file.original.relurl and not is_group %}
-          <a href="#metadata_info" id="more_info">{% trans "more info" %}</a>
+          <a href="#metadata_info" id="more_info">{% trans "More Info" %}</a>
           <div class="small-12 large-8 small-centered large-centered columns">
         <div class="panel callout radius" id="metadata_info" style="display: none;">
           <table class="small-12 large-12 large-centered">
@@ -580,11 +580,11 @@ Still keeping for future ref (if needed).
               <td width="250">{{node.legal.copyright | default_if_none:"Not set" | lower}}</td>
             </tr>
 
-
+<!-- 
             <tr>
               <td width="200">{% trans "Age Range" %}</td>
               <td width="250">{{node.age_range | default_if_none:"Not set" | lower}}</td>
-            </tr>
+            </tr> -->
 
             <tr>
               <td width="200">{% trans "Educational Level" %}</td>
@@ -603,7 +603,7 @@ Still keeping for future ref (if needed).
 
             <tr>
               <td width="200">{% trans "Target Audience" %}</td>
-              <td width="250">{{node.audience |join_with_commas | lower }}</td>
+              <td width="250">{{node.audience|join_with_commas|lower }}</td>
             </tr>
 
           </table>
@@ -1123,7 +1123,7 @@ function add_transcript_func(this_obj){
    var lable = $("#more_info").text().trim();
 
    if(lable == "Hide info") {
-     $("#more_info").text("more_info");
+     $("#more_info").text("More Info");
      $("#metadata_info").hide();
    }
    else {

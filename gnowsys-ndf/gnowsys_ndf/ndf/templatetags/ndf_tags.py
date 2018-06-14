@@ -4334,10 +4334,30 @@ def join_with_commas(obj_list):
     if not obj_list:
         return ""
     l=len(obj_list)
+    print obj_list
     if l==1:
         return u"%s" % obj_list[0]
-    else:    
-        return ", ".join(unicode(obj) for obj in obj_list[:l-1]) \
-                + " and " + unicode(obj_list[l-1])
+    else:
+    	print "--------------------------------"
+    	str_obj = str(obj_list)
+    	str_obj = str_obj[1:-1]
+    	print str_obj
+    	string_list_of_values=""
 
+    	for temp in str_obj.split(','):
+    		# print "============================"
+    		# print temp
+    		# print "-=========================="
+    		temp = str(temp).strip()
+    		temp = temp[2:-1]
+    		# print "+++++++++++"
+    		# print temp
+    		# print "+++++++++++"
+    		string_list_of_values = string_list_of_values+temp+', '
+        # return ", ".join(unicode(obj) for obj in obj_list[:l-1]) \
+        #         + " and " + unicode(obj_list[l-1])
+        	# print "!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        	# print string_list_of_values
+        	# print "!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        return string_list_of_values[:-1]
 
