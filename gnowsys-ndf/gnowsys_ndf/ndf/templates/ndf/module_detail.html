@@ -80,7 +80,10 @@
 	{% for each_node in units_under_module %}
 		<li class="card-image-wrapper">
 		{% if each_node.name in PARTNER_LIST %}
+			{% include 'ndf/card_group.html' with node=each_node  url_name='e-library' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}
+		{% comment %}
 			{% include 'ndf/card_group.html' with node=each_node has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_node.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
+		{% endcomment %}
 		{% else %}
 			{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
 		{%  endif %}

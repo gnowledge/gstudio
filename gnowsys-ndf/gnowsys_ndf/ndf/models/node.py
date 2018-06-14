@@ -978,7 +978,7 @@ class Node(DjangoDocument):
     def rcs_function(self,is_new,**kwargs):
         history_manager = HistoryManager()
         rcs_obj = RCS()
-        if False:
+        if True:
             if is_new:
                 # Create history-version-file
                 try:
