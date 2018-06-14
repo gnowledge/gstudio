@@ -22,7 +22,6 @@ position: relative !important;
 {% url 'auth_password_reset' as auth_pwd_reset_url %}
 {% url 'registration_register' as register_url %}
 
-
 <div class="row" style="margin: 1.2rem 0;">
 	<div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
 		<div class="row">
@@ -47,16 +46,28 @@ position: relative !important;
 		{% endif %}
 		{% csrf_token %}
 				<!-- Email -->
+			{% if site.SITE_NAME == "NROER" %}
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
 						<label class="left">
-							E-mail or {{ form.username.label }}
+							<center>{{error_msg_flag}}</center>
+							E-mail 
 						</label>
 					</div>
 				</div>
+			{% else %}
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
-						{{ form.username }}
+						<label class="left">
+							E-mail or {{ form.username.label }} 
+						</label>
+					</div>
+				</div>
+			{% endif %}
+				<div class="row">
+					<div class="small-10 medium-8 large-8 columns end">
+						<!-- {{ form.username }} -->
+						<input type="text" id="username" name="username"  placeholder="Email">
 					</div>
 				</div>
 
@@ -64,14 +75,16 @@ position: relative !important;
 				<div class="row">
 					<div class="small-10 medium-10 large-4 columns">
 						<label class="left">
-							{{ form.password.label_tag }}
+							Password
+							<!-- {{ form.password.label_tag }} -->
 						</label>
 					</div>
 					
 				</div>
 				<div class="row">
 					<div class="small-10 medium-8 large-8 columns end">
-						{{ form.password }}
+						<!-- {{ form.password }} -->
+						<input type="password" name="password" id="password" placeholder="Password">
 					</div>
 				</div>
 				<div class="row">

@@ -2,28 +2,25 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 ###############Mastodon OAUTH Dependancy##########
-from gnowsys_ndf.ndf.forms import mform
 import mastodon
 from django.contrib.auth import authenticate, login
 from mastodon import Mastodon
-from django.template.response import TemplateResponse
+from django.template.response import TemplateResponse,loader
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.contrib import messages
 ########################################
 
-
-class test(object):
+class mastodon_login(object):
     def moauth(self,request):
        
-        if request.method == 'POST':
-               
-            form = mform(request.POST)
-
+        if request.method == 'POST':    
+            #form = mform(request.POST)
             ###GET username and password from user#####
             Username = request.POST.get('username')
             Password = request.POST.get('password')
            
-            
             ###CHECKING CLIENT CREDENTIALS USING MASTODON API##########
             mastodon_var = mastodon.Mastodon(
                
@@ -39,66 +36,49 @@ class test(object):
                 Username,
                 Password,
                 to_file='gnowsys_ndf/gstudio_configs/NROER-access_token.secret',
-               
-               
                 )
                 mastodon_var2 = Mastodon(
                     client_id = 'gnowsys_ndf/gstudio_configs/NROER-client_cred.secret',
                     access_token = access_token,
                     api_base_url = 'https://member.metastudio.org'
                 )
-            except Exception as e:
-                print e
+            except Exception as e: 
                 pass       
                
             name = Username
             email = Username
             password = Password
-           
-
                        
             if access_token:
                
                 ###check whether given email is present in user table or not####
                 user_email = User.objects.filter(email=name).exists()
-                
-                
                 if user_email:
              
                     ##Fetch auth object using email
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
                     if(nodes!=None):
-                        nodes.access_token = access_token
-                       
                         
                         ####SECOND AND BY-DEFAULT CUSTOMIZE LAYER FOR AUTHENTICATION
-                        user = authenticate(username=name, password=None)
+                            user = authenticate(username=name, password=None)
 
-                        
-                        if user is not None:
-                        
-                            if user.is_active:
-                                user.is_active=True
-                               
-                                login(request,user)
-                               
-                                return HttpResponseRedirect( reverse('landing_page') )
-                        else:
-                            HttpResponse("Error1")
+                            if user is not None:
+                                if user.is_active:
+                                    user.is_active=True
+                                    login(request,user)
+                                    return HttpResponseRedirect( reverse('landing_page') )
+                            else:
+                                HttpResponse("Invalid Credentials")
                     else:
                         ##Creating auth object for user
                         member = User.objects.get(email=name) 
                         Author.create_author(member.id,agency_type='Other')
                         
                         ##Fetch auth object using email
-                        author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
-                        
-                        ##Assign access token for auth object
-                        author.access_token = access_token
-
+                        author = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})   
                         author.save()
-
+                            
                         #By default layer and customise layer of authentication
                         user = authenticate(username=name, password=None)
                         if user is not None:
@@ -106,7 +86,7 @@ class test(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error1")
+                                HttpResponse("Invalid Credentials")
 
                 else:
                     ##Creating user in django user table 
@@ -116,18 +96,15 @@ class test(object):
                     ##Fetch auth object using email
                     nodes = node_collection.one({'email':{'$regex':email,'$options': 'i' },'_type':unicode("Author")})
 
-                    if(nodes!=None):
-
-                        
-                        user = authenticate(username=name, password=None)
-                        if user is not None:
-                            if user.is_active:
-                                
-                                login(request, user)
-                                return HttpResponseRedirect( reverse('landing_page') )
-                            else:
-                                HttpResponse("Error2")
-
+                    if(nodes!=None):                     
+   
+                            user = authenticate(username=name, password=None)
+                            if user is not None:
+                                if user.is_active:
+                                    login(request, user)
+                                    return HttpResponseRedirect( reverse('landing_page') )
+                                else:
+                                    HttpResponse("Invalid Credentials")
 
 
                     else:
@@ -136,8 +113,8 @@ class test(object):
                         member = User.objects.get(email=name)
                         Author.create_author(member.id,agency_type='Other')                       
                         author = node_collection.one({"created_by":int(member.id),"_type":unicode("Author")})
-                        author.access_token = access_token
                         author.save()
+                        
                         ####SECOND AND BY-DEFAULT LAYER FOR AUTHENTICATION
                         user = authenticate(username=name, password=None)
                         if user is not None:
@@ -145,22 +122,21 @@ class test(object):
                                 login(request, user)
                                 return HttpResponseRedirect( reverse('landing_page') )
                             else:
-                                HttpResponse("Error2")
+                                HttpResponse("Invalid Credentials")
                 return HttpResponseRedirect( reverse('landing_page') )  
                  
             else:
-
-                return HttpResponseRedirect(reverse('login') ) 
+                error_msg_flag = "You entered wrong credentials"
+                template = loader.get_template('registration/login.html')
+                context = {'error_msg_flag':error_msg_flag} 
+                return render(request,'registration/login.html',context)
             
         else:
           
             return HttpResponse("Invalid Credentials.")
 
-
-
-
 # Below class used for overriding defualt authenticate method of django
-class MyCustomBackend:
+class CustomBackendAuthenticationForDjango:
    
     # Create an authentication method
     # This is called by the standard Django login procedure
