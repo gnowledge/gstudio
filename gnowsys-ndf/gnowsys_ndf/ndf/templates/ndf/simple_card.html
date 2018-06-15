@@ -154,7 +154,11 @@
         {% endif %}     
      {% if user.is_authenticated  and not group_object.edit_policy == "NON_EDITABLE"  or gstaff_access %} 
       {% if not no_checkbox  %}
-        </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
+        {% if site.GSTUDIO_ELASTIC_SEARCH != True %}
+          </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.pk}}">
+        {% else %}
+          </a> <input type="checkbox" style="margin:0; float:left;" class="filenode" name="filenode" value="{{resource.id}}">
+        {% endif %}
       {% endif %}
     {% endif %}
   </div>
