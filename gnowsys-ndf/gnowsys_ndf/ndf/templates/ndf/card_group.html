@@ -6,7 +6,7 @@
 {% endif %}
 {% load get_member_of_list from es_tags %}
 
-{% if site.GSTUDIO_ELASTIC_SEARCH != True and site.TESTING_VARIABLE_FOR_ES == False %}
+{% if site.GSTUDIO_ELASTIC_SEARCH != True or site.TESTING_VARIABLE_FOR_ES == False %}
 <div class="unit_card">
     {% if not no_url and not prevent_click %}
     {% if first_arg and second_arg and third_arg %}
