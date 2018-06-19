@@ -706,9 +706,7 @@ def upload_prof_pic(request, group_id):
         if if_module == "True":
             return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':group_obj._id }))
         else:
-            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id,'_id':node_id }))
-            #return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
-
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
 def my_courses(request, group_id):
 
