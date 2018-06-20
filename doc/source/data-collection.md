@@ -150,8 +150,8 @@ Derived data is one which we can pull out from above complete data by running sc
 - Prerequisite:
     - Get in docker (ref. Utility 1)
     - Reach at required gstudio location within docker (ref. Utility 2)
-- [RUN]: `python manage.py activity_timestamp <username>`
-- Example [RUN]: `python manage.py activity_timestamp green-apple-sp100`
+- [ RUN ]: `python manage.py activity_timestamp <username>`
+- Example [ RUN ]: `python manage.py activity_timestamp green-apple-sp100`
 
 1.2 For **all user's**:
 - Script Name: `get_all_users_activity_timestamp_csvs.py`
@@ -159,26 +159,31 @@ Derived data is one which we can pull out from above complete data by running sc
     - Get in docker (ref. Utility 1)
     - Reach at required gstudio location within docker (ref. Utility 2)
     - Get into project shell (ref. Utility 3)
-- [RUN]: `execfile('../doc/deployer/get_all_users_activity_timestamp_csvs.py')`
+- [ RUN ]: `execfile('../doc/deployer/get_all_users_activity_timestamp_csvs.py')`
 
 ### 2. Progress CSV's: [format: CSV]
 - Script name: `export_users_analytics`
 - Prerequisite:
     - Get in docker (ref. Utility 1)
     - Reach at required gstudio location within docker (ref. Utility 2)
-- [RUN]: `python manage.py export_users_analytics`
+- [ RUN ]: `python manage.py export_users_analytics`
 
 ### 3. Assessments data [format: DB data dumps]
 - Script Name: `single_school_get_MIT_activity_data.py`
 - Prerequisite:
     - Get in docker (ref. Utility 1)
     - Reach at required gstudio location within docker (ref. Utility 4)
-- [RUN]: `python single_school_get_MIT_activity_data.py`
+- [ RUN ]: `python single_school_get_MIT_activity_data.py`
 
 ---
 
-## Utility Commands:
-### 1. Get into docker [RUN]: `docker exec -it gstudio bash`
-### 2. Reach at required `gstudio` location within docker [RUN]: `cd /home/docker/code/gstudio/gnowsys-ndf`
-### 3. Get into project shell [RUN]: `python manage.py shell`
-### 4. Reach at required `qbank-gstudio-scripts` location within docker [RUN]: `cd qbank-gstudio-scripts/single_school_get_MIT_activity_data/`
+### Utility Commands:
+
+#### 1. Get into docker [ RUN ]:
+- `docker exec -it gstudio bash`
+#### 2. Reach at required `gstudio` location within docker [ RUN ]:
+- `cd /home/docker/code/gstudio/gnowsys-ndf`
+#### 3. Get into project shell [ RUN ]:
+- `python manage.py shell`
+#### 4. Reach at required `qbank-gstudio-scripts` location within docker [ RUN ]:
+- `cd qbank-gstudio-scripts/single_school_get_MIT_activity_data/`
