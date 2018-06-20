@@ -17,7 +17,8 @@ Year (YYYY)                                             [ LEVEL 0 ]
                 - db                                    [ LEVEL 4 ]
                 - media                                 [ LEVEL 4 ]
                 - rcs-repo                              [ LEVEL 4 ]
-                - pgdump-all.sql                        [ LEVEL 4 ]
+                - postgres-dump                         [ LEVEL 4 ]
+                    - pg_dump_all.sql                   [ LEVEL 5 ]
                 - system-heartbeat                      [ LEVEL 4 ]
                 - gstudio-exported-users-analytics-csvs [ LEVEL 4 ]
                 - gstudio_tools_logs                    [ LEVEL 4 ]
@@ -64,7 +65,7 @@ we have a provision to collect data from the said platforms and both may reside 
     - `db`: mongoDB data *(gStudio + qbank)*.
     - `media`: Files uploaded on clixserver *(gStudio)*.
     - `rcs-repo`: rcs, versioned json files *(gStudio)*.
-    - `pgdump-all.sql`: Postgres DB dump.
+    - `postgres-dump`: Postgres DB dump folder containing file `pg_dump_all.sql`. This is dump of user data.
     - `system-heartbeat`: Contains log of following:
         - Server Id
         - School Id
@@ -102,7 +103,8 @@ Example-data-collection-dir-str/
     │       │   ├── db
     │       │   ├── media
     │       │   ├── rcs-repo
-    │       │   ├── pgdump-all.sql
+    │       │   ├── postgres-dump
+    │       │   |    └── pg_dump_all.sql
     │       |   ├── gstudio-exported-users-analytics-csvs
     │       |   ├── gstudio_tools_logs
     │       |   ├── gstudio-logs
@@ -121,7 +123,8 @@ Example-data-collection-dir-str/
             │   ├── db
             │   ├── media
             │   ├── rcs-repo
-            │   ├── pgdump-all.sql
+            │   ├── postgres-dump
+            │   |    └── pg_dump_all.sql
             │   ├── gstudio-exported-users-analytics-csvs
             │   ├── gstudio_tools_logs
             │   ├── gstudio-logs
