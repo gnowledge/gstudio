@@ -141,7 +141,7 @@ Example-data-collection-dir-str/
 
 ---
 
-# Derived Data
+## Derived Data
 Derived data is one which we can pull out from above complete data by running scripts on it.
 
 ### 1. Activity Timestamp [format: CSV]
@@ -177,8 +177,8 @@ Derived data is one which we can pull out from above complete data by running sc
 
 ---
 
-# Utility Commands:
-1. Get into docker [RUN]: `docker exec -it gstudio bash`
-2. Reach at required `gstudio` location within docker [RUN]: `cd /home/docker/code/gstudio/gnowsys-ndf`
-3. Get into project shell [RUN]: `python manage.py shell`
-4. Reach at required `qbank-gstudio-scripts` location within docker [RUN]: `cd qbank-gstudio-scripts/single_school_get_MIT_activity_data/`
+## Utility Commands:
+### 1. Get into docker [RUN]: `docker exec -it gstudio bash`
+### 2. Reach at required `gstudio` location within docker [RUN]: `cd /home/docker/code/gstudio/gnowsys-ndf`
+### 3. Get into project shell [RUN]: `python manage.py shell`
+### 4. Reach at required `qbank-gstudio-scripts` location within docker [RUN]: `cd qbank-gstudio-scripts/single_school_get_MIT_activity_data/`
