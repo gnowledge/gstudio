@@ -216,7 +216,7 @@ class GSystem(Node):
         try:
             if md5_or_relurl:
                 file_blob = gfs.open(md5_or_relurl)
-        except Exception, e:
+        except Exception as e:
                 print "File '", md5_or_relurl, "' not found: ", e
 
         return file_blob
