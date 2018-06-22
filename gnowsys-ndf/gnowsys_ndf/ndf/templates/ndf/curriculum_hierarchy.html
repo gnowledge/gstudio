@@ -1,8 +1,6 @@
 {% extends "ndf/gbase.html" %}
 {% load i18n %}
 {% load ndf_tags %}
-
-
 {% block title %} {% trans "Topic Map" %} -- {{curriculum_obj.name }}  
 {% endblock %}
 
@@ -76,6 +74,20 @@ float:left;
                             <a href="" class="hyperlink-style">Title: {{curriculum_obj.name}} </a>
                             <a href="" class="hyperlink-info"> No. of Sections:{{curriculum_obj.collection_set|length}} </a>
                             <a href="" class="hyperlink-info"> Created on: {{curriculum_obj.created_at}}</a>
+                                        <div class="content reveal-modal graph-div " id="view-prerequisite-graph" data-reveal>
+              <a class="close-reveal-modal">&#215;</a>
+              {% include "ndf/graph_prerequisites.html" with node=curriculum_obj %}
+            </div>
+        
+             
+                    
+            
+          
+                                    
+
+    
+                    <a href="#view-prerequisite-graph"  data-reveal-id="view-prerequisite-graph" type="button" class="button-hollow-grey" style="margin-left: 0px;">
+                        View Graph </a>
                         </div>
                     </div>
                     {% if is_gstaff or curriculum_obj.created_by == request.user.id %}
@@ -166,8 +178,8 @@ float:left;
   <p><span class="w3-tag w3-blue">New!</span></p>-->
  <div class ="elements_for_editing" style="display:none">
  <div class="tagsfor">
- <ul> <h4 style="margin-left: 5px; ">Prequisites: </h4></ul>
-	{% comment %}
+ <ul> <h4 style="margin-left: 5px; ">Prerequisites: </h4></ul>
+ {% comment %}
     <span id="tag1">
     
 	<ul><a href="#">molecule<i id="reveal-tag" onclick="$(this).closest('a').remove();return false;" class="fa fa-close"></i></a></ul>
@@ -227,11 +239,27 @@ float:left;
    	<div> molecule , ion , proton</div>
 </span>-->
 </br>
+         
+           
+          
+                   
+           
 
+        
+             
+                    
+            
+          
+                                    
 
                     <button type="button" class="button-hollow-grey edit_subsection" style="margin-left: 0px;">
                         Edit
                     </button>
+    
+                    <a href="#view-prerequisite-graph"  data-reveal-id="view-prerequisite-graph" type="button" class="button-hollow-grey" style="margin-left: 0px;">
+                        View Graph </a>
+
+                
                     {% endif %}   
                </div>
                 
@@ -265,7 +293,7 @@ float:left;
 
 
 
-    <script type="text/javascript">
+   <script type="text/javascript">
         // var baseTree = [{
         //     name: 'Add Branch',
         //     class: 'create_branch',
@@ -396,11 +424,15 @@ float:left;
                                  //$('.subsection-label-heading').append("<h6>Select Prequisite topics for : " +node.name+ "</h6>");
                                 
                                 $('.subsection-label-view').append(" <div>Topic Name " + ": " +node.name+ "</div>" ).css("margin-left","0px" ,"color","#000000");
-                                
+                
                                 if(node.prerequisite_name){
+                                    
+                                    $('.subsection-label-view ').append("<div>Prequisites Of " +node.name+ " are " + ":</div>").css('color','#A9A9A9');
+                                    
+                                    $('.subsection-label-view').append("<div class='prerequisite_name'>" +  node.prerequisite_name + " </div>").css('color','#A9A9A9');
+                                          }
+                                        
 
-                                    $('.subsection-label-view ').append("<div class='prerequisite_name'>Prequisites Of " +node.name+ " are " + ":" +  node.prerequisite_name + " </div>").css('color','#A9A9A9');
-                                }
 
                                 
                                 $('.elements_for_editing').css('display','block');     
@@ -661,6 +693,7 @@ float:left;
                 $(".section-edit-area").css('display', 'none')
                 $('.section-view-area').css('display', 'block')
                 $("option:selected").removeAttr("selected");
+                 
             });
     
             $('.edit_section').click(function(event) {
@@ -675,7 +708,11 @@ float:left;
              
             });
         
-    
+            //$('.edit_graphsection').click(function(event) {
+              //  $(".listing-row").html("");
+               // $('.prereqgraph').css('display' , 'block')
+             
+            //});
  
       
  function search_func(){
