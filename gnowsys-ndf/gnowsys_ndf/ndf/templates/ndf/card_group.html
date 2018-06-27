@@ -45,22 +45,33 @@
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
         {% endif %}
         {% if node.altnames %}
-        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
+        <div class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:40}}</div>
         {% else %}
-        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
+        <div class="unit_title" title="{{node.name}}">{{node.name|truncatechars:40}}</div>
         {% endif %}
     </div>
-    <div class="unit_desc">
-        {{node.content|safe|striptags}}
+    <div class="unit_desc" title="{{node.content|safe|striptags}}">
+            {{node.content|safe|striptags|default_if_none:"No description added yet."|truncatechars:55}}
+
     </div>
-    
+    <hr style="height:1px;  width:100%; text-align:center; margin: 0 auto;">
     <div class="unit_actions">
         {% if group_counts %} 
         Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
         <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
         {% else %} 
         
-        <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
+        <div class="small-6 columns" style="padding: 0px;">
+            <div class="small-12 columns" style="padding: 0px;">
+                <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
+                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+            </div><br/>
+            <div class="small-12 columns" style="padding: 0px;">
+                    <i style="font-size:15px; color: black" class="fi-torsos"></i>
+                    <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Member{{node.author_set|pluralize}}</div>
+            </div>
+        </div>
+        <a href="{% url url_name first_arg %}" class="view_unit" style="margin-left: 55px;">{% trans "View" %}</a>
         {% if "base_unit" not in node.member_of_names_list and node.agency_type != "Other" %}
         <div class="right">
             {% if not no_enroll and not is_gstaff %}
@@ -115,9 +126,9 @@
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
         {% endif %}
         {% if node.altnames %}
-        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:20}}</span>
+        <span class="unit_title" title="{{node.altnames}}">{{node.altnames|truncatechars:40}}</span>
         {% else %}
-        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:20}}</span>
+        <span class="unit_title" title="{{node.name}}">{{node.name|truncatechars:40}}</span>
         {% endif %}
     </div>
     <div class="unit_desc">
