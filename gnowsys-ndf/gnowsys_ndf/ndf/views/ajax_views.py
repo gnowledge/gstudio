@@ -6350,7 +6350,6 @@ def get_visits_count(request, group_id):
 
 			# print "\n\nquery", query
 
-			from gnowsys_ndf.ndf.gstudio_es.mongo_to_es_mapper import Mapper
 			from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
 
 			if GSTUDIO_ELASTIC_SEARCH:

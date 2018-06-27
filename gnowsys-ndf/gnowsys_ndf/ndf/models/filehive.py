@@ -376,8 +376,11 @@ class Filehive(DjangoDocument):
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
-                message = "This document (" + str(self.md5) + ") is created on " + self.uploaded_at.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                if self.uploaded_at:
+                    message = "This document (" + str(self.md5) + ") is created on " + self.uploaded_at.strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                else:
+                    pass
 
         else:
             # Update history-version-file
@@ -390,9 +393,11 @@ class Filehive(DjangoDocument):
                 try:
                     if history_manager.create_or_replace_json_file(self):
                         fp = history_manager.get_file_path(self)
-                        message = "This document (" + str(self.md5) + ") is re-created on " + self.uploaded_at.strftime("%d %B %Y")
-                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-
+                        if self.uploaded_at:
+                            message = "This document (" + str(self.md5) + ") is re-created on " + self.uploaded_at.strftime("%d %B %Y")
+                            rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+                        else:
+                            pass
                 except Exception as err:
                     print "\n DocumentError: This document (", self._id, ":", str(self.md5), ") can't be re-created!!!\n"
                     node_collection.collection.remove({'_id': self._id})

@@ -172,7 +172,7 @@
                                                   <a href="/{{node.pk}}">
                                                 {% elif res_type %}
                                                   {% if res_type != "event_app_instance_detail" %}
-                                                          <a href="{% url res_type groupid node.pk   %}">{{i.url}}
+                                                         
                                                   {% else %}
                                                         {% get_event_type node as app_set_id %}
                                                         <a href="{% url res_type groupid app_set_id node.pk  %}">{{i.url}}
