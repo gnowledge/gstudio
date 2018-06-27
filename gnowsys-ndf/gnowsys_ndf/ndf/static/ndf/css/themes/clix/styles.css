@@ -30649,7 +30649,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #333333;
 }
 
-/* line 7476, ../../../scss/_app_styles.scss */
+/* line 7475, ../../../scss/_app_styles.scss */
 .button-save-new {
   height: 2rem;
   padding: 0 2rem;
@@ -30666,13 +30666,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #fff;
   transition: all .1s ease;
 }
-/* line 7491, ../../../scss/_app_styles.scss */
+/* line 7490, ../../../scss/_app_styles.scss */
 .button-save-new:hover {
   background-color: #fff;
   color: #912a7d;
 }
 
-/* line 7502, ../../../scss/_app_styles.scss */
+/* line 7501, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner {
   width: 100%;
   height: 200px;
@@ -30680,7 +30680,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-size: 100% 100%;
   position: relative;
 }
-/* line 7509, ../../../scss/_app_styles.scss */
+/* line 7508, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner:before {
   content: ' ';
   background-color: rgba(0, 0, 0, 0.1);
@@ -30694,13 +30694,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   z-index: 10;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
-/* line 7523, ../../../scss/_app_styles.scss */
+/* line 7522, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile {
   position: absolute;
   bottom: 30px;
   left: 40px;
 }
-/* line 7528, ../../../scss/_app_styles.scss */
+/* line 7527, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo {
   display: inline-block;
   margin-right: 10px;
@@ -30709,79 +30709,79 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   overflow: hidden;
   background-color: #fff;
 }
-/* line 7536, ../../../scss/_app_styles.scss */
+/* line 7535, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg {
   height: 100px;
   width: 100px;
 }
-/* line 7541, ../../../scss/_app_styles.scss */
+/* line 7540, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .buddy_logo svg path {
   fill: #7a422a;
 }
-/* line 7546, ../../../scss/_app_styles.scss */
+/* line 7545, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading {
   color: #fff;
   display: inline-block;
   vertical-align: top;
 }
-/* line 7551, ../../../scss/_app_styles.scss */
+/* line 7550, ../../../scss/_app_styles.scss */
 .mydesk_page .page_banner .banner_profile .banner_heading .buddy_name {
   font-size: 23px;
   display: block;
   margin-bottom: 10px;
 }
-/* line 7559, ../../../scss/_app_styles.scss */
+/* line 7558, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu {
   border-bottom: 1px solid #e5e5e5;
 }
-/* line 7563, ../../../scss/_app_styles.scss */
+/* line 7562, ../../../scss/_app_styles.scss */
 .mydesk_page .page_menu li > a {
   padding: 12px 20px 9px;
 }
 
-/* line 7572, ../../../scss/_app_styles.scss */
+/* line 7571, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit {
   width: 100%;
   height: 50px;
   background-color: #fff;
   color: #164A7B;
 }
-/* line 7577, ../../../scss/_app_styles.scss */
+/* line 7576, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > p {
   margin-left: 81px;
   padding: 0px 0px 0px 1px;
   font-family: OpenSans-Semibold;
   font-size: 20px;
 }
-/* line 7583, ../../../scss/_app_styles.scss */
+/* line 7582, ../../../scss/_app_styles.scss */
 .lms_explore_head_unit > a {
   padding: 0px 85px 3px 0px;
 }
 
-/* line 7589, ../../../scss/_app_styles.scss */
+/* line 7588, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: -19.3px;
 }
 
-/* line 7596, ../../../scss/_app_styles.scss */
+/* line 7595, ../../../scss/_app_styles.scss */
 .course-students-data {
   margin: 2px 2px 2px 2px;
   border: 2px solid #164a7b;
   padding: 19px 14px 0px 5px;
 }
-/* line 7603, ../../../scss/_app_styles.scss */
+/* line 7602, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(odd) {
   margin: 0px 10px;
 }
-/* line 7606, ../../../scss/_app_styles.scss */
+/* line 7605, ../../../scss/_app_styles.scss */
 .course-students-data .students-table-legends > span:nth-child(even) {
   display: inline-block;
   vertical-align: top;
   margin-right: 10px;
 }
 
-/* line 7614, ../../../scss/_app_styles.scss */
+/* line 7613, ../../../scss/_app_styles.scss */
 .badge_ex {
   display: inline-block;
   line-height: 22px;
@@ -30797,7 +30797,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 
-/* line 7633, ../../../scss/_app_styles.scss */
+/* line 7632, ../../../scss/_app_styles.scss */
 .badge_ex.green {
   background: #77cc51;
   border-color: #59ad33;
@@ -30807,7 +30807,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #a5dd8c, #77cc51);
 }
 
-/* line 7642, ../../../scss/_app_styles.scss */
+/* line 7641, ../../../scss/_app_styles.scss */
 .badge_ex.yellow {
   background: #faba3e;
   border-color: #f4a306;
@@ -30817,7 +30817,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-image: linear-gradient(to bottom, #fcd589, #faba3e);
 }
 
-/* line 7651, ../../../scss/_app_styles.scss */
+/* line 7650, ../../../scss/_app_styles.scss */
 .badge_ex.red {
   background: #fa623f;
   border-color: #fa5a35;
@@ -30837,13 +30837,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
         background-color: #A6D7F5;
     }
   }*/
-/* line 7674, ../../../scss/_app_styles.scss */
+/* line 7673, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs {
   width: 100%;
   margin: 0em 0em 0.5em;
   border-bottom: 1px solid #CCC;
 }
-/* line 7679, ../../../scss/_app_styles.scss */
+/* line 7678, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title {
   width: 43%;
   /*        background-color: blue;*/
@@ -30853,7 +30853,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   text-transform: uppercase;
   color: #fff;
 }
-/* line 7688, ../../../scss/_app_styles.scss */
+/* line 7687, ../../../scss/_app_styles.scss */
 .create-task-event-tabs .tabs .tab-title.active {
   background-color: #719dc7;
   border: 1px solid #CCC;
@@ -30861,7 +30861,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #fff;
 }
 
-/* line 7701, ../../../scss/_app_styles.scss */
+/* line 7700, ../../../scss/_app_styles.scss */
 .create_unit {
   background: #fff;
   box-shadow: 0px 2px 3px #000;
@@ -30869,7 +30869,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 10px;
 }
 
-/* line 7709, ../../../scss/_app_styles.scss */
+/* line 7708, ../../../scss/_app_styles.scss */
 .asset-unit-button {
   color: #ce7869;
   padding: 7px 14px;
@@ -30881,13 +30881,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-right: 30px;
   margin-bottom: 8px;
 }
-/* line 7719, ../../../scss/_app_styles.scss */
+/* line 7718, ../../../scss/_app_styles.scss */
 .asset-unit-button:hover {
   background-color: rgba(206, 120, 105, 0.2);
   color: #ce7869;
 }
 
-/* line 7725, ../../../scss/_app_styles.scss */
+/* line 7724, ../../../scss/_app_styles.scss */
 .course_creator_header {
   width: 100%;
   height: 70px;
@@ -30895,7 +30895,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7732, ../../../scss/_app_styles.scss */
+/* line 7731, ../../../scss/_app_styles.scss */
 .course_creator_header .unit_editor {
   width: 100%;
   height: 320px;
@@ -30903,13 +30903,13 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   padding: 5px 15px;
   box-shadow: 1px 0px 0px #000;
 }
-/* line 7741, ../../../scss/_app_styles.scss */
+/* line 7740, ../../../scss/_app_styles.scss */
 .course_creator_header .back_to_group {
   padding: 0px 15px 0px 10px;
   border-right: 1px solid #ccc;
   margin-right: 15px;
 }
-/* line 7747, ../../../scss/_app_styles.scss */
+/* line 7746, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit {
   width: 500px;
   height: 40px;
@@ -30918,24 +30918,24 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7756, ../../../scss/_app_styles.scss */
+/* line 7755, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7760, ../../../scss/_app_styles.scss */
+/* line 7759, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7768, ../../../scss/_app_styles.scss */
+/* line 7767, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading_unit select {
   font-size: 14px;
   font-family: 'OpenSans-Regular', sans-serif;
   color: gray;
   border: 0px solid #74b3dc;
 }
-/* line 7779, ../../../scss/_app_styles.scss */
+/* line 7778, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input {
   width: 500px;
   height: 40px;
@@ -30944,31 +30944,31 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   float: right;
   text-align: center;
 }
-/* line 7787, ../../../scss/_app_styles.scss */
+/* line 7786, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input:focus {
   border: 1px solid #74b3dc;
 }
-/* line 7791, ../../../scss/_app_styles.scss */
+/* line 7790, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading input::-webkit-input-placeholder
  {
   color: #d9dfe4;
   letter-spacing: 0.8px;
 }
-/* line 7801, ../../../scss/_app_styles.scss */
+/* line 7800, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading h5 {
   margin-top: 15px;
 }
-/* line 7806, ../../../scss/_app_styles.scss */
+/* line 7805, ../../../scss/_app_styles.scss */
 .course_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 7814, ../../../scss/_app_styles.scss */
+/* line 7813, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul {
   margin: 0px;
 }
-/* line 7817, ../../../scss/_app_styles.scss */
+/* line 7816, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -30977,11 +30977,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 7826, ../../../scss/_app_styles.scss */
+/* line 7825, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions ul li.active, .course_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
-/* line 7831, ../../../scss/_app_styles.scss */
+/* line 7830, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions span {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -30993,7 +30993,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   cursor: pointer;
   border-radius: 3px;
 }
-/* line 7843, ../../../scss/_app_styles.scss */
+/* line 7842, ../../../scss/_app_styles.scss */
 .course_creator_header .course_actions i {
   margin-right: 5px;
   background: rgba(0, 0, 0, 0.6);
@@ -31006,20 +31006,20 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   border-radius: 3px;
 }
 
-/* line 7860, ../../../scss/_app_styles.scss */
+/* line 7859, ../../../scss/_app_styles.scss */
 .lms_explore_back_unit {
   background-color: #fff;
   margin-top: 2.7px;
 }
 
-/* line 7865, ../../../scss/_app_styles.scss */
+/* line 7864, ../../../scss/_app_styles.scss */
 .empty-dashboard-message {
   border: 3px solid #e4e4e4;
   background: #f8f8f8;
   padding: 40px 0;
   text-align: center;
 }
-/* line 7871, ../../../scss/_app_styles.scss */
+/* line 7870, ../../../scss/_app_styles.scss */
 .empty-dashboard-message > a {
   background-color: #164a7b;
   border: 1px solid #164a7b;
@@ -31033,7 +31033,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-left: 5px;
   padding: 15px 20px;
 }
-/* line 7885, ../../../scss/_app_styles.scss */
+/* line 7884, ../../../scss/_app_styles.scss */
 .empty-dashboard-message .button-explore-courses {
   font-size: 20px;
   font-weight: normal;
@@ -31043,7 +31043,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   width: 170px;
 }
 
-/* line 7900, ../../../scss/_app_styles.scss */
+/* line 7899, ../../../scss/_app_styles.scss */
 .module_card {
   display: table;
   height: 290px;
@@ -31054,16 +31054,16 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   position: relative;
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
 }
-/* line 7910, ../../../scss/_app_styles.scss */
+/* line 7909, ../../../scss/_app_styles.scss */
 .module_card:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 7914, ../../../scss/_app_styles.scss */
+/* line 7913, ../../../scss/_app_styles.scss */
 .module_card > div {
   display: table-cell;
   height: 290px;
 }
-/* line 7919, ../../../scss/_app_styles.scss */
+/* line 7918, ../../../scss/_app_styles.scss */
 .module_card .card_banner {
   width: 250px;
   height: 290px;
@@ -31077,14 +31077,14 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   -webkit-transition: border-radius .2s;
   transition: border-radius .2s;
 }
-/* line 7932, ../../../scss/_app_styles.scss */
+/* line 7931, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img {
   height: 100%;
   width: 100%;
   border-radius: 4px;
   -webkit-filter: drop-shadow(16px 16px 10px rgba(0, 0, 0, 0.9));
 }
-/* line 7937, ../../../scss/_app_styles.scss */
+/* line 7936, ../../../scss/_app_styles.scss */
 .module_card .card_banner > img:hover {
   -webkit-transform: scale(1.03);
   -moz-transform: scale(1.03);
@@ -31093,7 +31093,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   transform: scale(1.03);
   opacity: 0.8;
 }
-/* line 7949, ../../../scss/_app_styles.scss */
+/* line 7948, ../../../scss/_app_styles.scss */
 .module_card .card_banner > h4 {
   position: absolute;
   top: 100px;
@@ -31102,7 +31102,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: #ffffff !important;
   text-shadow: 2px 0px 8px black;
 }
-/* line 7964, ../../../scss/_app_styles.scss */
+/* line 7963, ../../../scss/_app_styles.scss */
 .module_card .card_title {
   display: block;
   width: 230px;
@@ -31112,27 +31112,27 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin: 0px auto;
   letter-spacing: 1px;
 }
-/* line 7975, ../../../scss/_app_styles.scss */
+/* line 7974, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_banner {
   border-radius: 8px;
 }
-/* line 7978, ../../../scss/_app_styles.scss */
+/* line 7977, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 7983, ../../../scss/_app_styles.scss */
+/* line 7982, ../../../scss/_app_styles.scss */
 .module_card.animated_card.isOpen .card_banner {
   border-radius: 8px 0px 0px 8px;
 }
-/* line 7987, ../../../scss/_app_styles.scss */
+/* line 7986, ../../../scss/_app_styles.scss */
 .module_card.animated_card:hover .card_summary {
   left: 30px;
 }
-/* line 7990, ../../../scss/_app_styles.scss */
+/* line 7989, ../../../scss/_app_styles.scss */
 .module_card.animated_card .card_summary {
   left: 5px;
 }
-/* line 7994, ../../../scss/_app_styles.scss */
+/* line 7993, ../../../scss/_app_styles.scss */
 .module_card .card_summary {
   width: 290px;
   padding: 0px 15px;
@@ -31148,35 +31148,35 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   /* Safari */
   transition-property: left;
 }
-/* line 8008, ../../../scss/_app_styles.scss */
+/* line 8007, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_label {
   font-weight: 500;
   font-size: 12.5px;
   letter-spacing: 1px;
   color: black;
 }
-/* line 8014, ../../../scss/_app_styles.scss */
+/* line 8013, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section {
   margin: 5px 0px;
   padding: 5px 0px;
 }
-/* line 8018, ../../../scss/_app_styles.scss */
+/* line 8017, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section:not(:last-child) {
   border-bottom: 1px solid #ccc;
 }
-/* line 8021, ../../../scss/_app_styles.scss */
+/* line 8020, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section p {
   margin-bottom: 7px;
   font-size: 12.5px;
 }
-/* line 8025, ../../../scss/_app_styles.scss */
+/* line 8024, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .ellipsis {
   width: 245px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* line 8033, ../../../scss/_app_styles.scss */
+/* line 8032, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol {
   background: #a2238d;
   height: 37px;
@@ -31190,11 +31190,11 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   margin-top: 2px !important;
   letter-spacing: 0.4px;
 }
-/* line 8046, ../../../scss/_app_styles.scss */
+/* line 8045, ../../../scss/_app_styles.scss */
 .module_card .card_summary .card_section .module-card-enrol:hover {
   box-shadow: 0px 0px 17px rgba(0, 0, 0, 0.68);
 }
-/* line 8052, ../../../scss/_app_styles.scss */
+/* line 8051, ../../../scss/_app_styles.scss */
 .module_card .card_summary .module_brief {
   display: block;
   /* Fallback for non-webkit */
@@ -31211,12 +31211,12 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   color: black;
 }
 
-/* line 8069, ../../../scss/_app_styles.scss */
+/* line 8068, ../../../scss/_app_styles.scss */
 .inner {
   display: inline-block !important;
 }
 
-/* line 8075, ../../../scss/_app_styles.scss */
+/* line 8074, ../../../scss/_app_styles.scss */
 .enroll-btn {
   width: 90px;
   opacity: 1;
@@ -31232,7 +31232,7 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
   background-color: #4b4852;
 }
 
-/* line 8095, ../../../scss/_app_styles.scss */
+/* line 8094, ../../../scss/_app_styles.scss */
 .enrollBtn {
   background: #a2238d;
   height: 37px;
@@ -31247,34 +31247,34 @@ ul.horizontal_tabs_gstudio > li.sub_group_action:hover ul {
 }
 
 /*****Toolbar CSS******/
-/* line 8110, ../../../scss/_app_styles.scss */
+/* line 8109, ../../../scss/_app_styles.scss */
 #toolbar {
   background-color: #3e3e3e;
 }
 
-/* line 8113, ../../../scss/_app_styles.scss */
+/* line 8112, ../../../scss/_app_styles.scss */
 .datetime {
   color: #eaeaea;
   padding: 4px 0px 2px 5px;
   font-size: 11px;
 }
 
-/* line 8118, ../../../scss/_app_styles.scss */
+/* line 8117, ../../../scss/_app_styles.scss */
 .changefont {
   text-align: right;
   padding: 2px 5px 1px 0px;
 }
-/* line 8122, ../../../scss/_app_styles.scss */
+/* line 8121, ../../../scss/_app_styles.scss */
 .changefont .minus {
   font-size: 60%;
   color: #eaeaea;
 }
-/* line 8125, ../../../scss/_app_styles.scss */
+/* line 8124, ../../../scss/_app_styles.scss */
 .changefont .normal {
   font-size: 80%;
   color: #eaeaea;
 }
-/* line 8128, ../../../scss/_app_styles.scss */
+/* line 8127, ../../../scss/_app_styles.scss */
 .changefont .plus {
   font-size: 100%;
   color: #eaeaea;
