@@ -3266,7 +3266,6 @@ def get_sg_member_of(group_id):
 	Returns list of names of "member_of" of sub-groups.
 	- Takes group_id as compulsory and only argument.
 	'''
-
 	sg_member_of_list = []
 	# get all underlying groups
 
