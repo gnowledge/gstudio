@@ -538,12 +538,12 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 				else:
 					if filetype == "all":
-						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+						q = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
 							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
 							minimum_should_match=1)
 
 					elif search_text in (None,'',""):
-						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos'])],
+						q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks'])],
 							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id)],minimum_should_match=1
 						)
 						
