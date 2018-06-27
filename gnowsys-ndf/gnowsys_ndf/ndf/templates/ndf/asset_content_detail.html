@@ -51,7 +51,7 @@
                   {% endif %}
               </div>
           {% if 'Page'  not in node.member_of_names_list %}
-            <div class="small-12 medium-6 columns">
+            <div class="small-12 medium-10 columns">
                 {% if node.created_by == request.user.id or is_gstaff  %}
                   <span data-dropdown="assetcontent-settings-drop" aria-controls="assetcontent-settings-drop" aria-expanded="false" class="orange-button" style="margin-left:-10px;">
                      {% trans "Link/Add Related File" %}  <i class="fa fa-chevron-down"></i>
