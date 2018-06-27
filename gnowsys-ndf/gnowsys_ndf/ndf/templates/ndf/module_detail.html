@@ -19,8 +19,8 @@
 		<div class="small-10 columns title-strip strip">
 
 			<div class="small-11 columns">
-				<h7 class="text-button-blue"><i>{% trans "Module Name: " %}</h7></i><strong> {{node.name}} </strong><br/>
-				<h7 class="text-button-blue"><i>{% trans "Module Description: " %}</i></h7> {{node.content|default:'No description added yet.'|safe}}
+				<h7 class="text-button-blue"><i>{% trans "Name: " %}</h7></i><strong> {{node.name}} </strong><br/>
+				<h7 class="text-button-blue"><i>{% trans "Description: " %}</i></h7> {{node.content|default:'No description added yet.'|safe}}
 			</div>
 			<div class="small-1 columns" style="margin-top:25px;">
 		         <div class="right course_actions">
@@ -64,23 +64,30 @@
 		        </div>
 		    </div>
 		</div>
-
-
+{% if units_under_module_count == 0  and has_search == True %}
+		<div class="large-8 columns">
+		<h3>Sorry, We couldn't find any results matching "{{ search_text|slice:"2:"|slice:"-2" }}" </h3>
+		</div>
+{% endif %}
 
 {# {% include 'ndf/card_group.html' with node=node groupid=node.pk %} #}
-
 
 <!-- Existing card list-->
 </div>	
 
-
-
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4" >
 <!-- Existing card list-->
-	{% for each_node in units_under_module  %}
-    <li class="card-image-wrapper" >
-		{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
-	</li>
+	{% for each_node in units_under_module %}
+		<li class="card-image-wrapper">
+		{% if each_node.name in PARTNER_LIST %}
+			{% include 'ndf/card_group.html' with node=each_node  url_name='e-library' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}
+		{% comment %}
+			{% include 'ndf/card_group.html' with node=each_node has_prof_pic=True url_name='e-library' first_arg='home' second_arg='' search_url_text='filter?selfilters=[{"or":[{"selFieldValue":"source","selFieldValueAltnames":"source","selFieldGstudioType":"attribute","selFieldText":"'|add:each_node.name|add:'","selFieldPrimaryType":"basestring"}]}]' %}
+		{% endcomment %}
+		{% else %}
+			{% include 'ndf/card_group.html' with node=each_node  url_name='groupchange' first_arg=each_node.pk groupid=each_node.pk is_gstaff=is_gstaff %}	
+		{%  endif %}
+		</li>
 	{% endfor %}
 </ul>
 

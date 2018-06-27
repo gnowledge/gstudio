@@ -9,8 +9,8 @@
                             <label class="mid_label inner">{% trans "Unique Name: " %}</label><b class="compulsory"> *</b>
                         </div>
                         <div class="small-8 columns">
+                            <label class="node_name_empty hide inner" style="color:red">{% trans "Please enter Unique Name" %}</label>
                             <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}" style="border-radius: 5px;">
-                            <label class="node_name_empty hide inner" style="color:red">{% trans "Please enter Name" %}</label>
                         </div>
                     </div>
                     <div class="row">
@@ -18,8 +18,8 @@
                             <label class="mid_label inner">{% trans "Display Name: " %}</label><b class="compulsory"> *</b>
                         </div>
                         <div class="small-8 columns">
+                            <label class="node_altname_empty hide inner" style="color:red">{% trans "Please enter Display Name" %}</label>
                             <input type="text" class="node_altname" name="alt_name" placeholder="Enter display name of Page"  value="{{activity_node.altnames}}" style="border-radius: 5px;">
-                            <label class="node_altname_empty hide inner" style="color:red">{% trans "Please enter display Name" %}</label>
                         </div>
                     </div>
 
@@ -72,13 +72,13 @@
                             </div>
                         {% endif %}
                     </div>
-                    {% if site.SITE_NAME == 'NROER' %}
+<!--                     {% if site.SITE_NAME == 'NROER' %}
                     <div class="row">
                         <div class="small-3 columns">
-                            <input type="checkbox" name="h5p_page" ><label class="mid_label inner">{% trans " Mark as H5P Page " %}</label>
+                            <input type="checkbox" name="h5p_page" class="h5p_page"><label id="mark_interactive" class="mid_label inner">{% trans " Mark as Interactive Page " %}</label>
                         </div>
                     </div>
-                    {% endif %}
+                    {% endif %} -->
 
                 </div>
                 <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
@@ -193,6 +193,17 @@
         {
             event.preventDefault();
         }
+    });
+        $( "#mark_interactive" ).click(function(event) {
+            event.preventDefault();
+            if ($('.h5p_page').is(':checked')){
+                 $('.h5p_page').prop('checked', false);
+             }
+            else
+            {
+                $('.h5p_page').prop('checked', true);
+            }
+
     });
 
 

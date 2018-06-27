@@ -5,7 +5,7 @@
 	Provide method applyFilter() in your template with following signature:
 	applyFilter(filtersObjArr)
 	where,
-	filtersObjArr -- is array containing all selected filters.
+	filtersObjArr is array containing all selected filters.
 		- Each of the filter is contained in following format of JS Object:
 			{
 				"selFieldValue": <selFieldValue>,
@@ -51,7 +51,7 @@
  			display: inline-block;
 	 		vertical-align: top;
 	 		margin-bottom: 0px;
- 			width: 330px;
+ 			width: 90px;
  		}
 
 
@@ -127,7 +127,7 @@
 					<div class="filter-body">
 						<div class="filter-button" id="filter_button">
 							<i class="fi-filter small" aria-hidden="true"></i>
-							<span>Add Filter</span>
+							<span>{% trans "Add Filter" %}</span>
 						</div>
 						<select name="filter-field-name">
 							<option value="initial-select"> -- {% trans 'Select' %} -- </option>
@@ -144,7 +144,13 @@
 									{% endcomment %}
 									{% firstof val.altnames key %}
 								</option>
+
 							{% endfor %}
+							<option value='tags'
+								data-primary-type='tags'
+								data-gstudio-type='tags' data-name-field='tags'>
+								{% trans 'Tags' %}
+							</option>
 
 						</select>
 						<select name="filter-field-value"
@@ -154,7 +160,7 @@
 
 						</select>
 						<input type="button" class="button radius tiny" value="{% trans 'Filter' %}"  style="width:65px!important" id="filter-btn">
-						<input type="button" class="button radius tiny" value="Clear" id="filter-clear-btn" style="width:65px!important">
+						<input type="button" class="button radius tiny" value="{% trans 'Clear' %}" id="filter-clear-btn" style="width:65px!important">
 					</div>
 				</div>
 			</div>
@@ -357,7 +363,7 @@
 		return filtersObjAndOrArr;
 	}
 
-	function updateFilterUrl(url)
+	function updateFilterUrl(url,url_in_addressbar)
 	{
 		var filters = getFiltersObjsInAndOrFormat();
 		// alert(filters);
@@ -368,8 +374,13 @@
 
 			url = url + 'filter?selfilters=' + filters;
 		}
-
-		window.location.href = url;
+		if (url_in_addressbar == "True"){
+			window.location.href = url;
+		}
+		else{
+			return filters;
+		}
+		return url
 	}
 
 	function getQueryVariable(variable)

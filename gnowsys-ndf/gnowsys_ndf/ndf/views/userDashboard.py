@@ -37,7 +37,8 @@ from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.views.filehive import write_files
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups, get_user_course_groups
-
+from gnowsys_ndf.ndf.gstudio_es.es import *
+from gnowsys_ndf.ndf.gstudio_es.paginator import Paginator ,EmptyPage, PageNotAnInteger
 #######################################################################################################################################
 
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
@@ -51,6 +52,38 @@ gst_group = node_collection.one({'_type': "GSystemType", 'name': "Group"})
 group_id = node_collection.one({'_type': "Group", 'name': "home"})._id
 gst_module_name, gst_module_id = GSystemType.get_gst_name_id('Module')
 gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
+
+################################# ELASTICSEARCH QUERYS ###############################################################################
+if GSTUDIO_ELASTIC_SEARCH and TESTING_VARIABLE_FOR_ES:
+    q = Q('bool', must=[Q('match', type='metatype'),Q('match', name=META_TYPE[0])])
+    gapp_mt = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', member_of=gapp_mt.hits[0].id),Q('match', name=GAPPS[3])])
+    GST_IMAGE = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='attributetype'),Q('match', name='user_preference_off')])
+    at_user_pref = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='gsystemtype'),Q('match', name='courseeventgroup')])
+    ce_gst = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='gsystemtype'),Q('match', name='announced_unit')])
+    announced_unit_gst = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='gsystemtype'),Q('match', name='announced course')])
+    gst_acourse = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='gsystemtype'),Q('match', name='group')])
+    gst_group = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', type='group'),Q('match', name='home')])
+    group_id = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', name='module')])
+    gst_module = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
+
+    q = Q('bool', must=[Q('match', name='base_unit')])
+    gst_base_unit = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).execute()
 
 
 #######################################################################################################################################
@@ -673,7 +706,10 @@ def upload_prof_pic(request, group_id):
         if if_module == "True":
             return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':group_obj._id }))
         else:
-            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
+            if node_id:
+                return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id,'_id':node_id}))
+            else:
+                return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': group_id}))
 
 
 def my_courses(request, group_id):
@@ -704,6 +740,7 @@ def my_courses(request, group_id):
         )
 
 def my_desk(request, group_id,page_no=1):
+
     if str(request.user) == 'AnonymousUser':
         raise Http404("You don't have an authority for this page!")
 
@@ -740,15 +777,40 @@ def my_desk(request, group_id,page_no=1):
     # for each in my_modules_cur:
     #     my_modules.append(each._id)
 
-    
-    my_units = node_collection.find(
-                {'member_of':
-                    {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
-                },
-                'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
-                'author_set': request.user.id}).sort('last_update', -1)
+    if GSTUDIO_ELASTIC_SEARCH and TESTING_VARIABLE_FOR_ES:
 
-    my_units_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
+        my_units_page_cur = None
+        q = Q('bool', must=[Q('match', author_set=request.user.id),~Q('match', name='Trash'),~Q('terms', name=GSTUDIO_DEFAULT_GROUPS_LIST)],
+        should=[Q('match',member_of=ce_gst.hits[0].id),Q('match',member_of=announced_unit_gst.hits[0].id),Q('match',member_of=gst_group.hits[0].id) ],
+        minimum_should_match=1)
+        my_units =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+        # print my_units.count()
+
+        if int(page_no)==1:
+            my_units=my_units[0:21]
+        else:
+            temp=( int(page_no) - 1) * 21
+            my_units=my_units[temp:temp+21]
+        paginator = Paginator(my_units, 21)
+        try:
+            my_units_page_cur = paginator.page(page_no)
+        except PageNotAnInteger:
+            my_units_page_cur = paginator.page(1)
+        except EmptyPage:
+            my_units_page_cur = paginator.page(paginator.num_pages)
+
+    else:
+        from mongokit import paginator
+        my_units = node_collection.find(
+                    {'member_of':
+                        {'$in': [ce_gst._id, announced_unit_gst._id, gst_group._id]
+                    },
+                    'name': {'$nin': GSTUDIO_DEFAULT_GROUPS_LIST },
+                    'author_set': request.user.id}).sort('last_update', -1)
+
+        my_units_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
+
+    #my_units_page_cur = paginator.Paginator(my_units, page_no, GSTUDIO_NO_OF_OBJS_PP)
     # my_modules_cur.rewind()
     return render_to_response('ndf/lms_dashboard.html',
                 {
@@ -756,7 +818,8 @@ def my_desk(request, group_id,page_no=1):
                     'node': auth_obj, 'title': title,
                     # 'my_course_objs': my_course_objs,
                     'units_cur':my_units,
-                    'my_units_page_cur':my_units_page_cur
+                    'my_units_page_cur':my_units_page_cur,
+                    'page_info':my_units_page_cur
                     # 'modules_cur': my_modules_cur
                 },
                 context_instance=RequestContext(request)

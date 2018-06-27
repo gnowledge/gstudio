@@ -456,6 +456,10 @@ class Counter(DjangoDocument):
 
         super(Counter, self).save(*args, **kwargs)
 
+        self.rcs_function(self,is_new,**kwargs)
+
+    @task
+    def rcs_function(self,is_new,**kwargs):
         # storing Filehive JSON in RSC system:
         history_manager = HistoryManager()
         rcs_obj = RCS()
@@ -495,7 +499,6 @@ class Counter(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ") can't be updated!!!\n"
                 raise RuntimeError(err)
-
 
 counter_collection  = db[Counter.collection_name].Counter
 

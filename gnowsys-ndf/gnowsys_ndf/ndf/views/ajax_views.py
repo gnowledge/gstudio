@@ -45,7 +45,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_node_metad
 from gnowsys_ndf.ndf.views.methods import create_task,parse_template_data,get_execution_time,get_group_name_id, dig_nodes_field
 from gnowsys_ndf.ndf.views.methods import get_widget_built_up_data, parse_template_data, get_prior_node_hierarchy, create_clone
 from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute, create_task, node_thread_access, get_course_units_tree, delete_node
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff,get_relation_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic, edit_drawer_widget, get_contents, get_sg_member_of, get_attribute_value, check_is_gstaff
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
@@ -888,6 +888,7 @@ def get_inner_collection(collection_list, node, no_res=False):
   inner_list = []
   error_list = []
   inner_list_append_temp=inner_list.append #a temp. variable which stores the lookup for append method
+
   # if not no_res or not res_flag:
   is_unit = any(mem_of_name in ["CourseUnit", "CourseUnitEvent"] for mem_of_name in node.member_of_names_list)
   if not no_res or not is_unit:
@@ -896,7 +897,6 @@ def get_inner_collection(collection_list, node, no_res=False):
         col_obj = node_collection.one({'_id': ObjectId(each)})
         if col_obj:
           for cl in collection_list:
-            prerequisite_name = ""
             if cl['id'] == node.pk:
               node_type = node_collection.one({'_id': ObjectId(col_obj.member_of[0])}).name
               # if col_obj._id in completed_ids:
@@ -908,11 +908,7 @@ def get_inner_collection(collection_list, node, no_res=False):
               #   # print "\n completed_ids -- ",completed_ids
               #   # print "\n\n col_obj ---- ", col_obj.name, " - - ",col_obj.member_of_names_list, " -- ", col_obj._id
               # else:
-              rel_has_prerequisite = get_relation_value(ObjectId(col_obj._id),'has_prerequisite')
-              for each in rel_has_prerequisite['grel_node']:
-                prerequisite_name = each.name
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org,'prerequisite_name' : prerequisite_name }
-              
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk,'node_type': node_type,"type":"division",'description':col_obj.content_org}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_inner_collection(inner_sub_list, col_obj, no_res)
               # if "CourseSubSectionEvent" == node_type:
@@ -966,14 +962,14 @@ def get_collection(request, group_id, node_id, no_res=False):
       obj = node_collection.one({'_id': ObjectId(each) })
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
-        # print "000000000000000000000\n\n\n\n\n\n\n\n\n\n\n\n",node_type,obj._id
+        # print "000000000000000000000",node.name
+
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch",'description':obj.content_org})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
           no_res = True
         collection_list = get_inner_collection(collection_list, obj, no_res)
     data = collection_list
-    print "*************************************",data
     updated_data = []
     # print data
     # cache.set(cache_key, json.dumps(data), 60*15)
@@ -6353,12 +6349,27 @@ def get_visits_count(request, group_id):
 				query = {'calling_url': {'$regex': u"/"+ unicode(get_params)},'name': "collection_nav"}
 
 			# print "\n\nquery", query
-			total_views = benchmark_collection.find(query,{'name':1})
-			response_dict['total_views'] = total_views.count()
-			if request.user.is_authenticated():
-				username = request.user.username
-				user_views = total_views.where("this.user =='"+str(username)+"'")
-				response_dict['user_views'] = user_views.count()
+
+			from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH
+
+			if GSTUDIO_ELASTIC_SEARCH:
+				q = eval("Q('bool',must=[Q('terms',calling_url="+str(curr_url_other)+")])")
+				total_views = Search(using=es, index="benchmarks",doc_type="benchmark").query(q)
+				#response_dict['total_views'] = q.ESQuery(benchmark=total_views).count()
+				response_dict['total_views'] = total_views.count()
+				if request.user.is_authenticated():
+					username = request.user.username
+					q = eval("Q('bool',must=[Q('terms',calling_url="+str(curr_url_other)+"),Q('match',user='"+username+"')])")
+					user_views = Search(using=es, index="benchmarks",doc_type="benchmark").query(q)
+
+					response_dict['user_views'] = user_views.count()
+			else:
+				total_views = benchmark_collection.find(query,{'name':1})	 
+				response_dict['total_views'] = total_views.count()
+				if request.user.is_authenticated():
+					username = request.user.username
+					user_views = total_views.where("this.user =='"+str(username)+"'")
+					response_dict['user_views'] = user_views.count()
 		response_dict['success'] = True
 		return HttpResponse(json.dumps(response_dict))
 	except Exception as e:
@@ -6857,11 +6868,11 @@ def create_edit_asset(request,group_id):
       # UNmarking Asset as RawMaterial
       asset_obj.tags.remove(u'raw@material')
 
-    if ( "announced_unit" in group_obj.member_of_names_list or "Author" in group_obj.member_of_names_list) and title == "raw material":
+    if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
 
     
-    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list or "Author"  in group_obj.member_of_names_list) and "gallery" == title:
+    if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list) and "gallery" == title:
       asset_obj.tags.append(u'asset@gallery')    
     
     if "announced_unit" in group_obj.member_of_names_list  and title == None or title == "None":
@@ -6886,7 +6897,7 @@ def add_assetcontent(request,group_id):
   if_transcript = request.POST.get('if_transcript','')
   if_alt_lang_file = request.POST.get('if_alt_file','')
   if_alt_format_file = request.POST.get('if_alt_format_file','')
-  assetcontentid = request.POST.get('assetcontentid','')  
+  assetcontentid = request.POST.get('assetcontentid','')
 
   uploaded_files = request.FILES.getlist('filehive', [])
   uploaded_transcript = request.FILES.getlist('uploaded_transcript', [])
@@ -6898,7 +6909,7 @@ def add_assetcontent(request,group_id):
   alt_file_format = request.POST.get('sel_alt_fr_type','')
 
   asset_cont_desc = request.POST.get('asset_cont_desc','')
-  asset_cont_name = request.POST.get('name','')
+  asset_cont_name = request.POST.get('asset_cont_name','')
   node_id = request.POST.get('node_id',None)
   if if_subtitle == "True":
     file_name = uploaded_subtitle[0].name
@@ -6962,6 +6973,7 @@ def add_assetcontent(request,group_id):
     alt_lang_file_node = create_grelation(ObjectId(assetcontentid), rt_alt_content, alt_lang_file_list, **{'triple_scope':{'relation_type_scope':{ alt_file_type : '' }, 'subject_scope': "many"}})
 
     return StreamingHttpResponse("success")
+
   asset_content = create_assetcontent(ObjectId(asset_obj),asset_cont_name,group_id,
     request.user.id,content=asset_cont_desc,files=uploaded_files,
     resource_type='File', request=request)
@@ -6975,9 +6987,7 @@ def add_assetcontent(request,group_id):
         create_gattribute(ObjectId(asset_content._id), attr_node, each_attrset[1])
 
 
-  # return StreamingHttpResponse("success")
-  # return  , asset_node ,asset_content._id
-  return HttpResponseRedirect(reverse('assetcontent_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(asset_node._id),'asst_content_id': ObjectId(asset_content._id)})) 
+  return StreamingHttpResponse("success")
 
 
 def add_to_collection_set(request, group_id):

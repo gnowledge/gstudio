@@ -33,6 +33,7 @@
             <div class="small-7 medium-4 large-7 columns">
             {% if not edit and asset_obj %}
                 <h4 class="page-name">{% firstof asset_obj.altnames|truncatechars:25  asset_obj.name|truncatechars:25 %} </h4>
+
                 <!-- description -->
                 <div class="small-12 columns "><label>Description: </label>
                   <i>{{asset_obj.content|default:'No description added yet.'|safe|striptags}}</i>
@@ -40,6 +41,7 @@
             </div>
             
         <div class="small-4 medium-6 large-4 columns right margin-right-50">
+
             {% if not edit and asset_obj %}
                     <span data-dropdown="asset-settings-drop" aria-controls="asset-settings-drop" aria-expanded="false" class="large orange-button">
                         {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
@@ -75,9 +77,11 @@
                         </li>
                     </ul>
             {% endif%}
+
             {% if request.user.is_authenticated  %}
                 <button type="button" class="orange-button add-asset-content"><i class="fi-plus"></i> {% trans "Add File" %}</button>
                 <a href="{% url 'create_edit_asset_page' group_id asset_obj.pk %}"><button type="button" class="orange-button" ><i class="fi-plus"></i> {% trans "Add  page" %}</button></a>
+
             {% endif %}
 
             <div class="small-3 columns page-name">
@@ -123,16 +127,15 @@
                 <label>
                     {% if edit or not asset_obj %}
                         {% if title == "raw material"  or 'raw@material' in asset_obj.tags %}
-                            {% trans "Resource Name" %}
+                            {% trans "Resource Name" %}  
 
                         {% elif title == "gallery"  or 'asset@gallery' in asset_obj.tags %}
-                             {% trans "Folder Name" %}
+                             {% trans "Folder Name" %}  
 
                         {% else %}
-                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;">*</h9>
+                       {% trans "Asset Name:" %} {% endif %}<h9 style="color: red;" id="asset_req">*</h9> 
                        <input type="text" placeholder="" class="required" id = "asset-name" name="asset_unique_name" value="{% if asset_obj %} {{asset_obj.name}}{% endif %}"/>
-
-                        {% trans "Display Name:" %}  <h9 style="color: red;">*</h9>
+                       {% trans "Display Name:" %}  <h9 style="color: red;" id="display_name">*</h9> 
                        <input type="text" placeholder="" class="required" id = "asset-disp-name" name="asset_display_name" value="{% if asset_obj %} {{asset_obj.altnames}}{% endif %}"/>
 
 
@@ -154,8 +157,8 @@
                          {% trans "Folder Description" %}
                     {% else %}
 
-                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;">*</h9>
-                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value=''>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
+                    {% trans "Asset description" %} {% endif %} <h9 style="color: red;" id="asset_description">*</h9>
+                    <textarea rows="4" cols="2" class="small-12 columns" placeholder="Enter Description" id="asset-descid" value='' required/>{% if asset_obj %} {{asset_obj.content|safe|striptags}}{% endif %}</textarea>
             </label>
             </div>
         </div>
@@ -215,7 +218,7 @@
         <div class="row">
             <div class="asset-tags-container small-12 medium-10 large-10 columns">
                 <label>
-                {% if not title == "raw material" %}
+                {% if not title == "raw material" and 'Author' not in group_object_member_of_names_list %}
                 <input type="checkbox" name="is_raw_material" class="is_raw_material" {% if "raw@material" in asset_obj.tags %} checked="checked" {% endif %}> {% trans "Mark as Resource" %}
 
                 </label>
@@ -230,7 +233,7 @@
             </div>
         </div>
 
-        <button type="button" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
+        <button type="submit" class="button-save-new save-asset" data-asset_id='{{asset_obj.pk}}' style="margin-top: 9px;margin-right: -150px;">{% trans "Save" %}</button>
         
         {% endif %}
 
@@ -253,7 +256,7 @@
                 <label>{% trans "Enter File Description" %} <br/>
                     <textarea rows="6" cols="2" class="small-12 columns" placeholder="Enter File Description" id="asset_content_desc"></textarea>
                 </label>
-                    <button type="submit" class="orange-button right" id="upload_asset"  style="margin-right: -3px;">{% trans "Upload" %}</button>
+                    <button type="button" class="orange-button right" id="upload_asset"  onclick="save_form()"  style="margin-right: -3px;">{% trans "Upload" %}</button>
                 </div>
             </div>
         </div>
@@ -271,9 +274,11 @@
 
         <div class="row">
             {% if asset_content_list.grel_id and asset_obj.created_by == request.user.id  or is_gstaff and asset_obj and asset_content_list.grel_id  %}
+
             <div class="row">
                 <button type="button" class="orange-button delete-asset-content right icon-widget" style="margin-right: 100px;display:none" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete Files" %}</button>
             </div>
+
             {% endif %}
 
         <div class="row listing-row" style="margin-left:10px;">
@@ -399,7 +404,7 @@
 
     // $('.save-asset').attr('disabled',true);
     $('#upload_asset').attr('disabled',true);
-
+   
     $('#asset_content_name').keyup(function(){
         if($(this).val().length !=0 )
             $('#upload_asset').attr('disabled', false);
@@ -408,27 +413,48 @@
     })
 
     $('#asset-name').keyup(function(){
-        if($(this).val().length !=0 && $('#asset-descid').val().length !=0 && $('#asset-disp-name').val().length !=0 )
+        //if($(this).val().length !=0 && $('#asset-descid').val().length !=0 && $('#asset-disp-name').val().length !=0 )
+            if($(this).val().length !=0 )	
             $('.save-asset').attr('disabled', false);
-        else
-            $('.save-asset').attr('disabled',true);
+       // else
+           // $('.save-asset').attr('disabled',true);
     })
 
     $('#asset-descid').keyup(function(){
-        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-disp-name').val().length !=0)
+       // if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-disp-name').val().length !=0)
+            if($(this).val().length !=0 )
             $('.save-asset').attr('disabled', false);
-        else
-            $('.save-asset').attr('disabled',true);
+       // else
+           // $('.save-asset').attr('disabled',true);
     })
     $('#asset-disp-name').keyup(function(){
-        if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-descid').val().length !=0 )
+        //if($(this).val().length !=0 &&  $('#asset-name').val().length !=0 && $('#asset-descid').val().length !=0 )
+            if($(this).val().length !=0 )
             $('.save-asset').attr('disabled', false);
-        else
-            $('.save-asset').attr('disabled',true);
+        //else
+           // $('.save-asset').attr('disabled',true);
     })
     $( ".save-asset" ).click(function(event) {
         updateAllTags();
         coll_arr = []
+
+        if($('#asset-name').val().length==0)
+        {
+          $('#asset_req').html("Asset Name is required !");
+        }
+        else if ($('#asset-disp-name').val().length==0)
+        {
+          $('#display_name').html(" Display Name is required !");
+        }
+
+        else if($('#asset-descid').val().length==0)
+        {
+          $('#asset_description').html("Asset Description is required !")
+        }   
+
+    // If x is Not a Number or less than one or greater than 10
+
+    
 
         $('#topic_list :selected').each(function(){
             coll_arr.push($(this).val())
@@ -460,7 +486,8 @@
         asset_disp_name = $("#asset-disp-name").val();
         asset_description = $("#asset-descid").val();
         var asset_id = $(this).attr('data-asset_id');
-        if (asset_name != '' && asset_description != ''){
+           
+         if (asset_name != '' && asset_description != ''){
             $.ajax({
                   type: "POST",
                   data:{
@@ -500,6 +527,7 @@
         else{
             event.preventDefault()
         }
+        
 
     });
 
