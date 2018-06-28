@@ -11,7 +11,7 @@
 {% block body_content %}
 {% load ndf_tags %}
 {% get_gstudio_workspace_instance as is_workspace_instance %}
-
+{% check_is_gstaff group_id request.user as is_gstaff %}
 <div class="mydesk_page">
 
   <div class="page_banner">
@@ -64,7 +64,7 @@
 
     {% endcomment %}
     </br>
-
+{% include 'ndf/widget_photo_upload.html' with url_name='my_desk' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
 <div class="small-12 columns group_sections_content">
   {% if site.SITE_NAME == "NROER" %}
     {% if title == "my desk" %}
@@ -73,9 +73,9 @@
             <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3">
               <li class="card-image-wrapper">
                 {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
-                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.id  no_enroll=True %}
+                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.id  no_enroll=True is_gstaff=is_gstaff %}
                 {% else %}
-                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk  no_enroll=True %}
+                {% include "ndf/card_group.html" with node=node url_name="course_about" first_arg=node.pk  no_enroll=True is_gstaff=is_gstaff %}
                 {% endif %}
               </li>
             </ul>
@@ -91,9 +91,9 @@
             {% for each_obj in units_cur %}
             <li class="card-image-wrapper">
               {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
-              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True is_gstaff=is_gstaff  %}
               {% else %}
-              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True is_gstaff=is_gstaff %}
               {% endif %}
             </li>
             {% endfor %}
@@ -117,9 +117,9 @@
           {% for each_obj in units_cur %}
           <li class="card-image-wrapper">
             {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
-            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True is_gstaff=is_gstaff %}
             {% else %}
-            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True %}
+            {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True is_gstaff=is_gstaff %}
             {% endif %}
           </li>
 
@@ -144,9 +144,9 @@
       {% for each_obj in units_cur %}
       <li class="card-image-wrapper">
         {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
-        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True %}
+        {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True is_gstaff=is_gstaff %}
         {% else %}
-        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  %}
+        {% include "ndf/card_group.html" with group_counts=True node=each_obj no_url=True first_arg=each_obj.pk  is_gstaff=is_gstaff %}
         {% endif %}
       </li>
       {% empty %}
@@ -229,20 +229,7 @@
           populateFileList(this);
 
           });
-        //   var $response=$(data);
-          // console.log("1111111122222222222222222222")
-          // console.log($response)
-          // var a = $response.filter('.group_sections_content #card_list');
-          // console.log(a)
-          // $("#card_list").empty()
-          // $("#card_list").append(a)
-        // // $(tabContainerDiv).find("ul.pagination a").click(function(e){
 
-        // //   e.preventDefault();
-        // //   populateFileList(this);
-
-        // //   })
-      console.log(data);
         },
         error: function(xhr, errmsg, err){
          console.log("error")
@@ -250,5 +237,58 @@
         }
       });
     }
+$("a.edit_unit").click(function(event){
+  var id= $(this).attr("id");
+  var unit_id = id;
+  console.log(id)
+  var node = {"pk":id};
+
+   $(this).parent().parent().find(".unit_banner").replaceWith("<a  data-reveal-id='group_banner_prof_pic_prop'>{% trans 'Change image' %}</a>");
+   // $(".dropzone").html("<form class='dropzone' id ='group_banner_docPost' enctype='multipart/form-data' method='post'  action='/"+id+"/upload_prof_pic'>");
+   var url="/"+id+"/upload_prof_pic/";
+
+   $('.dropzone').attr('action', url);
+   $( "input[name='pic_rt']" ).attr('value','is_profile');
+   var id = "#"+id;
+
+   var label = $(id).text().trim();
+   console.log(label)
+   if(label == "Edit") {
+     $(id).text("Save");
+     var title=$(this).parent().parent().find('.unit_title').attr("title");
+     var description=$(this).parent().parent().find('.unit_desc').text();
+     console.log(description);
+     $(this).parent().parent().find(".unit_title").replaceWith("<input type='text' id='unit-title-{{unit_id}}' class='unit_title' value='"+title+"'>");
+     $(this).parent().parent().find(".unit_desc").replaceWith("<input type='text' id='unit-desc-{{unit_id}}' class='unit_desc' value='"+description+"'>");
+     $(this).parent().parent().find("a#unit_card_link").removeAttr("href");
+     // $(this).parent().parent().find("#unit_card_link").append("-->");
+   }
+   else {
+     $(id).text("Edit");
+     var id = "#unit_card_"+unit_id
+     console.log(id)
+     var unit_title = $(id).find("#unit-title-{{unit_id}}").val();
+     var unit_desc = $(id).find("#unit-desc-{{unit_id}}").val();
+     console.log(unit_title)
+     console.log(unit_desc)
+     console.log("-------------------------------")
+    $.ajax({
+              type: "POST",
+              data:{
+                "unit_title":unit_title,
+                "unit_desc":unit_desc,
+                "unit_id":unit_id,
+                'csrfmiddlewaretoken': "{{csrf_token}}"
+                },
+              url: "{% url 'save_edited_card_info' group_id  %}",
+              datatype: "html",
+              success: function(data) {
+                location.reload()
+            }
+        });
+   }
+
+
+});//edit_unit closed
   </script>
   {% endblock  %}

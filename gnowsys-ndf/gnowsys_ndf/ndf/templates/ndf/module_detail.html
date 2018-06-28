@@ -168,16 +168,18 @@ $("a.edit_unit").click(function(event){
      $(id).text("Save");
      var title=$(this).parent().parent().find('.unit_title').attr("title");
      var description=$(this).parent().parent().find('.unit_desc').text();
-     console.log(title);
-     $(this).parent().parent().find(".unit_title").replaceWith("<input type='text' class='unit_title' value='"+title+"'>");
-     $(this).parent().parent().find(".unit_desc").replaceWith("<input type='text' class='unit_desc' value='"+description+"'>");
+     console.log(description);
+     $(this).parent().parent().find(".unit_title").replaceWith("<input type='text' id='unit-title-{{unit_id}}' class='unit_title' value='"+title+"'>");
+     $(this).parent().parent().find(".unit_desc").replaceWith("<input type='text' id='unit-desc-{{unit_id}}' class='unit_desc' value='"+description+"'>");
      $(this).parent().parent().find("a#unit_card_link").removeAttr("href");
      // $(this).parent().parent().find("#unit_card_link").append("-->");
    }
    else {
      $(id).text("Edit");
-     var unit_title = $(this).parent().parent().find(".unit_title").attr("value");
-     var unit_desc = $(this).parent().parent().find(".unit_desc").attr("value");
+     var id = "#unit_card_"+unit_id
+     console.log(id)
+     var unit_title = $(id).find("#unit-title-{{unit_id}}").val();
+     var unit_desc = $(id).find("#unit-desc-{{unit_id}}").val();
      console.log(unit_title)
      console.log(unit_desc)
      console.log("-------------------------------")

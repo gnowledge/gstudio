@@ -6,15 +6,16 @@
 {% endif %}
 {% load get_member_of_list from es_tags %}
 
+
 {% if site.GSTUDIO_ELASTIC_SEARCH != True or site.TESTING_VARIABLE_FOR_ES == False %}
-<div class="unit_card">
+<div id="unit_card_{{node.pk}}" class="unit_card">
     {% if not no_url and not prevent_click %}
     {% if first_arg and second_arg and third_arg %}
-    <a href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
+    <a id="unit_card_link" href="{% url url_name first_arg second_arg third_arg %}{{search_url_text|safe}}"/>
     {% elif first_arg and second_arg %}
-    <a href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
+    <a id="unit_card_link" href="{% url url_name first_arg second_arg %}{{search_url_text|safe}}"/>
     {% elif first_arg %}
-    <a href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
+    <a id="unit_card_link" href='{% url url_name first_arg %}{{search_url_text|safe}}'/>
     {% endif %}
     {% endif %}
 
@@ -37,7 +38,7 @@
         {% elif "Group" in node.member_of_names_list %}
         {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
-        <img src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
+        <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
         {% else %}
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
         {% endif %}
@@ -60,18 +61,10 @@
         Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
         <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
         {% else %} 
-        
-        <div class="small-6 columns" style="padding: 0px;">
-            <div class="small-12 columns" style="padding: 0px;">
-                <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
-                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
-            </div><br/>
-            <div class="small-12 columns" style="padding: 0px;">
-                    <i style="font-size:15px; color: black" class="fi-torsos"></i>
-                    <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Member{{node.author_set|pluralize}}</div>
-            </div>
-        </div>
-        <a href="{% url url_name first_arg %}" class="view_unit" style="margin-left: 55px;">{% trans "View" %}</a>
+        <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
+        {% if is_gstaff %}
+        <a id="{{first_arg}}" class="edit_unit">{% trans "Edit" %}</a>
+        {% endif %}
         {% if "base_unit" not in node.member_of_names_list and node.agency_type != "Other" %}
         <div class="right">
             {% if not no_enroll and not is_gstaff %}
@@ -155,3 +148,4 @@
 </div>
 
 {% endif %}
+

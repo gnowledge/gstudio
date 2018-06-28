@@ -131,6 +131,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
     url(r'^graph/adminRenderGraph/(?P<node_id>[^/]+)/fetch/(?P<graph_type>[^/]+)$', 'adminRenderGraph', name='adminRenderGraph'),
     # url(r'^get_rating_template/$', 'get_rating_template', name='get_rating_template'),
     url(r'^get_telegram_content/$', 'get_telegram_content', name='get_telegram_content'),
+    url(r'^save_edited_card_info/$', 'save_edited_card_info', name='save_edited_card_info'),
 
 
 )

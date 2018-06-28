@@ -7206,3 +7206,19 @@ def get_telegram_content(request, group_id):
   print TelegramBot.getMe()
 
   return HttpResponse("success")
+
+@get_execution_time
+def save_edited_card_info(request, group_id):
+  try:
+      group_id = ObjectId(group_id)
+  except:
+      group_name, group_id = get_group_name_id(group_id)
+
+  node_id = request.POST.get('unit_id', None)
+  unit_title = request.POST.get('unit_title', None)
+  unit_desc = request.POST.get('unit_desc', None)
+  node_obj = node_collection.one({'_id': ObjectId(node_id) })
+  
+  node_obj.update({"altnames":unicode(unit_title),"content":unicode(unit_desc)})
+  node_obj.save()
+  return HttpResponse("success")
