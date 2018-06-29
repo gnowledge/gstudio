@@ -64,7 +64,7 @@
 
     {% endcomment %}
     </br>
-{% include 'ndf/widget_photo_upload.html' with url_name='my_desk' widget_for="group_banner" is_banner=True  no_update_btn=True node=node  groupid=group_id if_module=True %}
+{% include 'ndf/widget_photo_upload.html' with url_name='my_desk' widget_for="group_banner" is_profile=True  no_update_btn=True node=node  groupid=group_id if_module=True is_mydesk=True %}
 <div class="small-12 columns group_sections_content">
   {% if site.SITE_NAME == "NROER" %}
     {% if title == "my desk" %}
@@ -91,7 +91,7 @@
             {% for each_obj in units_cur %}
             <li class="card-image-wrapper">
               {% if site.GSTUDIO_ELASTIC_SEARCH and site.TESTING_VARIABLE_FOR_ES %}
-              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True is_gstaff=is_gstaff  %}
+              {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.id no_enroll=True is_gstaff=is_gstaff %}
               {% else %}
               {% include "ndf/card_group.html" with node=each_obj url_name="groupchange" first_arg=each_obj.pk no_enroll=True is_gstaff=is_gstaff %}
               {% endif %}

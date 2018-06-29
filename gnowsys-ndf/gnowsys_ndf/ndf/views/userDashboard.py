@@ -653,6 +653,7 @@ def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
         if_module = request.POST.get('if_module','')
+        group_id_for_module = None
         if if_module == "True":
             group_id_for_module = request.POST.get('group_id_for_module','')
         url_name = request.POST.get('url_name','') # used for reverse
