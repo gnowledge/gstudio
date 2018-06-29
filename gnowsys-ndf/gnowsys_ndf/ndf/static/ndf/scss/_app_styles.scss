@@ -5420,10 +5420,10 @@ $unit-card-lines-to-show: 3;
          //enroll-button 
         .unit-card-enrol{
             background: rgb(162, 35, 141);
-            height: 25px;
+            height: 24px;
             text-align: center;
             color: #ffffff;
-            font-size: 19px;
+            font-size: 18px;
             border: 2px solid rgba(43, 51, 63, 0.42);
             border-radius: 5px;
             width: 90px !important;
@@ -8405,8 +8405,8 @@ svg {
   color: rgb(162, 35, 141);
   font-size: 19px;
   margin-top: 2px !important;
-  letter-spacing: 0.4px;
-  margin-left: -20px;
+  letter-spacing: 0.5px;
+  margin-left: 0px;
 
   &:hover {
       border-bottom:2px solid $secondary-orange;

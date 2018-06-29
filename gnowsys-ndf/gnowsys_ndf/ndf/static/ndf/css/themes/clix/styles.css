@@ -28662,10 +28662,10 @@ ul.authoring-tab > li > a.selected, ul.authoring-tab > li > a:hover {
 /* line 5421, ../../../scss/_app_styles.scss */
 .unit_card .unit_actions .unit-card-enrol {
   background: #a2238d;
-  height: 25px;
+  height: 24px;
   text-align: center;
   color: #ffffff;
-  font-size: 19px;
+  font-size: 18px;
   border: 2px solid rgba(43, 51, 63, 0.42);
   border-radius: 5px;
   width: 90px !important;
@@ -31568,8 +31568,8 @@ svg {
   color: #a2238d;
   font-size: 19px;
   margin-top: 2px !important;
-  letter-spacing: 0.4px;
-  margin-left: -20px;
+  letter-spacing: 0.5px;
+  margin-left: 0px;
 }
 /* line 8411, ../../../scss/_app_styles.scss */
 .edit_unit:hover {
