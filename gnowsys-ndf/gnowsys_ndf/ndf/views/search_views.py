@@ -229,14 +229,14 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 					strconcat = strconcat + value
 				
 
-			q = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
-					minimum_should_match=1)
+			# q = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+			# 		should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
+			# 		minimum_should_match=1)
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-			# search_result = search_result.filter('match', group_set=str(group_id))
-			# search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
-			# search_result = search_result.filter('match', access_policy='public')
-			# search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
+			search_result = search_result.filter('match', group_set=str(group_id))
+			search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
+			search_result = search_result.filter('match', access_policy='public')
+			search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
 		
 		has_next = True
 		if search_result.count() <=20:
