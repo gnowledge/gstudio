@@ -74,7 +74,17 @@
         {% if group_counts %} 
         Points :<a class="unit-card-analytics-points">  {{get_unit_points}} </a>
         <a onclick="show_my_performance($(this))" data-node-id = "{{node.pk}}" class="right unit-card-analytics"><i class="fa fa-eye" aria-hidden="true"></i> View details</a>
-        {% else %} 
+        {% else %}
+                <div class="small-6 columns" style="padding: 0px;">
+            <div class="small-12 columns" style="padding: 0px;">
+                <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
+                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+            </div><br/>
+            <div class="small-12 columns" style="padding: 0px;">
+                    <i style="font-size:15px; color: black" class="fi-torsos"></i>
+                    <div style="font-size:15px; color: black" class="inner" value="{{node.author_set|length}}">{{node.author_set|length}} Member{{node.author_set|pluralize}}</div>
+            </div>
+        </div>
         <a href="{% url url_name first_arg %}" class="view_unit">{% trans "View" %}</a>
         {% if is_gstaff %}
         <a id="{{first_arg}}" class="edit_unit">{% trans "Edit" %}</a>
