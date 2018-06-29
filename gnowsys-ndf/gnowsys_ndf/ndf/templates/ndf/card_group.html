@@ -39,6 +39,10 @@
         {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
         {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
         <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
+        {% elif "PartnerGroup" in node.member_of_names_list %}
+        {% get_relation_value node.pk 'has_profile_pic' as grel_dict %}
+        {% if not grel_dict.cursor and grel_dict.grel_node and grel_dict.grel_node.if_file.thumbnail.relurl %}
+        <img class="unit_banner" src="{{MEDIA_URL}}{{grel_dict.grel_node.if_file.mid.relurl}}" alt="" style="height:50px ;width:50px" />
         {% else %}
         <img class="unit_banner" src="/static/ndf/images/module_banner.png" style="height:50px ;width:50px"/>
         {% endif %}
