@@ -78,7 +78,13 @@
                 <div class="small-6 columns" style="padding: 0px;">
             <div class="small-12 columns" style="padding: 0px;">
                 <i style="font-size:15px; color: black" class="fi-list-thumbnails"></i> 
-                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} Lesson{{node.collection_set|pluralize}}</div>
+                <div style="font-size:15px; color: black" class="inner" value="{{node.collection_set|length}}">{{node.collection_set|length}} 
+                {% if "announced_unit" in node.member_of_names_list or "base_unit" in node.member_of_names_list %}
+                Lesson{{node.collection_set|pluralize}}
+                {% else %}
+                Section{{node.collection_set|pluralize}}
+                {% endif %}
+                </div>
             </div><br/>
             {% comment %}
             <div class="small-12 columns" style="padding: 0px;">
