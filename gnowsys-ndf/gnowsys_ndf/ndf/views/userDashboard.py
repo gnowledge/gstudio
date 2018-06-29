@@ -661,6 +661,7 @@ def upload_prof_pic(request, group_id):
         file_uploaded = request.FILES.get("filehive", "")
         pic_rt = request.POST.get("pic_rt", "")
         node_id = request.POST.get("node_id", "")
+        current_page_id = request.POST.get("current_page_id", "")
         # print "\n\n pic_rt === ", pic_rt
         has_profile_or_banner_rt = None
         if pic_rt == "is_banner":
@@ -703,7 +704,12 @@ def upload_prof_pic(request, group_id):
 
         if user:
             group_id = user
-        if if_module == "True":
+        print current_page_id
+        if current_page_id == group_id_for_module:
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': current_page_id}))
+        elif if_module == "True" and current_page_id:
+            return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':current_page_id}))
+        elif if_module == "True":
             return HttpResponseRedirect(reverse(str(url_name), kwargs={'group_id': ObjectId(group_id_for_module),'node_id':group_obj._id }))
         else:
             if node_id:
