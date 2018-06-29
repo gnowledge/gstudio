@@ -1,7 +1,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_object group_id as group_object %}
-
+    {% if not is_mydesk %}
     <div id="upload_picModal" class="processing-screen reveal-modal medium  radius" data-reveal data-alert>
         <div id="upload_picModalLabel" class="processing-screen-label"></div>
         <a class="close-reveal-modal">&#215;</a>
@@ -12,6 +12,7 @@
           {% get_relation_value node.pk 'has_thumbnail' as grel_dict %}
           {% get_relation_value node.pk 'has_logo' as grel_dict_logo %}
           {% get_relation_value node.pk 'has_banner_pic' as grel_banner %}
+
           {% if prof_pic_obj %}
             <img src="{{MEDIA_URL}}{{prof_pic_obj.if_file.original.relurl}}" class="img-height"/>
           {% elif grel_dict %}
@@ -45,7 +46,7 @@
         {% endif %}
         {% endif %}
         </div>
-
+        {% endif %}
 
             <div id="{{widget_for}}_prof_pic_prop" class="reveal-modal medium old-pics-data" data-reveal >
                 <a id="{{widget_for}}_upload_photo">
