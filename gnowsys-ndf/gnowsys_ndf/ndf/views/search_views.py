@@ -164,7 +164,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 	This view returns the results for global search on all GSystems by name, tags and contents.
 	Only publicly accessible GSystems are returned in results.
 	"""
-		
+	print group_id
 	context_to_return = {}
 	if GSTUDIO_ELASTIC_SEARCH == True :
 
@@ -195,7 +195,15 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		q = Q('match',name=dict(query='File',type='phrase'))
 		GST_FILE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 		GST_FILE1 = GST_FILE.execute()
-
+		q = Q('match',name=dict(query='Page',type='phrase'))
+		GST_PAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+		GST_PAGE1 = GST_FILE.execute()
+		q = Q('match',name=dict(query='interactive_page',type='phrase'))
+		GST_IPAGE = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+		GST_IPAGE1 = GST_FILE.execute()
+		q = Q('match',name=dict(query='Jsmol',type='phrase'))
+		GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
+		GST_JSMOL1 = GST_JSMOL.execute()
 		
 		if request.GET.get('search_text',None) in (None,''):
 
@@ -221,12 +229,14 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 					strconcat = strconcat + value
 				
 
-
+			q = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
+					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
+					minimum_should_match=1)
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
-			search_result = search_result.filter('match', group_set=str(group_id))
-			search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
-			search_result = search_result.filter('match', access_policy='public')
-			search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
+			# search_result = search_result.filter('match', group_set=str(group_id))
+			# search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
+			# search_result = search_result.filter('match', access_policy='public')
+			# search_result = search_result.exclude('terms', name=['thumbnail','jpg','png'])
 		
 		has_next = True
 		if search_result.count() <=20:
