@@ -6,7 +6,7 @@ class NodeJSONEncoder(json.JSONEncoder):
       return str(o)
 
     if isinstance(o, datetime.datetime):
-      return o.strftime("%d/%m/%Y %H:%M:%S")
+      return o.strftime("%d/%m/%Y %H:%M:%S:%f")
 
     return json.JSONEncoder.default(self, o)
 
