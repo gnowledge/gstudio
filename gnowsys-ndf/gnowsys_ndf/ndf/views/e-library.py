@@ -198,7 +198,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')],minimum_should_match=1)
 
 
-		files_new = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+		files_new = Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).sort({"last_update" : {"order" : "desc"}})
 		files_new = files_new[0:24]
 
 
@@ -284,18 +284,18 @@ if GSTUDIO_ELASTIC_SEARCH:
 			
 
 		if selfilters:
-			collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query)
+			collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query).sort({"last_update" : {"order" : "desc"}})
 		else:
 			if search_text in (None,'',""):
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set')],
 				should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 				minimum_should_match=1)
-				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).sort({"last_update" : {"order" : "desc"}})
 			else:
 				q = Q('bool', must=[Q('match', group_set=str(group_id)), Q('match',access_policy='public'),Q('exists',field='collection_set'),Q('multi_match', query=search_text, fields=['content','name','tags'])],
 				should=[Q('match',member_of=GST_FILE1.hits[0].id) ],
 				must_not=[Q('match', attribute_set__educationaluse ='ebooks')], minimum_should_match=1)
-				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+				collection_pages_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).sort({"last_update" : {"order" : "desc"}})
 
 		if int(page_no)==1:
 			collection_pages_cur=collection_pages_cur[0:24]
@@ -319,13 +319,13 @@ if GSTUDIO_ELASTIC_SEARCH:
 		#collection_pages_cur1_temp = [doc['_source'] for doc in collection_pages_cur1['hits']['hits']]
 
 		#results = paginator.Paginator(collection_pages_cur, page_no, no_of_objs_pp)
-		#datavisual.append({"name":"Doc", "count":  applications_count.count()})
-		#datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
-		#datavisual.append({"name":"Image","count": images_count.count()})
-		#datavisual.append({"name":"Video","count": videos_count.count()})
-		#datavisual.append({"name":"Interactives","count": intercatives_count.count()})
-		##datavisual.append({"name":"Audios","count": audios_count.count()})
-		#datavisual.append({"name":"eBooks","count": ebooks_count.count()})
+		# datavisual.append({"name":"Doc", "count":  applications_count.count()})
+		# datavisual.append({"name":"Page", "count": educationaluse_stats.get("Pages", 0)})
+		# datavisual.append({"name":"Image","count": images_count.count()})
+		# datavisual.append({"name":"Video","count": videos_count.count()})
+		# datavisual.append({"name":"Interactives","count": intercatives_count.count()})
+		# datavisual.append({"name":"Audios","count": audios_count.count()})
+		# datavisual.append({"name":"eBooks","count": ebooks_count.count()})
 		if collection_pages_cur:	
 			datavisual.append({"name":"Collections","count": collection_pages_cur.count()})
 		datavisual = json.dumps(datavisual)
@@ -496,7 +496,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 
 					
 
-				files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+				files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).sort({"last_update" : {"order" : "desc"}})
 				if int(page_no)==1:
 					files1=files1[0:24]
 				else:
@@ -558,7 +558,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 							should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)])
 
 
-				files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
+				files1 =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q).sort({"last_update" : {"order" : "desc"}})
 				if int(page_no)==1:
 					files1=files1[0:24]
 				else:
@@ -624,7 +624,7 @@ if GSTUDIO_ELASTIC_SEARCH:
 					#should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id) ],
 					#must_not=[Q('match', attribute_set__educationaluse ='ebooks')])
 
-				result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query)
+				result_cur =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(collection_query).sort({"last_update" : {"order" : "desc"}})
 
 				if int(page_no) == 1:
 					result_cur=result_cur[0:24]
