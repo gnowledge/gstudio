@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type
 
 
 gst_api_fields_dict = { "_id": 1, "name": 1, "altnames": 1, "language": 1, "content": 1, "if_file": 1, "tags": 1, "location": 1, "created_by": 1, "modified_by": 1, "contributors": 1, "legal": 1, "rating": 1, "created_at": 1, "last_update": 1, "collection_set": 1, "post_node": 1, "prior_node": 1, "access_policy": 1, "status": 1, "group_set": 1, "member_of": 1, "type_of": 1,
-    # "relation_set": 1, "attribute_set": 1, 
+    "relation_set": 1 #,"attribute_set": 1, 
 }
 
 api_name_model_name_dict = {
@@ -60,6 +60,7 @@ def api_get_gs_nodes(request):
     #     oid_name_dict[group_id] = group_name
 
     gsystem_structure_dict = GSystem.structure
+    gsystem_structure_dict.update({ '_id': ObjectId })
     gsystem_keys = gsystem_structure_dict.keys()
 
     gst_all_fields_dict = {i: 1 for i in gsystem_keys}
@@ -96,9 +97,10 @@ def api_get_gs_nodes(request):
     get_resource_type = request.GET.get('resource_type', None)
     if get_resource_type:
         gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
-        oid_name_dict[gst_id] = gst_name
-        get_parameters_dict['member_of'] = gst_id
-        attributes = sample_gs.get_possible_attributes([gst_id]) 
+        if gst_id:
+            oid_name_dict[gst_id] = gst_name
+            get_parameters_dict['member_of'] = gst_id
+            attributes = sample_gs.get_possible_attributes([gst_id]) 
 
     get_workspace = request.GET.get('workspace', None)
     if get_workspace:
@@ -108,7 +110,7 @@ def api_get_gs_nodes(request):
 
     for key, val in get_parameters_dict.iteritems():
         stripped_key = key.split('.')[0]
-        if stripped_key in gsystem_keys:
+        if stripped_key in (gsystem_keys):
             query_dict.update({ key: ({'$regex': val, '$options': 'i'} if isinstance(gsystem_structure_dict[stripped_key], basestring or unicode) else cast_to_data_type(val, gsystem_structure_dict[stripped_key])) })
 
         elif stripped_key in gst_attributes(gst_id):
@@ -116,6 +118,7 @@ def api_get_gs_nodes(request):
 
     # print "query_dict: ", query_dict
 
+    # making explicit human as decision taken
     human = eval(request.GET.get('human', '1'))
 
     gst_fields = gst_api_fields_dict if human else gst_all_fields_dict
