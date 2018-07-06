@@ -2138,6 +2138,12 @@ def cast_to_data_type(value, data_type):
         except Exception as e:
             casted_value = datetime.strptime(value, "%d/%m/%Y %H:%M:%S:%f")
 
+    elif (str(data_type) == "<class 'bson.objectid.ObjectId'>") or isinstance(data_type, (ObjectId, bson.objectid.ObjectId)):
+        try:
+            casted_value = ObjectId(value)
+        except Exception as e:
+            pass
+
     return casted_value
 
 
