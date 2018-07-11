@@ -6,7 +6,8 @@ from gnowsys_ndf.ndf.views.methods import *
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
-
+import datetime
+from functionOutput import *
 
 register = Library()
 
@@ -26,6 +27,28 @@ def convert_date_string_to_date(your_timestamp):
 		pass
 
 	return date
+
+
+
+#this function is the convert the date type object to days so as to ascertain the difference between 2 dates
+def getDayNum(date_Obj):
+	return 365*date_Obj.year + 30*date_Obj.month + date_Obj.day
+
+def getDateDiff(date1, date2):
+	return abs(getDayNum(date1)-getDayNum(date2))
+
+
+
+@get_execution_time
+@register.assignment_tag
+def getDate(strDate):
+	#the date is like DD/MM/YYYY
+	day = int(strDate[0]+strDate[1])
+	month = int(strDate[3]+strDate[4])
+	year = int(strDate[6]+strDate[7]+strDate[8]+strDate[9])
+	date = datetime.date(year,month,day)
+	return date
+
 
 
 @get_execution_time
@@ -88,6 +111,7 @@ def top_pages():
 				count =count +1
 				if count > 20:
 					break
+	top_pages_op(temp_list)
 	return temp_list
 
 
@@ -126,7 +150,7 @@ def top_users():
 				count =count +1
 				if count > 10:
 					break	
-
+	top_users_op(temp_list)
 	return temp_list
 
 @task
@@ -152,6 +176,7 @@ def top_downloads():
 				count =count +1
 				if count > 10:
 					break
+	top_downloads_op(temp_list)
 	return temp_list
 
 @task
@@ -175,6 +200,7 @@ def top_resources():
 				count =count+1
 		if count > 10:
 			break
+	top_resources_op(temp_list)
 	return temp_list
 
 @task
@@ -198,6 +224,7 @@ def top_videos():
 				count =count+1
 		if count > 10:
 			break
+	top_videos_op(temp_list)
 	return temp_list
 
 @task
@@ -221,6 +248,7 @@ def top_audios():
 				count =count+1
 		if count > 10:
 			break
+	top_audios_op(temp_list)
 	return temp_list
 
 @task
@@ -244,6 +272,7 @@ def top_images():
 				count =count+1
 		if count > 10:
 			break
+	top_images_op(temp_list)
 	return temp_list
 
 
@@ -281,3 +310,916 @@ def each_file_download_count(url,group_name_tag,node,download_filename):
 		print len(temp_list)
 		return "ERROR"
 	return temp_list
+
+#from here we start new functions
+      
+
+@get_execution_time
+@register.assignment_tag
+
+def anon_activity():
+	# to bucket the activities based on user_id. 
+	# if NULL, then the activity is anonymouse
+	# if not NULL, then to see that it's not the poeple of the org
+	search_query = Search(using=es,index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['user'])
+	user_field = A('terms', field='user',size="2147483647")
+	search_query.aggs.bucket('user_agg', user_field)
+	execute_query = search_query.execute()
+	response_of_anon_users = execute_query.aggregations.user_agg.buckets
+	activity = {"NonAnonymousUsers":0, "Anonymous":0,"Percent-anonymous":0}
+	for each_dict in response_of_anon_users:
+			if each_dict.key == None:
+				activity["Anonymous"] = each_dict.doc_count
+			else:
+				line = str(each_dict.key)
+				if re.search( r'nroer_team', line, re.M|re.I):
+					pass
+				elif re.search( r'mahesh777', line, re.M|re.I):
+					pass
+				elif re.search( r'nagarjuna', line, re.M|re.I):
+				    pass
+				elif re.search( r'siddhu', line, re.M|re.I):
+				    pass
+				elif re.search( r'rubina', line, re.M|re.I):
+				    pass
+				elif re.search( r'1186', line, re.M|re.I):
+				    pass
+				elif re.search( r'sadaqat', line, re.M|re.I):
+				    pass
+				elif re.search( r'('',)', line, re.M|re.I):
+				    pass
+				else:
+				    activity["NonAnonymousUsers"] += each_dict.doc_count	
+	activity["Percent-anonymous"] = 100.0*activity["Anonymous"]/(activity["Anonymous"]+activity["NonAnonymousUsers"])
+	return activity
+
+# this function is to find the top 10 users in the last month
+#returns a dictionary of 10 items, where each item is {user:frequency}
+#PS: There is no tie-breaker for users with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_users_lastWeek():
+	search_query = Search(using=es,index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['user','last_update'])
+	#print search_query.count()
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:100000]:
+
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.user))
+
+	user_dict = {}
+	freq_list = []
+	for user in temp_list:
+
+		
+		if re.search( r'nroer_team', user, re.M|re.I):
+			pass
+		elif re.search( r'mahesh777', user, re.M|re.I):
+			pass
+		elif re.search( r'nagarjuna', user, re.M|re.I):
+		    pass
+		elif re.search( r'siddhu', user, re.M|re.I):	
+			    pass
+		elif re.search( r'rubina', user, re.M|re.I):
+		    pass
+		elif re.search( r'1186', user, re.M|re.I):
+		    pass
+		elif re.search( r'sadaqat', user, re.M|re.I):
+		    pass
+		elif re.search( r'('',)', user, re.M|re.I):
+		    pass
+		elif (user in user_dict):
+			user_dict[user] += 1
+		else:
+			user_dict[user] = 1
+	freq_list = list(set(user_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	
+	for freq in freq_list:
+		if(count<10):
+			for user,user_freq in user_dict.items():
+				if(user_freq==freq):
+					count = count+1
+					top_list[user] = user_freq
+	return top_list
+
+
+# this function is to find the top 10 users in the last month
+#returns a dictionary of 10 items, where each item is {user:frequency}
+#PS: There is no tie-breaker for users with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_users_lastMonth():
+	search_query = Search(using=es,index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['user','last_update'])
+	#print search_query.count()
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<30):
+			temp_list.append(str(each_dict.user))
+
+	user_dict = {}
+	freq_list = []
+	for user in temp_list:
+
+		
+		if re.search( r'nroer_team', user, re.M|re.I):
+			pass
+		elif re.search( r'mahesh777', user, re.M|re.I):
+			pass
+		elif re.search( r'nagarjuna', user, re.M|re.I):
+		    pass
+		elif re.search( r'siddhu', user, re.M|re.I):	
+			    pass
+		elif re.search( r'rubina', user, re.M|re.I):
+		    pass
+		elif re.search( r'1186', user, re.M|re.I):
+		    pass
+		elif re.search( r'sadaqat', user, re.M|re.I):
+		    pass
+		elif re.search( r'('',)', user, re.M|re.I):
+		    pass
+		elif (user in user_dict):
+			user_dict[user] += 1
+		else:
+			user_dict[user] = 1
+	freq_list = list(set(user_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	
+	for freq in freq_list:
+		if(count<10):
+			for user,user_freq in user_dict.items():
+				if(user_freq==freq):
+					count = count+1
+					top_list[user] = user_freq
+	return top_list
+
+
+
+# this function is to find the top 10 users in the last month
+#returns a dictionary of 10 items, where each item is {user:frequency}
+#PS: There is no tie-breaker for users with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_users_lastYear():
+	search_query = Search(using=es,index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['user','last_update'])
+	#print search_query.count()
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.user))
+
+	user_dict = {}
+	freq_list = []
+	for user in temp_list:
+
+		
+		if re.search( r'nroer_team', user, re.M|re.I):
+			pass
+		elif re.search( r'mahesh777', user, re.M|re.I):
+			pass
+		elif re.search( r'nagarjuna', user, re.M|re.I):
+		    pass
+		elif re.search( r'siddhu', user, re.M|re.I):	
+			    pass
+		elif re.search( r'rubina', user, re.M|re.I):
+		    pass
+		elif re.search( r'1186', user, re.M|re.I):
+		    pass
+		elif re.search( r'sadaqat', user, re.M|re.I):
+		    pass
+		elif re.search( r'('',)', user, re.M|re.I):
+		    pass
+		elif (user in user_dict):
+			user_dict[user] += 1
+		else:
+			user_dict[user] = 1
+	freq_list = list(set(user_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	
+	for freq in freq_list:
+		if(count<10):
+			for user,user_freq in user_dict.items():
+				if(user_freq==freq):
+					count = count+1
+					top_list[user] = user_freq
+	return top_list
+
+
+# this function is to find the top 10 pages in the last week
+#returns a dictionary of 10 items, where each item is {page:frequency}
+#PS: There is no tie-breaker for pages with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_pages_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.calling_url))
+	page_dict = {}
+	freq_list = []
+	for page in temp_list:
+		if re.search( r'get_thread_comments_count', line, re.M|re.I):
+			pass
+		elif re.search( r'('',)', line, re.M|re.I):
+			pass
+		elif re.search( r'ajax', line, re.M|re.I):
+			pass
+		elif re.search( r'^/$', line, re.M|re.I):
+			pass
+		elif re.search( r'page-no', line, re.M|re.I):
+			pass
+		elif re.search( r'filter', line, re.M|re.I):
+			pass
+		elif re.search( r'searchresults', line, re.M|re.I):
+			pass
+		elif re.search( r'welcome', line, re.M|re.I):
+			pass
+		elif re.search( r'readDoc', line, re.M|re.I):
+			pass
+		elif page in page_dict:			
+			page_dict[page] += 1
+		else:
+			page_dict[page] = 1
+	freq_list = list(set(page_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for page,page_freq in page_dict:
+				if(page_freq==freq):
+					count = count+1
+					top_list[page] = page_freq
+	return top_list
+
+# this function is to find the top 10 pages in the last month
+#returns a dictionary of 10 items, where each item is {page:frequency}
+#PS: There is no tie-breaker for pages with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_pages_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_quer[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<30):
+			temp_list.append(str(each_dict.calling_url))
+	page_dict = {}
+	freq_list = []
+	for page in temp_list:
+		if re.search( r'get_thread_comments_count', page, re.M|re.I):
+			pass
+		elif re.search( r'('',)', page, re.M|re.I):
+			pass
+		elif re.search( r'ajax', page, re.M|re.I):
+			pass
+		elif re.search( r'^/$', page, re.M|re.I):
+			pass
+		elif re.search( r'page-no', page, re.M|re.I):
+			pass
+		elif re.search( r'filter', page, re.M|re.I):
+			pass
+		elif re.search( r'searchresults', page, re.M|re.I):
+			pass
+		elif re.search( r'welcome', page, re.M|re.I):
+			pass
+		elif re.search( r'readDoc', page, re.M|re.I):
+			pass
+		elif page in page_dict:			
+			page_dict[page] += 1
+		else:
+			page_dict[page] = 1
+	freq_list = list(set(page_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for page,page_freq in page_dict.items():
+				if(page_freq==freq):
+					count = count+1
+					top_list[page] = page_freq
+	return top_list
+
+# this function is to find the top 10 pages in the last year
+#returns a dictionary of 10 items, where each item is {page:frequency}
+#PS: There is no tie-breaker for pages with the exact same frequency, and hence all will be listed
+#in case there's a tie, even if the number exceeds 10
+@get_execution_time
+@register.assignment_tag
+def top_pages_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.calling_url))
+	page_dict = {}
+	freq_list = []
+	for page in temp_list:
+		if re.search( r'get_thread_comments_count', page, re.M|re.I):
+			pass
+		elif re.search( r'('',)', page, re.M|re.I):
+			pass
+		elif re.search( r'ajax', page, re.M|re.I):
+			pass
+		elif re.search( r'^/$', page, re.M|re.I):
+			pass
+		elif re.search( r'page-no', page, re.M|re.I):
+			pass
+		elif re.search( r'filter', page, re.M|re.I):
+			pass
+		elif re.search( r'searchresults', page, re.M|re.I):
+			pass
+		elif re.search( r'welcome', page, re.M|re.I):
+			pass
+		elif re.search( r'readDoc', page, re.M|re.I):
+			pass
+		elif page in page_dict:			
+			page_dict[page] += 1
+		else:
+			page_dict[page] = 1
+	freq_list = list(set(page_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for page,page_freq in page_dict.items():
+				if(page_freq==freq):
+					count = count+1
+					top_list[page] = page_freq
+	return top_list
+
+
+@get_execution_time
+@register.assignment_tag
+def top_downloads_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark").query('query_string', query='readDoc')
+	#print search_query.count()
+	#print "!!!!!!!!!!!!!!!!!"
+	search_query = search_query.source(["calling_url",'last_update'])
+	execute_query = search_query.execute()
+
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+	
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())< 7):
+			temp_list.append(str(each_dict.calling_url))
+	download_dict = {}
+	freq_list = []
+	for download in temp_list:
+		if re.search(r'readDoc', download, re.M|re.I):
+			if download in download_dict:			
+				download_dict[download] += 1
+			else:
+				download_dict[download] = 1
+	freq_list = list(set(download_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for download,download_freq in download_dict.items():
+				if(download_freq==freq):
+					count = count+1
+					top_list[download] = download_freq
+	return top_list	
+
+
+@get_execution_time
+@register.assignment_tag
+def top_downloads_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark").query('query_string', query='readDoc')
+	#print search_query.count()
+	#print "!!!!!!!!!!!!!!!!!"
+	search_query = search_query.source(["calling_url",'last_update'])
+	execute_query = search_query.execute()
+
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+	
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())< 30):
+			temp_list.append(str(each_dict.calling_url))
+	download_dict = {}
+	freq_list = []
+	for download in temp_list:
+		if re.search(r'readDoc', download, re.M|re.I):
+			if download in download_dict:			
+				download_dict[download] += 1
+			else:
+				download_dict[download] = 1
+	freq_list = list(set(download_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for download,download_freq in download_dict.items():
+				if(download_freq==freq):
+					count = count+1
+					top_list[download] = download_freq
+	return top_list	
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_downloads_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark").query('query_string', query='readDoc')
+	#print search_query.count()
+	#print "!!!!!!!!!!!!!!!!!"
+	search_query = search_query.source(["calling_url",'last_update'])
+	execute_query = search_query.execute()
+
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+	
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())< 365):
+			temp_list.append(str(each_dict.calling_url))
+	download_dict = {}
+	freq_list = []
+	for download in temp_list:
+		if re.search(r'readDoc', download, re.M|re.I):
+			if download in download_dict:			
+				download_dict[download] += 1
+			else:
+				download_dict[download] = 1
+	freq_list = list(set(download_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for download,download_freq in download_dict.items():
+				if(download_freq==freq):
+					count = count+1
+					top_list[download] = download_freq
+	return top_list	
+
+
+@get_execution_time
+@register.assignment_tag
+def top_resources_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.calling_url))
+	resource_dict = {}
+	freq_list = []
+	resource_extension_list=['mp4','webm','jpe','jpeg','png','mp3','epub','pdf']	
+	for resource in temp_list:
+		for each in resource_extension_list:
+			if re.search( eval(r'each'), resource, re.M|re.I):
+				if resource in resource_dict:
+					resource_dict[resource] += 1
+				else:
+					resource_dict[resource] = 1
+				break
+	freq_list = list(set(resource_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for resource,resource_freq in resource_dict.items():
+				if(resource_freq==freq):
+					count = count+1
+					top_list[resource] = resource_freq
+	return top_list
+
+@get_execution_time
+@register.assignment_tag
+def top_resources_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<30):
+			temp_list.append(str(each_dict.calling_url))
+	resource_dict = {}
+	freq_list = []
+	resource_extension_list=['mp4','webm','jpe','jpeg','png','mp3','epub','pdf']	
+	for resource in temp_list:
+		for each in resource_extension_list:
+			if re.search( eval(r'each'), resource, re.M|re.I):
+				if resource in resource_dict:
+					resource_dict[resource] += 1
+				else:
+					resource_dict[resource] = 1
+				break
+	freq_list = list(set(resource_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for resource,resource_freq in resource_dict.items():
+				if(resource_freq==freq):
+					count = count+1
+					top_list[resource] = resource_freq
+	return top_list
+
+@get_execution_time
+@register.assignment_tag
+def top_resources_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.calling_url))
+	resource_dict = {}
+	freq_list = []
+	resource_extension_list=['mp4','webm','jpe','jpeg','png','mp3','epub','pdf']	
+	for resource in temp_list:
+		for each in resource_extension_list:
+			if re.search( eval(r'each'), resource, re.M|re.I):
+				if resource in resource_dict:
+					resource_dict[resource] += 1
+				else:
+					resource_dict[resource] = 1
+				break
+	freq_list = list(set(resource_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for resource,resource_freq in resource_dict.items():
+				if(resource_freq==freq):
+					count = count+1
+					top_list[resource] = resource_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_videos_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.calling_url))
+	video_dict = {}
+	freq_list = []
+	video_extension_list=['mp4','webm']
+	for video in temp_list:
+		for each in video_extension_list:
+			if re.search( eval(r'each'), video, re.M|re.I):
+				if video in video_dict:
+					video_dict[video] += 1
+				else:
+					video_dict[video] = 1
+				break
+	freq_list = list(set(video_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for video,video_freq in video_dict.items():
+				if(video_freq==freq):
+					count = count+1
+					top_list[video] = video_freq
+	
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_videos_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<30):
+			temp_list.append(str(each_dict.calling_url))
+	video_dict = {}
+	freq_list = []
+	video_extension_list=['mp4','webm']
+	for video in temp_list:
+		for each in video_extension_list:
+			if re.search( eval(r'each'), video, re.M|re.I):
+				if video in video_dict:
+					video_dict[video] += 1
+				else:
+					video_dict[video] = 1
+				break
+	freq_list = list(set(video_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for video,video_freq in video_dict.items():
+				if(video_freq==freq):
+					count = count+1
+					top_list[video] = video_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_videos_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.calling_url))
+	video_dict = {}
+	freq_list = []
+	video_extension_list=['mp4','webm']
+	for video in temp_list:
+		for each in video_extension_list:
+			if re.search( eval(r'each'), video, re.M|re.I):
+				if video in video_dict:
+					video_dict[video] += 1
+				else:
+					video_dict[video] = 1
+				break
+	freq_list = list(set(video_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for video,video_freq in video_dict.items():
+				if(video_freq==freq):
+					count = count+1
+					top_list[video] = video_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_audios_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.calling_url))
+	audio_dict = {}
+	freq_list = []
+	audio_extension_list=['mp3']
+	for audio in temp_list:
+		for each in audio_extension_list:
+			if re.search( eval(r'each'), audio, re.M|re.I):
+				if audio in audio_dict:
+					audio_dict[audio] += 1
+				else:
+					audio_dict[audio] = 1
+	freq_list = list(set(audio_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for audio,audio_freq in audio_dict.items():
+				if(audio_freq==freq):
+					count = count+1
+					top_list[audio] = audio_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_audios_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())< 30):
+			temp_list.append(str(each_dict.calling_url))
+	audio_dict = {}
+	freq_list = []
+	audio_extension_list=['mp3']
+	for audio in temp_list:
+		for each in audio_extension_list:
+			if re.search( eval(r'each'), audio, re.M|re.I):
+				if audio in audio_dict:
+					audio_dict[audio] += 1
+				else:
+					audio_dict[audio] = 1
+	freq_list = list(set(audio_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for audio,audio_freq in audio_dict.items():
+				if(audio_freq==freq):
+					count = count+1
+					top_list[audio] = audio_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_audios_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.calling_url))
+	audio_dict = {}
+	freq_list = []
+	audio_extension_list=['mp3']
+	for audio in temp_list:
+		for each in audio_extension_list:
+			if re.search( eval(r'each'), audio, re.M|re.I):
+				if audio in audio_dict:
+					audio_dict[audio] += 1
+				else:
+					audio_dict[audio] = 1
+	freq_list = list(set(audio_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for audio,audio_freq in audio_dict.items():
+				if(audio_freq==freq):
+					count = count+1
+					top_list[audio] = audio_freq
+	return top_list
+
+	
+@get_execution_time
+@register.assignment_tag
+def top_images_lastWeek():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<7):
+			temp_list.append(str(each_dict.calling_url))
+	image_dict = {}
+	freq_list = []
+	image_extension_list=['jpe','jpeg','png']
+	for image in temp_list:
+		for each in image_extension_list:
+			if re.search( eval(r'each'), image, re.M|re.I):
+				if image in image_dict:
+					image_dict[image] += 1
+				else:
+					image_dict[image] = 1
+				break
+	freq_list = list(set(image_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for image,image_freq in image_dict.items():
+				if(image_freq==freq):
+					count = count+1
+					top_list[image] = image_freq
+	return top_list
+
+
+
+
+	
+@get_execution_time
+@register.assignment_tag
+def top_images_lastMonth():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<30):
+			temp_list.append(str(each_dict.calling_url))
+	image_dict = {}
+	freq_list = []
+	image_extension_list=['jpe','jpeg','png']
+	for image in temp_list:
+		for each in image_extension_list:
+			if re.search( eval(r'each'), image, re.M|re.I):
+				if image in image_dict:
+					image_dict[image] += 1
+				else:
+					image_dict[image] = 1
+				break
+	freq_list = list(set(image_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for image,image_freq in image_dict.items():
+				if(image_freq==freq):
+					count = count+1
+					top_list[image] = image_freq
+	return top_list
+
+
+
+@get_execution_time
+@register.assignment_tag
+def top_images_lastYear():
+	search_query = Search(using=es, index="benchmarks",doc_type="benchmark")
+	search_query = search_query.source(['calling_url','last_update'])
+	execute_query = search_query.execute()
+	temp_list = []
+	count = 1
+	for each_dict in search_query[0:10000]:
+		that_date = getDate(each_dict.last_update)
+		if(getDateDiff(that_date,datetime.date.today())<365):
+			temp_list.append(str(each_dict.calling_url))
+	image_dict = {}
+	freq_list = []
+	image_extension_list=['jpe','jpeg','png']
+	for image in temp_list:
+		for each in image_extension_list:
+			if re.search( eval(r'each'), image, re.M|re.I):
+				if image in image_dict:
+					image_dict[image] += 1
+				else:
+					image_dict[image] = 1
+				break
+	freq_list = list(set(image_dict.values()))
+	freq_list = sorted(freq_list,reverse=True)
+	count = 0
+	top_list = {}
+	for freq in freq_list:
+		if(count<10):
+			for image,image_freq in image_dict.items():
+				if(image_freq==freq):
+					count = count+1
+					top_list[image] = image_freq
+	return top_list
+
