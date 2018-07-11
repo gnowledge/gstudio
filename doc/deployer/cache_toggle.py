@@ -12,10 +12,11 @@ while((choice!=0 and choice!=1) or invalid==1):
 		invalid=0
 	except:
 		invalid=1
-
+setting_name="../../gnowsys-ndf/gnowsys_ndf/settings.py"
+temp_name="../../gnowsys-ndf/gnowsys_ndf/temp.py"
 print("Thank You. Configuring your settings now...")
-with open("temp.py","a") as outfile:
-	with open("settings.py","r") as infile:
+with open(temp_name,"a") as outfile:
+	with open(setting_name,"r") as infile:
 		for line in infile:
 			if('MAX_ENTRIES' in line):
 				print(line)
@@ -31,6 +32,6 @@ with open("temp.py","a") as outfile:
 				outfile.write(temp)
 			else:
 				outfile.write(line)
-os.remove("settings.py")
-os.rename("temp.py","settings.py")
+os.remove(setting_name)
+os.rename(temp_name,setting_name)
 			
