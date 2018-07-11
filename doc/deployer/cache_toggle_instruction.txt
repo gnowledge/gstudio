@@ -1,0 +1,9 @@
+1. Currently cache-toggle is a utility script to turn on or turn off the caching mechanism configured by gStudioLITE group.
+2. The path of settings.py file should be correctly entered.
+3. Script can easily be extended to interact with the settings file in general.
+4. GUI can be added to ensure user-friendliness.
+5. Simply changes the value of MAX_ENTRIES to zero, to turn off cache.
+
+
+
+
