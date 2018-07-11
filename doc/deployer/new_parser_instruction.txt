@@ -1,6 +1,6 @@
 1. Script which caches the full-site.
-2. Basically a web-scraper that uses Beuatiful Soup.
-3. Some links which needed browser automation were taken from the JS directly/
+2. Basically a web-scraper that uses Beautiful Soup and Selenium for browser-automation.
+3. Since many tags were stored as JS objects which were rendered only on a browser request, we needed to add Selenium.
 4. Follows a DFS to save on memory.
 5. Links are scraped off each web-page and the local links are set up in the stack.
 6. Links previously visited and already in stack are left untouched.
