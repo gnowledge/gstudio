@@ -1,0 +1,7 @@
+1. Script which caches the full-site.
+2. Basically a web-scraper that uses Beuatiful Soup.
+3. Some links which needed browser automation were taken from the JS directly/
+4. Follows a DFS to save on memory.
+5. Links are scraped off each web-page and the local links are set up in the stack.
+6. Links previously visited and already in stack are left untouched.
+7. Full-job will need some down-time, so preferable to run at startup only.
