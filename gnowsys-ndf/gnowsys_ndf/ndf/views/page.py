@@ -15,6 +15,9 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 from mongokit import paginator
 try:
   from bson import ObjectId
@@ -55,6 +58,7 @@ app = gst_page
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def page(request, group_id, app_id=None,page_no=1):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
@@ -183,6 +187,7 @@ def page(request, group_id, app_id=None,page_no=1):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -416,6 +421,7 @@ def create_edit_page(request, group_id, node_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
 
@@ -443,6 +449,7 @@ def delete_page(request, group_id, node_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
     # ins_objectid  = ObjectId()
@@ -523,6 +530,7 @@ def translate_node(request,group_id,node_id=None):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def publish_page(request,group_id,node):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :

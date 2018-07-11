@@ -18,6 +18,8 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from mongokit import IS
 from mongokit import paginator
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -41,7 +43,7 @@ from gnowsys_ndf.ndf.views.analytics_methods import *
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation, create_task, delete_grelation, node_thread_access, get_group_join_status, delete_node, auto_enroll, add_to_author_set
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORRECT_POINTS, GSTUDIO_COMMENT_POINTS, GSTUDIO_FILE_UPLOAD_POINTS
-from gnowsys_ndf.ndf.views.trash import trash_resource 
+from gnowsys_ndf.ndf.views.trash import trash_resource
 from gnowsys_ndf.ndf.views.translation import get_lang_node,get_trans_node_list,get_course_content_hierarchy, get_unit_hierarchy
 from gnowsys_ndf.ndf.views.assessment_analytics import user_assessment_results
 
@@ -64,6 +66,7 @@ has_banner_pic_rt = node_collection.one({'_type': 'RelationType', 'name': unicod
 app = GST_COURSE
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -140,6 +143,7 @@ def course(request, group_id, course_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details of base course group.
     """
@@ -269,6 +273,7 @@ def create_edit(request, group_id, node_id=None):
 
 # @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_detail(request, group_id, _id):
     try:
         group_id = ObjectId(group_id)
@@ -341,6 +346,7 @@ def course_detail(request, group_id, _id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Creates/Modifies document of given sub-types of Course(s).
@@ -837,6 +843,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   Detail view of NUSSD Course/ Announced Course
@@ -1062,6 +1069,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
 # Ajax views for setting up Course Structure
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_course_struct(request, group_id, node_id):
     """
     This view is to create the structure of the Course.
@@ -1142,6 +1150,7 @@ def create_course_struct(request, group_id, node_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_course_section(request, group_id):
     '''
     Accepts:
@@ -1194,6 +1203,7 @@ def save_course_section(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_course_sub_section(request, group_id):
     '''
     Accepts:
@@ -1249,6 +1259,7 @@ def save_course_sub_section(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def change_node_name(request, group_id):
     '''
     Accepts:
@@ -1272,6 +1283,7 @@ def change_node_name(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def change_order(request, group_id):
     '''
     Accepts:
@@ -1305,6 +1317,7 @@ def change_order(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_sub_section_prop(request, group_id):
     '''
     Accepts:
@@ -1373,6 +1386,7 @@ def course_sub_section_prop(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_units(request, group_id):
     '''
     Accepts:
@@ -1418,6 +1432,7 @@ def add_units(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_resources(request, group_id):
     '''
     Accepts:
@@ -1491,6 +1506,7 @@ def get_resources(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_resources(request, group_id):
     '''
     Accepts:
@@ -1590,6 +1606,7 @@ def save_resources(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_unit(request, group_id):
     '''
     Accepts:
@@ -1648,6 +1665,7 @@ def create_edit_unit(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id)
     if del_stat:
@@ -1656,6 +1674,7 @@ def delete_course(request, group_id, node_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_from_course_structure(request, group_id):
     '''
     Accepts:
@@ -1709,6 +1728,7 @@ def delete_item(item, ce_flag=False):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def enroll_generic(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1742,6 +1762,7 @@ def enroll_generic(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def remove_resource_from_unit(request, group_id):
     '''
     Accepts:
@@ -1771,6 +1792,7 @@ def remove_resource_from_unit(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_course_file(request, group_id):
     # this is context node getting from the url get request
     context_node_id = request.GET.get('context_node', '')
@@ -1825,6 +1847,7 @@ def add_course_file(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def unsubscribe_from_group(request, group_id):
     '''
     Accepts:
@@ -1866,6 +1889,7 @@ def unsubscribe_from_group(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def enroll_to_course(request, group_id):
     '''
     Accepts:
@@ -1928,6 +1952,7 @@ def enroll_to_course(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def set_release_date_css(request, group_id):
     response_dict = {"success": False}
     try:
@@ -1950,6 +1975,7 @@ def set_release_date_css(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_summary(request, group_id):
 
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -1967,6 +1993,7 @@ def course_summary(request, group_id):
     return render_to_response(template, variable)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_resource_detail(request, group_id, course_sub_section, course_unit, resource_id):
 
     group_name, group_id = get_group_name_id(group_id)
@@ -2014,6 +2041,7 @@ def course_resource_detail(request, group_id, course_sub_section, course_unit, r
 
 @auto_enroll
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def activity_player_detail(request, group_id, lesson_id, activity_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -2032,7 +2060,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
     if trans_lesson_node:
         lesson_name = trans_lesson_node.name
     else:
-        lesson_name  = lesson_node.name 
+        lesson_name  = lesson_node.name
     # all metadata reg position and next prev of resource
     translation_obj = node_obj.get_relation('translation_of')
 
@@ -2045,11 +2073,11 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
                                     {'name': 1, 'altnames': 1,'_id':1})
     act_list = []
     trans_act_list = get_trans_node_list(lesson_node.collection_set,request.LANGUAGE_CODE)
-    
-    lesson_index = group_obj_collection_set.index(lesson_node._id) 
+
+    lesson_index = group_obj_collection_set.index(lesson_node._id)
 
     resource_index = lesson_obj_collection_set.index(node_obj._id)
- 
+
     if (resource_index + 1) < resource_count:
         resource_next_id = lesson_node.collection_set[resource_index + 1]
 
@@ -2087,14 +2115,14 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
         'trans_lesson_name':lesson_name,
         'no_footer': True
     }
-    
-    
+
+
     if prev_lesson_obj and prev_lesson_obj.collection_set:
         context_variables.update({ 'lesson_act_prev_id': prev_lesson_obj.collection_set[0],'prev_lesson_id':prev_lesson_obj._id })
     if next_lesson_obj and next_lesson_obj.collection_set:
         context_variables.update({ 'next_lesson_id':next_lesson_obj._id,'lesson_next_act_id': next_lesson_obj.collection_set[0] })
-    
-    
+
+
     if request.user.is_authenticated():
         active_user_ids_list = [request.user.id]
         if GSTUDIO_BUDDY_LOGIN:
@@ -2121,6 +2149,7 @@ def activity_player_detail(request, group_id, lesson_id, activity_id):
 
 # Following View Not in Use
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_dashboard(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -2179,6 +2208,7 @@ def _get_current_and_old_display_pics(group_obj):
 
 # :::::::::::::::::::::::::::::::::TAB VIEWS BEGINS::::::::::::::::::::::
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_content(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -2211,6 +2241,7 @@ def course_content(request, group_id):
     return render_to_response(template, context_variables)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
@@ -2301,9 +2332,9 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
             tab = 'all-notes'
 
         if notebook_obj and not create_flag:
-            # return HttpResponseRedirect(reverse('course_notebook_tab_note', 
+            # return HttpResponseRedirect(reverse('course_notebook_tab_note',
                 # kwargs={'group_id': group_id, "node_id": notebook_obj.pk, 'tab': tab}))
-            return HttpResponseRedirect(reverse('course_notebook_note', 
+            return HttpResponseRedirect(reverse('course_notebook_note',
                 kwargs={'group_id': group_id, "node_id": notebook_obj.pk}))
 
     context_variables.update({'allow_to_comment': allow_to_comment})
@@ -2317,6 +2348,7 @@ def course_notebook(request, group_id, node_id=None, tab="my-notes"):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_raw_material(request, group_id, node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
 
@@ -2357,10 +2389,10 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "raw@material"}).sort('last_update', -1)
-    
+
     # from collections import defaultdict
     # asset_thumbnail = defaultdict(list)
-    
+
     # data_list = []
     # for each in asset_nodes:
     #     grel_asstcontent = get_relation_value (each.pk, 'has_assetcontent')
@@ -2369,7 +2401,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     #             if each_rel['if_file']['original']['relurl']:
     #                 asset_thumbnail[each._id].append(each_rel['if_file']['original']['relurl'])
     #             data_list.append(asset_thumbnail)
-    
+
 
     for each in asset_nodes:
         each.get_neighbourhood(each.member_of)
@@ -2431,15 +2463,15 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     if gstaff_access:
         allow_to_upload = True
     template = 'ndf/gcourse_event_group.html'
-    
+
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list or "base_unit" in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list :
         template = 'ndf/lms.html'
         # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         # context_variables.update({'assets_page_info':assets_page_info})
     if 'BaseCourseGroup' in group_obj.member_of_names_list:
         template = 'ndf/basecourse_group.html'
-    
-    
+
+
 
     context_variables.update({'title':'raw material' ,'files_cur': files_cur,'raw_material_page_info':raw_material_page_info ,'allow_to_upload': allow_to_upload,'allow_to_join': allow_to_join})
     return render_to_response(template,
@@ -2448,6 +2480,7 @@ def course_raw_material(request, group_id, node_id=None,page_no=1):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_gallery(request, group_id,node_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
 
@@ -2511,19 +2544,19 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
         context_variables.update({'files_cur': files_cur})
         gallery_page_info = paginator.Paginator(files_cur, page_no, GSTUDIO_NO_OF_OBJS_PP)
         context_variables.update({'gallery_page_info':gallery_page_info,'coll_cur':files_cur})
-    
+
     asset_gst_name, asset_gst_id = GSystemType.get_gst_name_id("Asset")
-    
+
     asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]},'tags': "asset@gallery"}).sort('last_update', -1)
-    
+
     template = 'ndf/gcourse_event_group.html'
-    
+
     if "announced_unit" in group_obj.member_of_names_list or "Group" in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list or 'base_unit' in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
         # assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
         # context_variables.update({'assets_page_info':assets_page_info})
-    
+
     context_variables.update({'asset_nodes': asset_nodes})
 
     return render_to_response(template,
@@ -2532,6 +2565,7 @@ def course_gallery(request, group_id,node_id=None,page_no=1):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_about(request, group_id):
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -2553,7 +2587,7 @@ def course_about(request, group_id):
 
       # print 'Weeks:', (end_day - start_day).days / 7
       weeks_count = (end_day - start_day).days / 7
-    
+
     show_analytics_notifications = True
     template = 'ndf/gcourse_event_group.html'
     context_variables = {
@@ -2572,10 +2606,10 @@ def course_about(request, group_id):
         educationallevel = get_attribute_value(group_obj._id,"educationallevel")
         context_variables.update({'educationalsubject_val': educationalsubject,
             "educationallevel_val": educationallevel})
-    
+
     if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list or 'Author' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list:
         template = 'ndf/lms.html'
-    
+
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj,
@@ -2586,6 +2620,7 @@ def course_about(request, group_id):
 # :::::::::::::::::::::::::::::::::TAB VIEWS ENDS::::::::::::::::::::::
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_gallerymodal(request, group_id, node_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -2611,6 +2646,7 @@ def course_gallerymodal(request, group_id, node_id):
     return render_to_response(template, context_variables)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_note_page(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -2638,6 +2674,7 @@ def course_note_page(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def inline_edit_res(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -2669,6 +2706,7 @@ def inline_edit_res(request, group_id):
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_filters(request, group_id):
 
     group_obj   = get_group_name_id(group_id, get_obj=True)
@@ -2776,6 +2814,7 @@ def course_filters(request, group_id):
 
 # @login_required # commented on-purpose for generating user-csvs
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_analytics(request, group_id, user_id, render_template=False, get_result_dict=False, **kwargs):
     # set get_result_dict=True to get only raw data in dict format,
     # without being redirected to template. So that this method can
@@ -2791,11 +2830,11 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
     #                             )
 
     # possible kwargs keys:
-    # 
+    #
     # `get_counter_obj_in_result`  # flag named such to avoid confusion with builtin Counter method
     # - default value is False (i.e: get_counter_obj_in_result=False)
     # - By setting this to True, result dict will have counter object as a value for key, `counter_obj`
-    # 
+    #
     # `assessment_and_quiz_data`
     analytics_data = {'user_id': user_id}
     analytics_data.update({
@@ -2809,7 +2848,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
-    
+
     try:
         # user_obj = User.objects.get(pk=int(user_id))
         author_obj = node_collection.one({ '_type': u'Author', 'created_by': int(user_id) })
@@ -2920,7 +2959,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
             for each_lesson_key, each_lesson_val in each_lesson_dict.iteritems():
                 if each_lesson_key == 'id':
                     lesson_id = each_lesson_dict[each_lesson_key]
-                    
+
                 if each_lesson_key == 'activities':
                     all_activities = all_activities + len(each_lesson_dict[each_lesson_key])
                     for each_act_dict in each_lesson_dict[each_lesson_key]:
@@ -3123,6 +3162,7 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_analytics_admin(request, group_id):
 
     cache_key = u'course_analytics_admin' + unicode(slugify(group_id))
@@ -3240,6 +3280,7 @@ def course_analytics_admin(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def build_progress_bar(request, group_id, node_id):
     cache_key = u'build_progress_bar_' + unicode(slugify(group_id)) + "_" + unicode(node_id) + "_" + unicode(request.user.id)
     cache_result = cache.get(cache_key)
@@ -3258,6 +3299,7 @@ def build_progress_bar(request, group_id, node_id):
     return HttpResponse(json.dumps(result_status))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_resource_completion_status(request, group_id):
     result_dict = {'COMPLETED':[]}
     cr_ids = request.GET.get("cr_ids", "")
@@ -3277,6 +3319,7 @@ def get_resource_completion_status(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def manage_users(request, group_id):
     group_obj   = get_group_name_id(group_id, get_obj=True)
     group_id    = group_obj._id
@@ -3292,6 +3335,7 @@ def manage_users(request, group_id):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def assets(request, group_id, asset_id=None,page_no=1):
     try:
         group_id = ObjectId(group_id)
@@ -3306,7 +3350,7 @@ def assets(request, group_id, asset_id=None,page_no=1):
         asset_obj = node_collection.one({'_id': ObjectId(asset_id)})
         asset_content_list = get_relation_value(ObjectId(asset_obj._id),'has_assetcontent')
         # topic_gst_name, topic_gst_id = GSystemType.get_gst_name_id("Topic")
-        
+
         asset_nodes = node_collection.find({'member_of': {'$in': [asset_gst_id]},
             'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
         # topic_nodes = node_collection.find({'member_of': {'$in': [topic_gst_id]}})
@@ -3318,14 +3362,14 @@ def assets(request, group_id, asset_id=None,page_no=1):
             'group_obj':group_obj, 'group_name':group_obj.name
         }
         if 'announced_unit' in group_obj.member_of_names_list or 'Group' in group_obj.member_of_names_list and 'base_unit' not in group_obj.member_of_names_list :
-                 
+
             if 'raw@material' in asset_obj.tags:
                 context_variables.update({'title':'raw_material_detail'})
                 template = 'ndf/lms.html'
             elif 'asset@gallery' in asset_obj.tags:
                 context_variables.update({'title':'asset_gallery_detail'})
                 template = 'ndf/lms.html'
-                        
+
             else:
                 #template = 'ndf/gevent_base.html'
                 template = 'ndf/lms.html'
@@ -3338,17 +3382,18 @@ def assets(request, group_id, asset_id=None,page_no=1):
         'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
     assets_page_info = paginator.Paginator(asset_nodes, page_no, GSTUDIO_NO_OF_OBJS_PP)
     context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_obj.name, 
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_obj.name,
             'asset_nodes': asset_nodes,'title':'asset_list',
             'group_obj':group_obj,'assets_page_info':assets_page_info
         }
-    
+
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     assetcontent_obj = node_collection.one({'_id': ObjectId(asst_content_id)})
@@ -3375,13 +3420,14 @@ def assetcontent_detail(request, group_id, asset_id,asst_content_id,page_no=1):
             context_variables.update( {'title':"raw_material_detail"})
         if "asset@gallery" in asset_obj.tags:
             context_variables.update( {'title':"asset_gallery_detail"})
-            
+
     return render_to_response(template,
                                 context_variables,
                                 context_instance = RequestContext(request)
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
@@ -3418,6 +3464,7 @@ def create_edit_course_page(request, group_id, page_id=None,page_type=None):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_pages(request, group_id, page_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -3432,7 +3479,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
 
     if page_id:
         node_obj = node_collection.one({'_id': ObjectId(page_id)})
-        
+
         rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 
         other_translations_grels = triple_collection.find({
@@ -3442,7 +3489,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
                             'right_subject': {'$nin': [node_obj._id]}
                         })
         other_translations = node_collection.find({'_id': {'$in': [r.right_subject for r in other_translations_grels]} })
-        
+
         context_variables.update({'activity_node': node_obj, 'hide_breadcrumbs': True,'other_translations':other_translations})
         context_variables.update({'editor_view': False})
 
@@ -3462,6 +3509,7 @@ def course_pages(request, group_id, page_id=None,page_no=1):
     )
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_course_page(request, group_id):
     group_obj = get_group_name_id(group_id, get_obj=True)
     group_id = group_obj._id
@@ -3470,7 +3518,7 @@ def save_course_page(request, group_id):
     if tags:
         tags = json.loads(tags)
     else:
-        tags = []    
+        tags = []
     #template = 'ndf/gevent_base.html'
     template = 'ndf/lms.html'
     page_gst_name, page_gst_id = GSystemType.get_gst_name_id("Page")
@@ -3495,7 +3543,7 @@ def save_course_page(request, group_id):
             if is_info_page == "Info":
                 info_page_gst_name, info_page_gst_id = GSystemType.get_gst_name_id('Info page')
                 page_obj.type_of = [info_page_gst_id]
-        
+
         if activity_lang:
             language = get_language_tuple(activity_lang)
             page_obj.language = language
@@ -3531,6 +3579,7 @@ def save_course_page(request, group_id):
          kwargs={'group_id': group_id, 'page_id': page_obj._id}))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def load_content_data(request, group_id):
     node_id = request.GET.get("node_id", "")
     node = node_collection.one({'_id': ObjectId(node_id)})
@@ -3542,6 +3591,7 @@ def load_content_data(request, group_id):
     },context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_activity_page(request, group_id):
     activity_id_list = request.POST.getlist('delete_files_list[]', '')
     activity_id = request.POST.get('activity_id', '')
@@ -3633,6 +3683,7 @@ def _get_unit_hierarchy(unit_group_obj,lang="en"):
     return unit_structure
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def widget_page_create_edit(request, group_id, node_id=None):
     node_id = request.GET.get('node_id', None)
     detail_url = request.GET.get('detail_url',)
@@ -3675,10 +3726,11 @@ def widget_page_create_edit(request, group_id, node_id=None):
     return render_to_response(template, req_context)
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def load_assessment_analytics(request, group_id):
     domain = request.GET.get('domain')
-    result_set = {'correct_attempted_quizitems': 0, 'visited_quizitems': 0, 
-    'unattempted_quizitems': 0, 'attempted_quizitems': 0, 
+    result_set = {'correct_attempted_quizitems': 0, 'visited_quizitems': 0,
+    'unattempted_quizitems': 0, 'attempted_quizitems': 0,
     'incorrect_attempted_quizitems': 0, 'notapplicable_quizitems': 0}
     user_id = request.GET.get('user_id')
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -3687,7 +3739,7 @@ def load_assessment_analytics(request, group_id):
     # Variable Decalarations
     correctAttemptCount = unattemptedCount = 0
     notapplicableCount = incorrectCount = attemptedCount = 0
-    count_dict = {'correctAttemptCount': correctAttemptCount, 
+    count_dict = {'correctAttemptCount': correctAttemptCount,
         'unattemptedCount': unattemptedCount, 'notapplicableCount': notapplicableCount,
         'incorrectCount': incorrectCount, 'attemptedCount': attemptedCount}
     total_items = 0
@@ -3715,7 +3767,7 @@ def load_assessment_analytics(request, group_id):
                                 #create
                                 if not counter_obj['assessment']:
                                     assessment_dict = {'id': each_sublist[1], 'correct': user_data_set['Correct'],
-                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                                    'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
                                     'incorrect': user_data_set['Incorrect']}
                                     counter_obj['assessment'].append(assessment_dict)
                                     counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -3778,7 +3830,7 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
             #create
             if not counter_obj['assessment']:
                 assessment_dict = {'id': offeredId, 'correct': user_data_set['Correct'],
-                'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'], 
+                'notapplicable': user_data_set['NotApplicable'], 'attempted': user_data_set['Attempted'],
                 'incorrect': user_data_set['Incorrect']}
                 counter_obj['assessment'].append(assessment_dict)
                 counter_obj['group_points'] += (user_data_set['Correct'] * GSTUDIO_QUIZ_CORRECT_POINTS)
@@ -3811,6 +3863,7 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
     return succes_update
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_quiz_data(request, group_id, all_data=False):
     '''
         all_data = True, will return checked and subimitted data
@@ -3870,19 +3923,19 @@ def course_quiz_data(request, group_id, all_data=False):
     for each_record in record_set['result']:
         for record_key,record_val in each_record.items():
             if record_key == "user_id":
-                # To prevent in error in case where 
+                # To prevent in error in case where
                 # User object does not exist, return user-id
                 user_obj = User.objects.get(pk=int(record_val))
                 if user_obj:
                     username = user_obj.username
                 else:
-                    username = record_val                    
+                    username = record_val
                 each_record['user_id'] = username
 
             if record_key == "thread_node" and record_val:
                 # QuizItemPost's prior_node list contains ObjectId
                 # of its Thread node and QuizItemEvent node
-                qie_node = node_collection.find_one({'_id': {'$in': record_val}, 
+                qie_node = node_collection.find_one({'_id': {'$in': record_val},
                     'name': {'$regex': '^(?!Thread of).*'}})
                 each_record['name'] = qie_node.content
 
@@ -3948,6 +4001,7 @@ def course_quiz_data(request, group_id, all_data=False):
             context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def finish_lesson(request, group_id, node_id):
     response_dict = {'success': False}
     try:
@@ -3961,6 +4015,6 @@ def finish_lesson(request, group_id, node_id):
                     lesson_node.save(groupid=group_id)
                     response_dict.update({'success': True})
     except Exception as complete_node_err:
-      print "\nError occurred in complete_node(). ", complete_node_err 
+      print "\nError occurred in complete_node(). ", complete_node_err
       pass
     return HttpResponse(json.dumps(response_dict))

@@ -2,10 +2,13 @@ from django import http
 from django.shortcuts import render_to_response
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 import datetime, re
 import subprocess
 
+@cache_control(must_revalidate=True, max_age=6)
 def cache_status(request):
 
     try:
@@ -78,7 +81,6 @@ def cache_status(request):
             all_cached_items=all_items_list,
         ))
 
-
 def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
     """
         This function allows you to invalidate any view-level cache which is implemented
@@ -113,7 +115,6 @@ def invalidate_cache_page(view_name, args=[], namespace=None, key_prefix=None):
             cache.set(key, None, 0)
         return True
     return False
-
 
 def invalidate_set_cache(cache_key):
     '''

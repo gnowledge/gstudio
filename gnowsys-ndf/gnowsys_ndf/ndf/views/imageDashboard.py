@@ -7,6 +7,8 @@ from django.template import RequestContext
 from mongokit import paginator
 import json
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -27,6 +29,7 @@ image_ins = node_collection.find_one({'_type': "GSystemType", "name": "Image"})
 file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def imageDashboard(request, group_id, image_id=None,page_no=1):
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
     '''
@@ -96,6 +99,7 @@ def imageDashboard(request, group_id, image_id=None,page_no=1):
     return render_to_response(template, variable)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def getImageThumbnail(request, group_id, _id):
     '''
     this funciton can be called to get thumbnail of image throw url
@@ -130,6 +134,7 @@ def getImageThumbnail(request, group_id, _id):
         return HttpResponse("")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def getFullImage(request, group_id, _id, file_name = ""):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -159,6 +164,7 @@ def getFullImage(request, group_id, _id, file_name = ""):
         return HttpResponse("")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_mid_size_img(request, group_id, _id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -198,6 +204,7 @@ def get_mid_size_img(request, group_id, _id):
             return HttpResponse(f.read(), content_type=f.content_type)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def image_search(request,group_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -225,6 +232,7 @@ def image_search(request,group_id):
         return render_to_response(template,variable)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def image_detail(request, group_id, _id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -284,6 +292,7 @@ def image_detail(request, group_id, _id):
         )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def image_edit(request,group_id,_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :

@@ -5,7 +5,8 @@ from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from gnowsys_ndf.ndf.models import Node, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
@@ -47,6 +48,7 @@ def set_notif_val(request,group_id,msg,activ,bx):
 
 # Send invitation to any user to join or unsubscribe
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def send_invitation(request,group_id):
     # Send invitation to any user to join or unsubscribe
     try:
@@ -99,6 +101,7 @@ def notifyuser(request,group_id):
         return HttpResponse("failure")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def notify_remove_user(request,group_id):
     colg = node_collection.one({'_id': ObjectId(group_id)})
     groupname=colg.name
@@ -115,6 +118,7 @@ def notify_remove_user(request,group_id):
         return HttpResponse("failure")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def invite_users(request,group_id):
     try:
         sending_user=request.user
@@ -194,6 +198,7 @@ def invite_users(request,group_id):
         return HttpResponse("Failure")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def invite_admins(request,group_id):
     #inorder to be a group admin, the user must be member of that group
     try:

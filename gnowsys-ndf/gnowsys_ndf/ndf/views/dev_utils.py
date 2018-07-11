@@ -7,7 +7,8 @@ import subprocess
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.http import Http404, HttpResponse
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -16,7 +17,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, NodeJSONEncoder
-
+@cache_control(must_revalidate=True, max_age=6)
 def query_doc(request, doc_id_or_name=None, option=None):
 
 	if ObjectId.is_valid(doc_id_or_name):
@@ -40,7 +41,7 @@ def query_doc(request, doc_id_or_name=None, option=None):
 					        context_instance=RequestContext(request)
 						    )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def render_test_template(request):
 	test_node = node_collection.one({"name":"home", '_type':"Group"})
 	return render_to_response(
@@ -49,15 +50,13 @@ def render_test_template(request):
         context_instance=RequestContext(request)
     )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def git_branch(request):
 	return HttpResponse(subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']),
 		content_type="text/plain")
-	
+@cache_control(must_revalidate=True, max_age=6)
 def git_misc(request, git_command):
 	response = "Unsupported"
 	if git_command in ['log', 'branch', 'status', 'tag', 'show', 'diff']:
 		response = subprocess.check_output(['git', git_command])
 	return HttpResponse(response, content_type="text/plain")
-
-	

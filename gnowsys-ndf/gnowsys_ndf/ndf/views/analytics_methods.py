@@ -5,6 +5,8 @@ from gnowsys_ndf.settings import *
 from gnowsys_ndf.ndf.views.methods import get_course_completetion_status, dig_nodes_field, sublistExists
 from gnowsys_ndf.ndf.templatetags.simple_filters import get_dict_from_list_of_dicts
 benchmark_collection = db[Benchmark.collection_name]
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 class AnalyticsMethods(object):
 	# print "=== Class Defination === "

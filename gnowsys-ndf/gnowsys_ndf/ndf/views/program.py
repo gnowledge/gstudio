@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -24,7 +26,7 @@ from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_prior_node_hierarchy
 from gnowsys_ndf.ndf.templatetags.ndf_tags import check_is_gstaff
-
+@cache_control(must_revalidate=True, max_age=6)
 def program_event_list(request, group_id):
     """
     * Renders a list of all 'programs'

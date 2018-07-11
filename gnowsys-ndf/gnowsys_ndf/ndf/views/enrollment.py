@@ -17,6 +17,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from mongokit import IS  # Don't delete used indirectly inside eval()
 
@@ -41,6 +43,7 @@ app = node_collection.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Creates/Modifies document of given sub-types of Course(s).
@@ -863,6 +866,7 @@ def enrollment_create_edit(request, group_id, app_id, app_set_id=None, app_set_i
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -889,7 +893,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
   else:
     app = node_collection.one({'_id': ObjectId(app_id)})
 
-  app_name = app.name 
+  app_name = app.name
 
   # app_name = "mis"
   app_set = ""
@@ -916,7 +920,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
     agency_type_node = node_collection.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
     if agency_type_node:
       for eachset in agency_type_node.collection_set:
-        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+        app_collection_set.append(node_collection.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
     sce_gst = node_collection.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)})#, {'name': 1, 'type_of': 1})
@@ -998,7 +1002,7 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
                                     if attr and 'nussd_course_type' in attr:
                                         each['for_course'] = attr['nussd_course_type']
                                     break
-                                        
+
 
                 ac_data_set.append(each)
 
@@ -1043,8 +1047,8 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
     property_order_list = get_property_order_with_value(node)
     node.get_neighbourhood(node.member_of)
 
-  context_variables = { 'groupid': group_id, 
-                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
+  context_variables = { 'groupid': group_id,
+                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set,
                         'app_set_id': app_set_id,
                         'title': title,
                         'nodes': nodes, "nodes_keys": nodes_keys, 'node': node,
@@ -1053,21 +1057,22 @@ def enrollment_detail(request, group_id, app_id, app_set_id=None, app_set_instan
                         'response_dict':json.dumps(response_dict, cls=NodeJSONEncoder)
                       }
   try:
-    return render_to_response([template, default_template], 
+    return render_to_response([template, default_template],
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n StudentCourseEnrollmentDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n StudentCourseEnrollmentDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def enrollment_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Student enrollment

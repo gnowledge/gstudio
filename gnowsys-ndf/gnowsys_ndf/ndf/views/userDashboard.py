@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.http import Http404
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 import ast
 try:
     from bson import ObjectId
@@ -58,6 +59,7 @@ gst_author_name, gst_author_id = GSystemType.get_gst_name_id('Author')
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def userpref(request, group_id):
     usrid = int(group_id)
     auth = node_collection.one({'_type': "Author", 'created_by': usrid})
@@ -75,6 +77,7 @@ def userpref(request, group_id):
     return HttpResponse("Success")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def uDashboard(request, group_id):
 
     try:
@@ -302,6 +305,7 @@ def uDashboard(request, group_id):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_preferences(request, group_id, auth_id):
     try:
         grp = node_collection.one({'_id': ObjectId(auth_id)})
@@ -347,6 +351,7 @@ def user_preferences(request, group_id, auth_id):
         return HttpResponse("Failure")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_template_view(request, group_id):
     auth_group = None
     group_list=[]
@@ -395,6 +400,7 @@ def user_template_view(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_activity(request, group_id):
     activity_user = node_collection.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
 
@@ -421,6 +427,7 @@ def user_activity(request, group_id):
     return render_to_response(template, variable)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_dashboard(request, group_id):
     """
     This view returns data required for group's dashboard.
@@ -552,6 +559,7 @@ def group_dashboard(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def user_profile(request, group_id):
     from django.contrib.auth.models import User
 
@@ -612,6 +620,7 @@ def user_profile(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def user_data_profile(request, group_id):
 	user = {}
 	auth_node = node_collection.one({"_id":ObjectId(group_id)})
@@ -622,6 +631,7 @@ def user_data_profile(request, group_id):
 	return HttpResponse(json.dumps(user,cls=NodeJSONEncoder))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def upload_prof_pic(request, group_id):
     if request.method == "POST" :
         user = request.POST.get('user','')
@@ -683,6 +693,7 @@ def upload_prof_pic(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def my_courses(request, group_id):
 
     if str(request.user) == 'AnonymousUser':
@@ -712,6 +723,7 @@ def my_courses(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def my_desk(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -794,6 +806,7 @@ def my_desk(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def my_groups(request, group_id,page_no=1):
 
     from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
@@ -837,6 +850,7 @@ def my_groups(request, group_id,page_no=1):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def my_dashboard(request, group_id):
 
     user_id = eval(group_id)
@@ -879,6 +893,7 @@ def my_dashboard(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def my_performance(request, group_id):
     from gnowsys_ndf.settings import GSTUDIO_WORKSPACE_INSTANCE
 
@@ -919,6 +934,7 @@ def my_performance(request, group_id):
 
 @get_execution_time
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_profile(request, user_id):
     from django.contrib.auth.models import User
 

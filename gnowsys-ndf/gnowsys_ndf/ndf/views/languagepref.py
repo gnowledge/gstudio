@@ -1,5 +1,7 @@
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 # from django.utils import translation
 # from django.http import HttpResponse
 # from django.http import StreamingHttpResponse
@@ -18,6 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def lang_pref(request):
     url=request.GET.get('url','')
     appid=request.GET.get('appid','')
@@ -28,7 +31,7 @@ def lang_pref(request):
         lan_dict['primary']=request.LANGUAGE_CODE
         lan_dict['default']=u"en"
         auth.preferred_languages=lan_dict
-        if not auth.agency_type: 
+        if not auth.agency_type:
             auth.agency_type = "Other"  # Sets default value for agency_type as "Other"
         auth.modified_by=request.user.id
         auth.save(groupid=group_id)

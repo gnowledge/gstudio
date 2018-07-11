@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 import json 
 try:
     from bson import ObjectId
@@ -23,6 +26,7 @@ GST_VIDEO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[4]})
 file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def videoDashboard(request, group_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -77,6 +81,7 @@ def videoDashboard(request, group_id):
     variable = RequestContext(request, {'group_id':group_id,'groupid':group_id,'files_cur':files_cur})
     return render_to_response(template, variable)
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def getvideoThumbnail(request, group_id, _id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -104,7 +109,8 @@ def getvideoThumbnail(request, group_id, _id):
         else:
             f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[0]))
             return HttpResponse(f.read(), content_type=f.content_type)
-@get_execution_time    
+@get_execution_time
+@cache_control(must_revalidate=True, max_age=6)   
 def getFullvideo(request, group_id, _id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -134,7 +140,8 @@ def getFullvideo(request, group_id, _id):
             f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[0]))
             return HttpResponse(f.read(), content_type=f.content_type)
        
-@get_execution_time        
+@get_execution_time
+@cache_control(must_revalidate=True, max_age=6)        
 def video_search(request,group_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -162,6 +169,7 @@ def video_search(request,group_id):
         return render_to_response(template,variable)        
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def video_detail(request, group_id, _id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -207,7 +215,8 @@ def video_detail(request, group_id, _id):
                                   },
                                   context_instance = RequestContext(request)
         )
-@get_execution_time        
+@get_execution_time    
+@cache_control(must_revalidate=True, max_age=6)    
 def video_edit(request,group_id,_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :

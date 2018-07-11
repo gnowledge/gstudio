@@ -10,6 +10,8 @@ from gnowsys_ndf.ndf.models import Node, GSystemType, Buddy, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.methods import get_group_name_id, get_language_tuple, create_grelation, get_execution_time, auto_enroll
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_DEFAULT_LANGUAGE, GSTUDIO_FILE_UPLOAD_POINTS
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 # gst_asset = node_collection.one({'_type': u'GSystemType', 'name': u'Asset'})
 gst_asset_name, gst_asset_id = GSystemType.get_gst_name_id(u'Asset')
@@ -145,7 +147,7 @@ def create_assetcontent(asset_id,
 		{'_id': 0, 'right_subject': 1})
 	for each_asset in asset_grels:
 		asset_contents_list.append(each_asset['right_subject'])
-	
+
 	create_grelation(asset_obj._id, rt_has_asset_content, asset_contents_list)
 	active_user_ids_list = [request.user.id]
 	if GSTUDIO_BUDDY_LOGIN:

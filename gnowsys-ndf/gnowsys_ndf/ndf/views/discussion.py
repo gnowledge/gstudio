@@ -9,6 +9,8 @@ from django.shortcuts import render_to_response  # , render
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from mongokit import paginator
 import mongokit
@@ -62,6 +64,7 @@ reply_st = node_collection.one({ '_type':'GSystemType', 'name':'Reply'})
 @login_required
 @get_execution_time
 @auto_enroll
+@cache_control(must_revalidate=True, max_age=6)
 def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
@@ -139,6 +142,7 @@ def create_discussion(request, group_id, node_id):
 @get_execution_time
 @login_required
 @auto_enroll
+@cache_control(must_revalidate=True, max_age=6)
 def discussion_reply(request, group_id, node_id):
     try:
         group_id = ObjectId(group_id)
@@ -387,6 +391,7 @@ def discussion_reply(request, group_id, node_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def discussion_delete_reply(request, group_id, node_id):
 
     try:
@@ -420,6 +425,7 @@ def discussion_delete_reply(request, group_id, node_id):
 @login_required
 @auto_enroll
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
 
     try:
@@ -453,12 +459,14 @@ def edit_comment(request, group_id, node_id=None,call_from_discussion=None):
     return render_to_response(template, context_variables, context_instance = RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_thread_comments_count(request, group_id, thread_node_id):
     return HttpResponse(node_collection.find({'group_set': ObjectId(group_id),
                          'member_of': reply_st._id,
                          'origin' : { '$elemMatch' : {'thread_id':ObjectId(thread_node_id)}}}).count())
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_user_replies(request, group_id, user_name_or_id):
 
     group_obj = get_group_name_id(group_id, get_obj=True)

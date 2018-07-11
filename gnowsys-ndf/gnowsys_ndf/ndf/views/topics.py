@@ -9,7 +9,8 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from mongokit import paginator
 
 try:
@@ -33,6 +34,7 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 #######################################################################################################################################
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def themes(request, group_id, app_id=None, app_set_id=None):
 
     try:
@@ -137,7 +139,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                               context_instance = RequestContext(request)
     )       
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def list_themes(request, group_id):
 
     try:
@@ -162,7 +164,7 @@ def list_themes(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def delete_theme(request, group_id, theme_id):
 
     try:
@@ -185,6 +187,7 @@ list_trans_coll = []
 coll_set_dict={}
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
@@ -749,6 +752,7 @@ def get_coll_set(node):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def topic_detail_view(request, group_id, app_Id=None):
 
   try:
@@ -830,7 +834,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 	                                context_instance = RequestContext(request)
   )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_filtered_topic_resources(request, group_id, node_id):
 
     selfilters = request.POST.get('filters', None)

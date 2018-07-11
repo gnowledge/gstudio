@@ -50,7 +50,7 @@ from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
 # from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.views.asset import *
-from gnowsys_ndf.ndf.views.trash import * 
+from gnowsys_ndf.ndf.views.trash import *
 
 theme_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -60,6 +60,8 @@ GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': 'Page'})
 # This function is used to check (while creating a new group) group exists or not
 # This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 @get_execution_time
 class Encoder(json.JSONEncoder):
@@ -69,7 +71,7 @@ class Encoder(json.JSONEncoder):
         else:
             return obj
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_node_json_from_id(request, group_id, node_id=None):
     if not node_id:
         node_id = request.GET.get('node_id')
@@ -87,7 +89,7 @@ def get_node_json_from_id(request, group_id, node_id=None):
     else:
       return HttpResponse(0)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def save_node(request, group_id, node_id=None):
     try:
         group_id = ObjectId(group_id)
@@ -119,6 +121,7 @@ def save_node(request, group_id, node_id=None):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def remove_from_nodelist(request, group_id):
     parent_node_id = request.POST.get('parent_node_id', None)
     child_node_id = request.POST.get('child_node_id', None)
@@ -138,6 +141,7 @@ def remove_from_nodelist(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def ajax_delete_node(request, group_id):
     node_to_delete = request.POST.get('node_to_delete', None)
     deletion_type = eval(request.POST.get('deletion_type', 0))
@@ -158,6 +162,7 @@ def checkgroup(request, group_name):
         return HttpResponse("failure")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def terms_list(request, group_id):
     if request.is_ajax() and request.method == "POST":
         # page number which have clicked on pagination
@@ -190,6 +195,7 @@ def terms_list(request, group_id):
 
 # This ajax view creates the page collection of selected nodes from list view
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def collection_create(request, group_id):
   '''
   This ajax view creates the page collection of selected nodes from list view
@@ -239,6 +245,7 @@ def collection_create(request, group_id):
 
 # This ajax view renders the output as "node view" by clicking on collections
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def collection_nav(request, group_id):
   '''
   This ajax function retunrs the node on main template, when clicked on collection hierarchy
@@ -345,6 +352,7 @@ def collection_nav(request, group_id):
 
 # This view handles the collection list of resource and its breadcrumbs
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def collection_view(request, group_id):
   '''
   This ajax function returns breadcrumbs_list for clicked node in collection hierarchy
@@ -381,6 +389,7 @@ def collection_view(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def shelf(request, group_id):
     if request.is_ajax() and request.method == "POST":
       shelf = request.POST.get("shelf_name", '')
@@ -468,6 +477,7 @@ def shelf(request, group_id):
       )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def drawer_widget(request, group_id):
     drawer = None
     drawers = None
@@ -558,6 +568,7 @@ def drawer_widget(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def select_drawer(request, group_id):
     if request.is_ajax() and request.method == "POST":
         drawer = None
@@ -676,6 +687,7 @@ def select_drawer(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def search_drawer(request, group_id):
     if request.is_ajax() and request.method == "POST":
 
@@ -783,6 +795,7 @@ def search_drawer(request, group_id):
       )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_topic_contents(request, group_id):
   # if request.is_ajax() and request.method == "POST":
   node_id = request.GET.get("node_id", '')
@@ -831,6 +844,7 @@ def get_collection_list(collection_list, node):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_tree_hierarchy(request, group_id, node_id):
 
     Collapsible = request.GET.get("collapsible", "")
@@ -945,6 +959,7 @@ def get_inner_collection(collection_list, node, no_res=False):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_collection(request, group_id, node_id, no_res=False):
   try:
     # cache_key = u'get_collection' + unicode(group_id) + "_" + unicode(node_id)
@@ -962,7 +977,7 @@ def get_collection(request, group_id, node_id, no_res=False):
       if obj:
         node_type = node_collection.one({'_id': ObjectId(obj.member_of[0])}).name
         # print "000000000000000000000",node.name
-        
+
         collection_list.append({'name':obj.name,'id':obj.pk,'node_type':node_type,'type' : "branch"})
         # collection_list = get_inner_collection(collection_list, obj, gstaff_access, completed_ids_list, incompleted_ids_list)
         if "BaseCourseGroup" in node.member_of_names_list:
@@ -979,6 +994,7 @@ def get_collection(request, group_id, node_id, no_res=False):
     print ee
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_sub_themes(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
@@ -1011,11 +1027,12 @@ def add_sub_themes(request, group_id):
     return HttpResponse("None")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_theme_item(request, group_id):
   if request.is_ajax() and request.method == "POST":
 
     existing_id = request.POST.get("existing_id", '')
-      
+
     context_theme_id = request.POST.get("context_theme", '')
     name =request.POST.get('name','')
     parent_node_id =request.POST.get('parent_id','')
@@ -1053,6 +1070,7 @@ def add_theme_item(request, group_id):
     return HttpResponse("success")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_topics(request, group_id):
   if request.is_ajax() and request.method == "POST":
     # print "\n Inside add_topics ajax view\n"
@@ -1085,6 +1103,7 @@ def add_topics(request, group_id):
     return HttpResponse("None")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_page(request, group_id):
   is_create_note = request.POST.get("is_create_note", '')
   tags = request.POST.get("tags", '')
@@ -1150,6 +1169,7 @@ def add_page(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_file(request, group_id):
     # this is context node getting from the url get request
     context_node_id = request.GET.get('context_node', '')
@@ -1213,7 +1233,6 @@ def add_file(request, group_id):
         file_obj.save(groupid=group_id)
         context_node.save(groupid=group_id)
     return HttpResponseRedirect(url_name)
-
 
 
 def collection_of_node(node=None, group_id=None):
@@ -1312,6 +1331,7 @@ def theme_node_collection(node=None, group_id=None):
     return True
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
@@ -1358,6 +1378,7 @@ def delete_themes(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def change_group_settings(request,group_id):
     '''
     changing group's object data
@@ -1412,6 +1433,7 @@ def get_module_set_list(node):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def make_module_set(request, group_id):
     '''
     This methode will create module of collection and stores objectid's with version number's
@@ -1567,6 +1589,7 @@ def walk(node):
     return list
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_module_json(request, group_id):
     _id = request.GET.get("_id", "")
     node = node_collection.one({'_id': ObjectId(_id)})
@@ -1576,6 +1599,7 @@ def get_module_json(request, group_id):
 
 # ------------- For generating graph json data ------------
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def graph_nodes(request, group_id):
   page_node = node_collection.one({'_id': ObjectId(request.GET.get("id"))})
   page_node.get_neighbourhood(page_node.member_of)
@@ -1746,6 +1770,7 @@ def graph_nodes(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
     node_id = request.GET.get("object_id", "")
@@ -1758,6 +1783,7 @@ def get_data_for_switch_groups(request,group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_drawer(request, group_id):
     '''
     designer module's drawer widget function
@@ -1774,6 +1800,7 @@ def get_data_for_drawer(request, group_id):
 
 # This method is not in use
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_user_drawer(request, group_id,):
     # This method will return data for user widget
     d1 = []
@@ -1850,6 +1877,7 @@ def set_drawer_widget_for_users(st, coll_obj_list):
     return data_list
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_batch_drawer(request, group_id):
     '''
     This method will return data for batch drawer widget
@@ -1942,6 +1970,7 @@ def set_drawer_widget(st, coll_obj_list, extra_key=None):
     return data_list
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_event_task(request, group_id):
     #date creation for task type is date month and year
     day_list=[]
@@ -2094,6 +2123,7 @@ def get_data_for_event_task(request, group_id):
     return HttpResponse(json.dumps(day_list,cls=NodeJSONEncoder))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_drawer_of_attributetype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -2128,6 +2158,7 @@ def get_data_for_drawer_of_attributetype_set(request, group_id):
     return HttpResponse(json.dumps(data_list))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_data_for_drawer_of_relationtype_set(request, group_id):
     '''
     this method will fetch data for designer module's drawer widget
@@ -2164,6 +2195,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def deletion_instances(request, group_id):
   """
   Deletes the given node(s) and associated GAttribute(s) & GRelation(s)
@@ -2279,6 +2311,7 @@ def deletion_instances(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_visited_location(request, group_id):
   usrid = request.user.id
   visited_location = ""
@@ -2326,6 +2359,7 @@ def get_online_editing_user(request, group_id):
 '''
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def view_articles(request, group_id):
   if request.is_ajax():
     # extracting all the bibtex entries from database
@@ -2353,6 +2387,7 @@ def view_articles(request, group_id):
   return StreamingHttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_author_set_users(request, group_id):
     '''
     This ajax function will give all users present in node's author_set field
@@ -2390,6 +2425,7 @@ def get_author_set_users(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def remove_user_from_author_set(request, group_id):
     '''
     This ajax function remove the user from athor_set
@@ -2418,6 +2454,7 @@ def remove_user_from_author_set(request, group_id):
         return StreamingHttpResponse("Invalid Ajax call")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_filterd_user_list(request, group_id):
     '''
     This function will return (all user's) - (subscribed user for perticular group)
@@ -2435,6 +2472,7 @@ def get_filterd_user_list(request, group_id):
         return HttpResponse(json.dumps(filtered_users))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def search_tasks(request, group_id):
     '''
     This function will return (all task's)
@@ -2456,6 +2494,7 @@ def search_tasks(request, group_id):
 	raise Http404
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_group_member_user(request, group_id):
   """Returns member(s) of the group excluding (group-admin(s)) in form of
   dictionary that consists of key-value pair:
@@ -2475,6 +2514,7 @@ def get_group_member_user(request, group_id):
     raise Http404
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def annotationlibInSelText(request, group_id):
   """
   This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
@@ -2527,6 +2567,7 @@ def annotationlibInSelText(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delComment(request, group_id):
   '''
   Delete comment from thread
@@ -2538,6 +2579,7 @@ def delComment(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_students(request, group_id):
   """
   This view returns list of students along with required data based on selection criteria
@@ -2836,6 +2878,7 @@ def get_students(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_statewise_data(request, group_id):
     """
     This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
@@ -2971,6 +3014,7 @@ def get_statewise_data(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_college_wise_students_data(request, group_id):
   """
   This view returns a download link of CSV created consisting of students statistical data based on degree_year for each college.
@@ -3115,6 +3159,7 @@ def get_college_wise_students_data(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -3196,6 +3241,7 @@ def set_user_link(request, group_id):
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def set_enrollment_code(request, group_id):
   """
   """
@@ -3207,6 +3253,7 @@ def set_enrollment_code(request, group_id):
     raise Exception(error_message)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_students_assignments(request, group_id):
   """
   Arguments:
@@ -3329,6 +3376,7 @@ def get_students_assignments(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_districts(request, group_id):
   """
   This view fetches district(s) belonging to given state.
@@ -3386,6 +3434,7 @@ def get_districts(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_affiliated_colleges(request, group_id):
   """
   This view returns list of colleges affiliated to given university.
@@ -3460,6 +3509,7 @@ def get_affiliated_colleges(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_courses(request, group_id):
     """
     This view returns list of NUSSD-Course(s) belonging to given course type.
@@ -3556,6 +3606,7 @@ def get_courses(request, group_id):
         return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_announced_courses_with_ctype(request, group_id):
     """
     This view returns list of announced-course(s) that match given criteria
@@ -3852,6 +3903,7 @@ def get_announced_courses_with_ctype(request, group_id):
         return HttpResponse(json.dumps({'message': error_message}))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_colleges(request, group_id, app_id):
     """This view returns HttpResponse with following data:
       - List of college(s) affiliated to given university where
@@ -4026,6 +4078,7 @@ def get_colleges(request, group_id, app_id):
         return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_anncourses_allstudents(request, group_id):
   """
   This view returns ...
@@ -4222,6 +4275,7 @@ def get_anncourses_allstudents(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_course_details_for_trainer(request, group_id):
   """
   This view returns a dictionary holding data required for trainer's enrollment
@@ -4378,6 +4432,7 @@ def get_course_details_for_trainer(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_students_for_approval(request, group_id):
   """This returns data-review list of students that need approval for Course enrollment.
   """
@@ -4514,6 +4569,7 @@ def get_students_for_approval(request, group_id):
     return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def approve_students(request, group_id):
     """This returns approved and/or rejected students count respectively.
     """
@@ -4857,6 +4913,7 @@ def mp_approve_students(student_cur, course_ids, course_enrollment_status_text, 
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_students_for_batches(request, group_id):
     """
     This view returns ...
@@ -4928,6 +4985,7 @@ def get_students_for_batches(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title
@@ -4943,6 +5001,7 @@ def edit_task_title(request, group_id):
 	raise Http404
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def edit_task_content(request, group_id):
     '''
     This function will edit task's title
@@ -4963,6 +5022,7 @@ def edit_task_content(request, group_id):
 	raise Http404
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def insert_picture(request, group_id):
     if request.is_ajax():
         resource_list=node_collection.find(
@@ -4988,6 +5048,7 @@ def insert_picture(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def close_event(request, group_id, node):
 	#close_event checks if the event start date is greater than or less than current date time
 	#if current date time if greater than event time than it changes tha edit button
@@ -4999,6 +5060,7 @@ def close_event(request, group_id, node):
 
     return HttpResponse("event closed")
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_time(request, group_id, node):
   start_time = request.POST.get('start_time','')
   end_time = request.POST.get('end_time','')
@@ -5031,6 +5093,7 @@ def save_time(request, group_id, node):
   return HttpResponse("Session rescheduled")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def check_date(request, group_id, node):
 
     reschedule = request.POST.get('reschedule','')
@@ -5060,6 +5123,7 @@ def check_date(request, group_id, node):
     return HttpResponse(message)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def reschedule_task(request, group_id, node):
 
  task_dict={}
@@ -5200,6 +5264,7 @@ def reschedule_task(request, group_id, node):
  return HttpResponse(return_message)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def event_assginee(request, group_id, app_set_instance_id=None):
 
  Event=   request.POST.getlist("Event","")
@@ -5293,6 +5358,7 @@ def event_assginee(request, group_id, app_set_instance_id=None):
  return HttpResponse("Details Entered")
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_course_name(request, group_id,Course_type):
   courses=node_collection.find({"attribute_set.nussd_course_type":unicode(Course_type)})
 
@@ -5306,6 +5372,7 @@ def fetch_course_name(request, group_id,Course_type):
   return HttpResponse(json.dumps(course_list))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_course_Module(request, group_id,announced_course):
   #Course_name
   batch = request.GET.get('batchid','')
@@ -5362,6 +5429,7 @@ def fetch_course_Module(request, group_id,announced_course):
   return HttpResponse(json.dumps(superdict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_batch_student(request, group_id,Course_name):
   try:
     courses=node_collection.one({"_id":ObjectId(Course_name)},{'relation_set.has_batch_member':1})
@@ -5379,6 +5447,7 @@ def fetch_batch_student(request, group_id,Course_name):
     return HttpResponse(json.dumps(list1))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_course_session(request, group_id,Course_name):
   try:
 	  courses=node_collection.one({"_id":ObjectId(Course_name)})
@@ -5415,6 +5484,7 @@ def fetch_course_session(request, group_id,Course_name):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_course_batches(request, group_id,Course_name):
   #courses=node_collection.one({"_id":ObjectId(Course_name)})
   #courses=node_collection.find({"relation_set.announced_for":ObjectId(Course_name)})
@@ -5435,6 +5505,7 @@ def fetch_course_batches(request, group_id,Course_name):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_csv(request,group_id,app_set_instance_id=None):
         #column_header = [u'Name', 'Presence','Attendance_marks','Assessment_marks']
         json_data=request.POST.getlist("attendance[]","")
@@ -5455,6 +5526,7 @@ def save_csv(request,group_id,app_set_instance_id=None):
             fw.writerow(ast.literal_eval(row))
         return HttpResponse((STATIC_URL + filename))
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_assessment(request,group_id,app_set_instance_id):
     node = node_collection.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     node.get_neighbourhood(node.member_of)
@@ -5481,6 +5553,7 @@ def get_assessment(request,group_id,app_set_instance_id):
     return HttpResponse(json.dumps(marks_list))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_attendees(request,group_id,node):
  #get all the ObjectId of the people who would attend the event
  node=node_collection.one({'_id':ObjectId(node)})
@@ -5518,6 +5591,7 @@ def get_attendees(request,group_id,node):
  return HttpResponse(json.dumps(a))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_attendance(request,group_id,node):
  #method is written to get the presence and absence of attendees for the event
  node=node_collection.one({'_id':ObjectId(node)})
@@ -5621,6 +5695,7 @@ def get_attendance(request,group_id,node):
  return HttpResponse(json.dumps(attendance))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def attendees_relations(request,group_id,node):
  test_output = node_collection.find({"_id":ObjectId(node),"attribute_set.start_time":{'$lt':datetime.datetime.today()}})
  if test_output.count() != 0:
@@ -5686,6 +5761,7 @@ def attendees_relations(request,group_id,node):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def page_scroll(request,group_id,page):
   hyperlinks = request.GET.get("links")
   if hyperlinks:
@@ -5736,6 +5812,7 @@ def page_scroll(request,group_id,page):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_batches_with_acourse(request, group_id):
   """
   This view returns list of batches that match given criteria
@@ -5781,6 +5858,7 @@ def get_batches_with_acourse(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_universities(request, group_id):
     """
     This view fetches Universities belonging to given state.
@@ -5846,6 +5924,7 @@ def get_universities(request, group_id):
 
 # MIS Reports
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_detailed_report(request, group_id):
   """
   This view returns list of students along with required data based on selection criteria
@@ -6208,7 +6287,7 @@ def get_detailed_report(request, group_id):
     response_dict["message"] = error_message
     return HttpResponse(json.dumps(response_dict, cls=NodeJSONEncoder))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_resource_by_oid(request, group_id):
 
     oid = request.GET.get('oid', None)
@@ -6226,7 +6305,7 @@ def get_resource_by_oid(request, group_id):
 
     return HttpResponse('false')
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_resource_by_oid_list(request, group_id):
 
     oid_list = request.GET.get('oid_list', None)
@@ -6256,7 +6335,7 @@ def get_resource_by_oid_list(request, group_id):
 
     return HttpResponse('false')
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def show_coll_cards(request, group_id):
 
     node_id = request.GET.get('node_id')
@@ -6274,7 +6353,7 @@ def show_coll_cards(request, group_id):
 
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_visits_count(request, group_id):
 	'''
 	Accepts:
@@ -6344,6 +6423,7 @@ def get_visits_count(request, group_id):
 		return HttpResponse(json.dumps(response_dict))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_ckeditor(request,group_id):
     ckeditor_toolbar_val = request.GET.get('ckeditor_toolbar')
     return render_to_response('ndf/html_editor.html',
@@ -6354,6 +6434,7 @@ def get_ckeditor(request,group_id):
             context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_gin_line_template(request,group_id,node_id):
     node_obj = node_collection.one({'_id': ObjectId(node_id)})
     global_disc_all_replies = []
@@ -6373,6 +6454,7 @@ def get_gin_line_template(request,group_id,node_id):
             context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_create_collection(request, group_id):
   is_create_collection =  request.GET.get('is_create_collection','')
   is_add_to_collection =  request.GET.get('is_add_to_collection','')
@@ -6404,6 +6486,7 @@ def course_create_collection(request, group_id):
     },context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_create_note(request, group_id):
   img_list = request.GET.get('img_list','')
   audio_list = request.GET.get('audio_list','')
@@ -6420,6 +6503,7 @@ def course_create_note(request, group_id):
       },context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
   '''
   Renders the Concept Graph, Collection Graph, Dependency Graph
@@ -6436,6 +6520,7 @@ def adminRenderGraph(request,group_id,node_id=None,graph_type="concept"):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def upload_file_ckeditor(request,group_id):
     try:
         group_id = ObjectId(group_id)
@@ -6493,6 +6578,7 @@ def upload_file_ckeditor(request,group_id):
 #     return HttpResponseRedirect( reverse('file_detail', kwargs={"group_id": group_id,'_id':gs_obj_id}) )
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def search_users(request, group_id):
     if request.is_ajax() and request.method == "GET":
         from bson import json_util
@@ -6519,6 +6605,7 @@ def search_users(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_user_password(request, group_id):
     response_dict = {'success': False}
     if request.is_ajax() and request.method == "POST":
@@ -6533,6 +6620,7 @@ def save_user_password(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def upload_video_thumbnail(request,group_id):
     try:
         group_id = ObjectId(group_id)
@@ -6563,6 +6651,7 @@ def upload_video_thumbnail(request,group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_paged_images(request, group_id):
   is_create_collection =  request.GET.get('is_create_collection','')
   is_add_to_collection =  request.GET.get('is_add_to_collection','')
@@ -6589,6 +6678,7 @@ def get_paged_images(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_templates_page(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6605,6 +6695,7 @@ def get_templates_page(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_group_templates_page(request, group_id):
   # try:
   #     group_id = ObjectId(group_id)
@@ -6643,6 +6734,7 @@ def get_group_pages(request, group_id):
 '''
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def get_group_resources(request, group_id, res_type="Page"):
     except_collection_set = []
     res_cur = None
@@ -6677,6 +6769,7 @@ def get_group_resources(request, group_id, res_type="Page"):
     variable = RequestContext(request, {'cursor': res_cur, 'groupid': group_id, 'group_id': group_id, 'card_class': card_class })
     return render_to_response(template, variable)
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_info_pages(request, group_id):
     node_id = request.POST.get("node_id", '')
     page_type = request.POST.get("page_type", '')
@@ -6687,6 +6780,7 @@ def get_info_pages(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_transcript(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6703,6 +6797,7 @@ def add_transcript(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_video_player(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6718,6 +6813,7 @@ def get_video_player(request, group_id):
             context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_audio_player(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6735,6 +6831,7 @@ def get_audio_player(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_jhapps(request,group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6753,6 +6850,7 @@ def get_jhapps(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_asset(request,group_id):
   try:
       group_id = ObjectId(group_id)
@@ -6774,8 +6872,9 @@ def add_asset(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_asset(request,group_id):
-  
+
   try:
       group_id = ObjectId(group_id)
   except:
@@ -6783,7 +6882,7 @@ def create_edit_asset(request,group_id):
   group_obj = Group.get_group_name_id(group_id, get_obj=True)
   selected_topic =  request.POST.get("topic_list", '')
   # selected_topic_list =  request.POST.getlist("coll_arr[]", '')
-  
+
   if request.method == "POST":
     asset_name =  str(request.POST.get("asset_name", '')).strip()
     asset_disp_name =  str(request.POST.get("asset_disp_name", '')).strip()
@@ -6795,9 +6894,9 @@ def create_edit_asset(request,group_id):
         tags = json.loads(tags)
     else:
         tags = []
-    
+
     asset_lang =  request.POST.get("sel_asset_lang", '')
-    
+
     is_raw_material = eval(request.POST.get('is_raw_material', "False"))
     # print "\nis_raw_material: ", is_raw_material, " type: ", type(is_raw_material)
 
@@ -6807,9 +6906,9 @@ def create_edit_asset(request,group_id):
 
 
     asset_obj.fill_gstystem_values(tags=tags)
-    
+
     rt_teaches = node_collection.one({'_type': "RelationType", 'name': unicode("teaches")})
-    
+
     if selected_topic:
       # selected_topic_list = map(ObjectId,selected_topic_list)
       create_grelation(asset_obj._id,rt_teaches,ObjectId(selected_topic))
@@ -6826,13 +6925,13 @@ def create_edit_asset(request,group_id):
       # elif not is_raw_material and u'raw@material' in asset_obj.tags and "base_unit" in group_obj.member_of_names_list:
       # UNmarking Asset as RawMaterial
       asset_obj.tags.remove(u'raw@material')
-    
+
     if "announced_unit" in group_obj.member_of_names_list and title == "raw material":
       asset_obj.tags.append(u'raw@material')
-    
+
     if ("announced_unit" in group_obj.member_of_names_list  or "Group" in group_obj.member_of_names_list) and "gallery" == title:
-      asset_obj.tags.append(u'asset@gallery')    
-    
+      asset_obj.tags.append(u'asset@gallery')
+
     if "announced_unit" in group_obj.member_of_names_list  and title == None or title == "None":
       asset_obj.tags.append(u'asset@asset')
 
@@ -6849,6 +6948,7 @@ def create_edit_asset(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_assetcontent(request,group_id):
   asset_obj = request.POST.get('asset_obj','')
   if_subtitle = request.POST.get('if_subtitle','')
@@ -6874,7 +6974,7 @@ def add_assetcontent(request,group_id):
     if not file_name:
       file_name = asset_cont_name
     subtitle_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
-      name=file_name, group_name_or_id=group_id, created_by=request.user.id, 
+      name=file_name, group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_subtitle,resource_type='File', request=request)
 
     rt_subtitle = node_collection.one({'_type':'RelationType', 'name':'has_subtitle'})
@@ -6899,7 +6999,7 @@ def add_assetcontent(request,group_id):
 
     rt_transcript = node_collection.one({'_type':'RelationType', 'name':'has_transcript'})
     transcript_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
-      name=file_name,  group_name_or_id=group_id, created_by=request.user.id, 
+      name=file_name,  group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_transcript, resource_type='File', request=request)
     transcript_list = [ObjectId(transcript_obj._id)]
 
@@ -6916,7 +7016,7 @@ def add_assetcontent(request,group_id):
     if not file_name:
       file_name = asset_cont_name
     alt_file_type = request.POST.get('alt_file_type','')
-    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj), 
+    alt_lang_file_obj = create_assetcontent(asset_id=ObjectId(asset_obj),
       name=file_name, group_name_or_id=group_id, created_by=request.user.id,
       files=uploaded_alt_lang_file,resource_type='File', request=request)
     rt_alt_content = node_collection.one({'_type':'RelationType', 'name':'has_alt_content'})
@@ -6937,7 +7037,7 @@ def add_assetcontent(request,group_id):
     resource_type='File', request=request)
   return StreamingHttpResponse("success")
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def add_to_collection_set(request, group_id):
     child_node_id = request.POST.get('child_node_id', None)
     parent_node_id = request.POST.get('parent_node_id', None)
@@ -6952,7 +7052,7 @@ def add_to_collection_set(request, group_id):
     else:
         return HttpResponse(0)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def delete_asset(request, group_id):
     if_delete_asset = request.POST.get('delete_asset', '')
     if_delete_asset_content = request.POST.get('delete_asset_content', '')
@@ -6973,7 +7073,7 @@ def delete_asset(request, group_id):
           print '\nDeleted Node',del_rel
       return HttpResponse('success')
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_metadata_page(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
@@ -6984,6 +7084,7 @@ def get_metadata_page(request, group_id):
             },
             context_instance=RequestContext(request))
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_admin_page_form(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
@@ -6994,6 +7095,7 @@ def get_admin_page_form(request, group_id):
             },
             context_instance=RequestContext(request))
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_help_page_form(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
@@ -7004,6 +7106,7 @@ def get_help_page_form(request, group_id):
             },
             context_instance=RequestContext(request))
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_interaction_widget(request, group_id):
   node_id = request.POST.get('node_id', None)
   node_obj = node_collection.one({'_id':ObjectId(node_id)})
@@ -7012,8 +7115,9 @@ def get_interaction_widget(request, group_id):
                 'group_id': group_id, 'groupid': group_id,
                 'node_id':node_id,'node':node_obj
             },
-            context_instance=RequestContext(request)) 
+            context_instance=RequestContext(request))
 
+@cache_control(must_revalidate=True, max_age=6)
 def save_interactions(request, group_id):
   group_obj = get_group_name_id(group_id, get_obj=True)
   node_id = request.POST.get('node_id', None)
@@ -7033,8 +7137,8 @@ def save_interactions(request, group_id):
   else:
     create_gattribute(node._id, discussion_enable_at, False)
   return HttpResponseRedirect(reverse('view_course_page', kwargs={'group_id':ObjectId(group_id),'page_id': ObjectId(node._id)}))
-  
 
+@cache_control(must_revalidate=True, max_age=6)
 def save_metadata(request, group_id):
   node_id = request.POST.get('node_id', None)
   node  = node_collection.one({"_id":ObjectId(node_id)})
@@ -7071,6 +7175,7 @@ def save_metadata(request, group_id):
     return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
   # return HttpResponse('success')
 
+@cache_control(must_revalidate=True, max_age=6)
 def export_to_epub(request, group_id, node_id):
     from gnowsys_ndf.ndf.views.export_to_epub import *
     response_dict = {'success': False}
@@ -7086,6 +7191,7 @@ def export_to_epub(request, group_id, node_id):
         pass
     return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
 
+@cache_control(must_revalidate=True, max_age=6)
 def remove_related_doc(request, group_id):
     node = request.POST.get('node', None)
     selected_obj = request.POST.get('sel_file', None)
@@ -7097,6 +7203,7 @@ def remove_related_doc(request, group_id):
     delete_grelation(subject_id=ObjectId(node_obj.pk), deletion_type=1, **{'node_id': ObjectId(rel_node._id)})
     return HttpResponse('success')
 
+@cache_control(must_revalidate=True, max_age=6)
 def get_translated_node(request, group_id):
     node_id = request.GET.get('node_id', None)
     language = request.GET.get('language', None)
@@ -7107,14 +7214,14 @@ def get_translated_node(request, group_id):
     else:
       return HttpResponse(json.dumps(node_obj, cls=NodeJSONEncoder))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 @get_execution_time
 def get_rating_template(request, group_id):
   try:
       group_id = ObjectId(group_id)
   except:
       group_name, group_id = get_group_name_id(group_id)
-    
+
   node_id = request.GET.get('node_id', None)
   node_obj = Node.get_node_by_id(ObjectId(node_id))
   is_comments = request.GET.get('if_comments', None)
@@ -7129,6 +7236,7 @@ def get_rating_template(request, group_id):
             },
             context_instance=RequestContext(request))
 
+@cache_control(must_revalidate=True, max_age=6)
 def delete_curriculum_node(request, group_id):
     node_id = request.POST.get('node_id', None)
     node_obj = Node.get_node_by_id(node_id)
@@ -7136,4 +7244,3 @@ def delete_curriculum_node(request, group_id):
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       trash_resource(request,ObjectId(group_id),ObjectId(node_id))
       return HttpResponse("Success")
-

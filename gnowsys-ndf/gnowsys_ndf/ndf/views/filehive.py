@@ -9,6 +9,8 @@ from hashfs import HashFS
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from gnowsys_ndf.settings import MEDIA_ROOT, GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.models import node_collection, filehive_collection, gfs
@@ -24,12 +26,12 @@ except ImportError:  # old pymongo
 gst_file = node_collection.one({'_type': u'GSystemType', 'name': u'File'})
 gst_file_id = gst_file._id
 
+@cache_control(must_revalidate=True, max_age=6)
 def upload_form(request, group_id):
 	if request.method == 'GET':
 		return render_to_response('ndf/filehive.html', {
 			'group_id': group_id, 'groupid': group_id,
 			}, context_instance=RequestContext(request))
-
 
 def write_files(request, group_id, make_collection=False, unique_gs_per_file=True, **kwargs):
 
@@ -103,7 +105,7 @@ def write_files(request, group_id, make_collection=False, unique_gs_per_file=Tru
 	# 	'group_id': group_id, 'groupid': group_id,
 	# 	}, context_instance=RequestContext(request))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def read_file(request, group_id):
 
 	all_fgs = node_collection.find({'_type': 'GSystem', 'member_of': gst_file._id})

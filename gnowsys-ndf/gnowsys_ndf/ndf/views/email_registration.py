@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from registration_email.forms import EmailRegistrationForm
 
@@ -28,7 +30,6 @@ def generate_username(username):
         pass
 
     return username
-
 
 class GstudioEmailRegistrationForm(EmailRegistrationForm):
     """
@@ -87,6 +88,7 @@ class GstudioEmailRegistrationForm(EmailRegistrationForm):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def password_reset_email(request, *args, **kwargs):
     if request.method == "POST":
         eml=request.POST.get('email',None)
@@ -98,6 +100,7 @@ def password_reset_email(request, *args, **kwargs):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def password_reset_error(request,*args,**kwargs):
     if request.method == "POST":
         eml=request.POST.get('email',None)

@@ -7,6 +7,9 @@ from django.http import StreamingHttpResponse
 ''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 from django.http import Http404
 from collections import OrderedDict
 try:
@@ -17,7 +20,7 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection, NodeJSONEncoder,Author, Buddy
-
+@cache_control(must_revalidate=True, max_age=6)
 def tools_logging(request):
 
 	#Method for tools logging
@@ -90,6 +93,7 @@ def tools_logging(request):
 	else:
 		return StreamingHttpResponse("Failure")
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def tools_temp(request):
     context_variables = {'title' : "tools"}
     return render_to_response(

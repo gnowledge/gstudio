@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -17,13 +19,14 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,get_execution_time
 from gnowsys_ndf.ndf.views.methods import get_node_metadata, node_thread_access, create_thread_for_node
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
-from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id 
+from gnowsys_ndf.ndf.views.methods import get_node_metadata, get_node_common_fields, create_gattribute, get_page, get_execution_time,set_all_urls,get_group_name_id
 gapp_mt = node_collection.one({'_type': "MetaType", 'name': META_TYPE[0]})
 GST_AUDIO = node_collection.one({'member_of': gapp_mt._id, 'name': GAPPS[3]})
 file_gst = node_collection.find_one( { "_type" : "GSystemType","name":"File" } )
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def audioDashboard(request, group_id, audio_id=None):
 
     '''
@@ -39,7 +42,7 @@ def audioDashboard(request, group_id, audio_id=None):
                                     'member_of': file_gst._id,
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     'if_file.mime_type': {'$regex': 'audio'},
-                                    'status' : { '$ne': u"DELETED" } 
+                                    'status' : { '$ne': u"DELETED" }
 
                                     # 'created_by': {'$in': gstaff_users},
                         # '$or': [

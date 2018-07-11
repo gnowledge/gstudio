@@ -13,7 +13,10 @@ from gnowsys_ndf.ndf.views.methods import *
 import json
 import datetime
 
+from django.views.decorators.cache import cache_control
+
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDesignerDashboardClass(request, class_name='GSystemType'):
     '''
     fetching class's objects
@@ -108,6 +111,7 @@ def adminDesignerDashboardClass(request, class_name='GSystemType'):
 
 
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id=None):
     '''
     delete class's objects
@@ -359,3 +363,5 @@ def adminDesignerDashboardClassCreate(request, class_name='GSystemType', node_id
         variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,'group_id':groupid, 'help_tip':help_tip })
 
     return render_to_response(template, variable)
+
+    

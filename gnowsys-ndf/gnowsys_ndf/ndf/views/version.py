@@ -7,6 +7,9 @@ from gnowsys_ndf.ndf.views.html_diff import htmldiff
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string,get_published_version_list
 from gnowsys_ndf.ndf.views.methods import get_group_name_id
 from gnowsys_ndf.ndf.views.methods import parse_data
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -16,7 +19,7 @@ from gnowsys_ndf.ndf.models import node_collection
 from gnowsys_ndf.ndf.models import HistoryManager
 history_manager = HistoryManager()
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def version_node(request, group_id, node_id, version_no = None):
     """Renders either a single or compared version-view based on request.
 
@@ -122,7 +125,6 @@ def version_node(request, group_id, node_id, version_no = None):
                               context_instance = RequestContext(request)
     )        
 
-
 def diff_prettyHtml(diffs):
     """Convert a diff array into a pretty HTML report.
 
@@ -201,7 +203,7 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
         return ""
-
+@cache_control(must_revalidate=True, max_age=6)
 def merge_doc(request,group_id,node_id,version_1,version_2):
      node = node_collection.one({'_id': ObjectId(node_id)})
      doc=history_manager.get_version_document(node,version_1)
@@ -244,7 +246,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
     )        
 
   
-  
+@cache_control(must_revalidate=True, max_age=6) 
 def revert_doc(request,group_id,node_id,version_1):
    node = node_collection.one({'_id': ObjectId(node_id)})
    group = node_collection.one({'_id': ObjectId(group_id)})

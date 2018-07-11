@@ -11,6 +11,8 @@ from django.template import RequestContext
 # from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -42,6 +44,7 @@ app=gst_group
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_partner(request,group_id):
   # ins_objectid  = ObjectId()
   # if ins_objectid.is_valid(group_id) is False :
@@ -134,7 +137,7 @@ def create_partner(request,group_id):
       nodes_list.append(str((each.name).strip().lower()))
   return render_to_response("ndf/create_partner.html", {'groupid': group_id, 'group_obj':group_obj,'appId': app._id, 'group_id': group_id, 'nodes_list': nodes_list},RequestContext(request))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def partner_list(request, group_id):
 
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -166,6 +169,7 @@ def partner_list(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def nroer_groups(request, group_id, groups_category):
     group_name, group_id = get_group_name_id(group_id)
 
@@ -213,7 +217,7 @@ def nroer_groups(request, group_id, groups_category):
 
                           }, context_instance=RequestContext(request))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def partner_showcase(request, group_id):
 
     group_name, group_id = get_group_name_id(group_id)

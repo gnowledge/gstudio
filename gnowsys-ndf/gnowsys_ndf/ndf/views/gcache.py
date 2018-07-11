@@ -1,5 +1,8 @@
 from django.core.cache import cache
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 class Gcache(object):
 	"""docstring for Gcache"""
 	def __init__(self, arg):

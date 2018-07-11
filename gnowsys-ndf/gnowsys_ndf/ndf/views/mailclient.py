@@ -1,6 +1,8 @@
 from django.core.mail import EmailMessage
 from django.views.generic import TemplateView
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, gridfs_collection
 from django.contrib.auth.models import User
@@ -49,7 +51,6 @@ server_dict = {
     "Bits_Pilani": "imap.gmail.com",
     "Rediffmail": "pop.rediffmail.com"
 }
-
 def connected_to_internet(url='http://www.google.com/', timeout=2):
     try:
         _ = requests.get(url, timeout=timeout)
@@ -60,6 +61,7 @@ def connected_to_internet(url='http://www.google.com/', timeout=2):
     return False
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def mailclient(request, group_id):
     '''
     This function fetches the mailboxes and the corresponding E-Mail IDs.
@@ -130,6 +132,7 @@ def mailclient(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mailbox_create_edit(request, group_id):
     '''
     takes {
@@ -245,7 +248,6 @@ def mailbox_create_edit(request, group_id):
 
 
 
-
 def sorted_ls(path):
     '''
     takes {
@@ -349,7 +351,6 @@ def read_mails(path, _type, displayFrom):
             mails_list.append(temp)
 
         return mails_list
-
 
 def store_mails(mails, path):
     '''
@@ -698,6 +699,7 @@ def get_mails_in_box(mailboxname, username, mail_type, displayFrom):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def render_mailbox_pane(request,group_id):
     '''
     This function sends the fecthed mails using 'get_mails_in_box'
@@ -719,6 +721,7 @@ def render_mailbox_pane(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mailbox_edit(request, group_id,mailboxname):
     '''
     takes {
@@ -872,6 +875,7 @@ def mailbox_edit(request, group_id,mailboxname):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mailbox_delete(request, group_id,mailboxname):
     '''
     takes {
@@ -1008,6 +1012,7 @@ def mailbox_delete(request, group_id,mailboxname):
     return render_to_response(template, variable)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mailclient_error_display(request, group_id, error_obj):
     '''
     takes {
@@ -1035,6 +1040,7 @@ def mailclient_error_display(request, group_id, error_obj):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mailbox_settings(request, group_id,mailboxname):
     '''
     takes {
@@ -1081,6 +1087,7 @@ def get_email_id(filename,mailboxname,username):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def compose_mail(request, group_id,mailboxname):
     '''
         takes {
@@ -1230,6 +1237,7 @@ def compose_mail(request, group_id,mailboxname):
 
     return render_to_response(template,variable)
 
+@cache_control(must_revalidate=True, max_age=6)
 def update_mail_status(request,group_id):
     '''
     takes {
@@ -1324,6 +1332,7 @@ def update_mail_status(request,group_id):
         # return render(request, template, {'groupname': group_name,'groupid': group_id,'group_id': group_id, "emails"  : mails_list})
         return render_to_response(template,variable)
 
+@cache_control(must_revalidate=True, max_age=6)
 def fetch_mail_body(request,group_id):
     '''
     takes {
@@ -1378,6 +1387,8 @@ def fetch_mail_body(request,group_id):
         return response
 
 # The mailBox-name must not be repeated for an individual user but other users can share the same mailBox-name
+
+@cache_control(must_revalidate=True, max_age=6)
 def unique_mailbox_name(request,group_id):
     '''
     takes {
@@ -1464,6 +1475,7 @@ def unique_mailbox_name(request,group_id):
         return render_to_response(template,variable)
 
 # The ID is unique to the individual user hence must not be repeated in the mailBox-data
+@cache_control(must_revalidate=True, max_age=6)
 def unique_mailbox_id(request,group_id):
     '''
     takes {

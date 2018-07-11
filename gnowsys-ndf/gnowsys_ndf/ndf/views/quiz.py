@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse, resolve
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 import json
 try:
@@ -52,6 +54,7 @@ app = gst_quiz
 #       V I E W S   D E F I N E D   F O R   G A P P -- ' Q U I Z '
 ##############################################################################
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def quiz(request, group_id):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
@@ -84,6 +87,7 @@ def quiz(request, group_id):
     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def quiz_item_detail(request, group_id, node_id=None):
     try:
         group_id = ObjectId(group_id)
@@ -97,7 +101,6 @@ def quiz_item_detail(request, group_id, node_id=None):
     return render_to_response(template,
                               variable,
                               context_instance=RequestContext(request))
-
 
 def created_trans_node(request, group_id, node_id, trans_node_id, language):
     rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
@@ -128,7 +131,6 @@ def created_trans_node(request, group_id, node_id, trans_node_id, language):
         translate_grel = create_grelation(node_id, rt_translation_of, trans_grel_list, language=language)
     return translated_node
 
-
 def get_quiz_item_name_content(request):
     question_name = request.POST.get('quiz_item_name',u'Untitled')
     question_content = request.POST.get('content_org',u'Untitled')
@@ -155,6 +157,7 @@ def options_attachment(request, quiz_item_node, language):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, lang='en'):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -342,6 +345,7 @@ def create_edit_quiz_item(request, group_id, node_id=None, trans_node_id=None, l
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """
@@ -390,6 +394,7 @@ def create_edit_quiz(request, group_id, node_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def quiz_details(request, group_id, node_id):
     try:
         group_id = ObjectId(group_id)
@@ -415,6 +420,7 @@ def quiz_details(request, group_id, node_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_quizitem_answer(request, group_id):
     response_dict = {"success": False}
     try:
@@ -654,7 +660,6 @@ def save_quizitem_response(user_id, quiz_type_val, user_action, user_given_ans, 
         pass
         print "\nError occurred in save_quizitem_response(). ", save_quizitem_response_err 
     return old_submitted_ans, user_ans, new_list
-
 def get_quiz_item_options(node):
     options_list = []
     try:
@@ -671,7 +676,7 @@ def get_quiz_item_options(node):
         print "\nError in get_quiz_item_options(). Error: ", get_quiz_item_options_err
     # print "\noptions_list: ", options_list
     return options_list 
-
+@cache_control(must_revalidate=True, max_age=6)
 def render_quiz_player(request, group_id, node, get_context=False):
     try:
         if gst_quiz_item._id not in node.member_of or gst_quiz_item_event._id not in node.member_of:

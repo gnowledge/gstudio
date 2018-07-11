@@ -7,6 +7,8 @@ from django.shortcuts import render_to_response  #, render
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -20,6 +22,7 @@ from gnowsys_ndf.settings import GSTUDIO_INSTITUTE_ID
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def list_buddy(request, group_id='home'):
 
     '''
@@ -58,6 +61,7 @@ def list_buddy(request, group_id='home'):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def update_buddies(request, group_id):
 
     selected_buddies_list = eval(request.POST.get('selected_buddies_list', '[]'))
@@ -134,6 +138,7 @@ def update_buddies(request, group_id):
 
 # @get_execution_time
 # @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def search_authors(request, group_id):
     selected_ids = request.GET.get('selected_ids', '')
     selected_ids = selected_ids.split(',')
@@ -149,7 +154,7 @@ def search_authors(request, group_id):
                 )
             )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_buddy_auth_id_from_name(request, group_id, username=None):
     response_dict ={'success': False}
     username = request.GET.get('selected_buddy_username')
@@ -158,5 +163,5 @@ def get_buddy_auth_id_from_name(request, group_id, username=None):
     if auth_node and (auth_node.created_by not in sitewide_active_userids_list):
         response_dict.update({'auth_id': str(auth_node._id)})
         response_dict.update({'success': True})
-        
+
     return HttpResponse(json.dumps(response_dict))

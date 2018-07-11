@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -15,7 +16,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
-from gnowsys_ndf.ndf.models import GSystemType, Node 
+from gnowsys_ndf.ndf.models import GSystemType, Node
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import *
@@ -24,7 +25,7 @@ collection = get_database()[Node.collection_name]
 sitename=Site.objects.all()
 if sitename :
     sitename = sitename[0]
-else : 
+else :
     sitename = ""
 
 db = get_database()
@@ -61,10 +62,10 @@ Bibtex_entries.append(dictionary)
 dictionary={'techreport':["author","title","institution","year","type","number","address","month","note","key"]}
 Bibtex_entries.append(dictionary)
 dictionary={'unpublished':["author","title","note","month","year","key"]}
-Bibtex_entries.append(dictionary) 
+Bibtex_entries.append(dictionary)
 
 ##Bib_App function
-
+@cache_control(must_revalidate=True, max_age=6)
 def Bib_App(request, group_id):
     """
     Renders the main page of the app
@@ -86,12 +87,12 @@ def Bib_App(request, group_id):
     variable = RequestContext(request,{'title': title, 'group_id': group_id, 'groupid': group_id})
     return render_to_response(template,variable)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def view_entries(request, group_id,node_id=None):
     '''
     renders the list view of all entries of a specific type when node_id is known
     '''
-  
+
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
       group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -104,7 +105,7 @@ def view_entries(request, group_id,node_id=None):
           group_id = str(auth._id)
     else :
         pass
-    
+
     if node_id is None:
         num = int(request.GET.get('num'))
         entry=Bibtex_entries[num]
@@ -124,7 +125,7 @@ def view_entries(request, group_id,node_id=None):
 
     return render_to_response(template,variable)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def view_entry(request,group_id,node_id):
     ''' renders list view of entries of a specific bibtex type when the type is known
     '''
@@ -147,6 +148,7 @@ def view_entry(request,group_id,node_id):
     variable = RequestContext(request, {'entry_inst': entry_inst, 'group_id': group_id, 'groupid': group_id,'title':title})
     return render_to_response(template,variable)
 
+@cache_control(must_revalidate=True, max_age=6)
 def view_sentry(request,group_id,node_id):
     ''' for displaying a specific entry
     '''
@@ -181,7 +183,7 @@ def view_sentry(request,group_id,node_id):
     print "before return"
     return render_to_response(template,variable)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def create_entries(request, group_id):
     ''' for creating a new bibtex entry_list
     '''
@@ -198,7 +200,7 @@ def create_entries(request, group_id):
                 group_id = str(auth._id)
     else :
         pass
-        ''' for retreiving the fields of a particular bibtex entry 
+        ''' for retreiving the fields of a particular bibtex entry
         '''
     num = int(request.GET.get('num'))
     entry=Bibtex_entries[num]
@@ -215,7 +217,7 @@ def create_entries(request, group_id):
                           'list_item':list_item,
                           'num':num
                       }
-    entry_node = collection.GSystem()  
+    entry_node = collection.GSystem()
     cite=""
     i=0
     value=""
@@ -249,7 +251,7 @@ def create_entries(request, group_id):
         get_node_common_fields(request,entry_node,group_id,GST_BIBTEX)
 
         entry_node.status=u'PUBLISHED'
-        
+
         entry_node.save()
         '''
         creating a GAttribute of AttributeType BibTex_entry for the already created GSystem
@@ -280,14 +282,14 @@ def create_entries(request, group_id):
         entry_list.object_value=unicode(value)
         entry_list.save()
         return HttpResponseRedirect(reverse('view_entry', kwargs={'group_id': group_id, 'node_id': GST_BIBTEX._id}))
-    else:     
+    else:
         return render_to_response("ndf/create_edit_entries.html",
                                   context_variables,
                                   context_instance=RequestContext(request))
 
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def delete_sentry(request, group_id, node_id):
     """Change the status to Hidden.
     """
@@ -312,11 +314,11 @@ def delete_sentry(request, group_id, node_id):
     gst_bibtex=(s[11:-3])
     gst_bibtex=unicode(gst_bibtex, "UTF-8")
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    
+
     return HttpResponseRedirect(reverse('view_entry', kwargs={'group_id': group_id,'node_id':gst_bibtex}))
-                          
 
 
+@cache_control(must_revalidate=True, max_age=6)
 def edit_entry(request,group_id,node_id):
     '''for editing entries
     '''
@@ -357,13 +359,13 @@ def edit_entry(request,group_id,node_id):
             values.append(each.split('$')[1])
         except:
             u="not found"
-    content_org=GST_current.content_org    
+    content_org=GST_current.content_org
     value=""
     Name=str(gst_entry.name)
     i=0
     key=""
     value=""
-    list_item=tags 
+    list_item=tags
     cite=""
     if request.method == "POST":
         name=request.POST.get("name")
@@ -392,7 +394,7 @@ def edit_entry(request,group_id,node_id):
                 cite += "page "+c+","
 
         var +="}"
-        
+
         GST_current.save()
         Bibtex=collection.Node.one({'name':'BibTex_entry','_type':'AttributeType'})
         Bibtex_entry=collection.Node.one({'subject':GST_current._id,'attribute_type':Bibtex._id})
@@ -414,4 +416,3 @@ def edit_entry(request,group_id,node_id):
     variable=RequestContext(request,{'group_id':group_id,'groupid':group_id,'title':GST_current.name ,'tags':tags,'values':values,'zipped':zipped,'content_org':content_org})
     template="ndf/edit_entry.html"
     return render_to_response(template,variable)
-    

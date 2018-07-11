@@ -14,7 +14,8 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.generic import View
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -35,6 +36,7 @@ from gnowsys_ndf.ndf.views.notify import *
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 
 	try:
@@ -150,7 +152,7 @@ def moderation_status(request, group_id, node_id, get_only_response_dict=False):
 		return response_dict
 
 	return render_to_response('ndf/under_moderation.html', response_dict, RequestContext(request))
-
+@cache_control(must_revalidate=True, max_age=6)
 def all_under_moderation(request, group_id):
 	from gnowsys_ndf.ndf.views.group import CreateModeratedGroup, CreateEventGroup, CreateGroup
 
@@ -196,6 +198,7 @@ def all_under_moderation(request, group_id):
 		raise Http404('Group is not EDITABLE_MODERATED')
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def moderation(request, group_id, page_no=1):
 	# try:
 	# 	group_id = ObjectId(group_id)
@@ -212,6 +215,7 @@ def moderation(request, group_id, page_no=1):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def approve_resource(request, group_id):
 	'''
 	Method to approve resorce.

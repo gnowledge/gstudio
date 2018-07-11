@@ -1,4 +1,6 @@
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from difflib import SequenceMatcher
 import re
 try:
@@ -24,7 +26,7 @@ class HTMLMatcher(SequenceMatcher):
 
     def set_seq2(self, b):
         SequenceMatcher.set_seq2(self, self.splitHTML(b))
-        
+
     def splitTags(self, t):
         result = []
         pos = 0
@@ -245,5 +247,3 @@ if __name__ == '__main__':
         doctest.testmod()
     else:
         print diffFiles(sys.argv[1], sys.argv[2])
-    
-

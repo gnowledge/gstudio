@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_execution_time,create_gattribute, create_grelation, get_group_name_id
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 #from stemming.porter2 import stem
 
 try:
@@ -42,6 +44,7 @@ class Encoder(json.JSONEncoder):
 
 
 # DISPLAYS THE SEARCH PAGE - USEFUL ONLY IF COMING TO THE SEARCH PAGE FROM THE OUTSIDE
+@cache_control(must_revalidate=True, max_age=6)
 def search_page(request, group_id):
 	# ins_objectid  = ObjectId()
 	# if ins_objectid.is_valid(group_id) is False :
@@ -101,6 +104,7 @@ def getRenderableContext(group_id):
 	
 
 # VIEW FOR KEYWORD SEARCH
+@cache_control(must_revalidate=True, max_age=6)
 def search_query(request, group_id):
 	col = get_database()[Node.collection_name]
 
@@ -150,6 +154,7 @@ def search_query(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def results_search(request, group_id, page_no=1, return_only_dict = None):
 	"""
 	This view returns the results for global search on all GSystems by name, tags and contents.
@@ -522,6 +527,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 
 
 # KEYWORD SEARCH FOR A SPECIFIC GROUP
+@cache_control(must_revalidate=True, max_age=6)
 def results_search_group(request, group_id):
 	"""
 	This view returns the results for search on all GSystems by name, tags and contents in the group currently chosen.
@@ -797,7 +803,7 @@ def results_search_group(request, group_id):
 # 	return render(request, 'ndf/advanced_search2.html', {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "allUsers":allUsers, "group_id":group_id})
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_attributes(request, group_id):
 	attributes = []
 
@@ -833,7 +839,6 @@ def get_attributes(request, group_id):
 	#print attributes
 	return HttpResponse(json.dumps(attributes, cls=Encoder))
 
-
 def user_name_to_id(userNames):
 	allUsers = []
 	for user in userNames:
@@ -841,7 +846,6 @@ def user_name_to_id(userNames):
 		allUsers.append(sg_id)
 
 	return allUsers
-
 
 def group_name_to_id(groupNames):
 	allGroups = []
@@ -853,7 +857,7 @@ def group_name_to_id(groupNames):
 
 	return allGroups
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def advanced_search_results(request, group_id): 
 
 	# READ THE GET VALUES
@@ -958,7 +962,6 @@ def advanced_search_results(request, group_id):
 
 	return render(request, 'ndf/search_page.html', context_to_return)
 
-
 def get_public_groups():
 	cur = node_collection.find({"_type": "Group", "group_type": "PUBLIC"}, {"name": 1})
 	allGroups = []
@@ -966,7 +969,6 @@ def get_public_groups():
 		allGroups.append(obj.name)
 
 	return allGroups
-
 
 def addType(obj):
 	##print "received: ", obj.member_of[0]
@@ -989,7 +991,6 @@ def addType(obj):
 	#datetime.datetime.strptime(obj.last_update, "%Y-%m-%dT%H:%M:%S.%fZ").date()
 	#print "obj", obj2
 	return obj2
-
 
 def sort_names_by_similarity(exact_match, search_str_user):
 	matches = []					# TO STORE A LIST OF SORTED MATCH PERCENTAGE
@@ -1014,7 +1015,6 @@ def sort_names_by_similarity(exact_match, search_str_user):
 
 	return final_list
 
-
 def removeArticles(text):
 	words = text.split()
 	articles=['a', 'an', 'and', 'the', 'i', 'is', 'this', 'that', 'there', 'here', 'am', 'on', 'at', 'of', 'where']
@@ -1024,10 +1024,8 @@ def removeArticles(text):
 	words = removeDuplicateWords(words)
 	return words
 
-
 def removeDuplicateWords(words):
 	return list(OrderedDict.fromkeys(words))
-
 
 def stemWords(words, search_str_user):
 	stemmed = []
@@ -1078,7 +1076,7 @@ def populate_list_of_group_members(group_ids):
 
 	return memList
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_users(request, group_id):
 	group_ids = str(request.GET['Groups'])
 	group_ids = group_ids.split(",")
@@ -1092,7 +1090,7 @@ def get_users(request, group_id):
 		allUsers = populate_list_of_group_members(group_ids)
 	return HttpResponse(json.dumps(allUsers, cls=Encoder))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_node_info(request, group_id, node_name):
 
 	# ins_objectid  = ObjectId()
@@ -1154,7 +1152,7 @@ def get_node_info(request, group_id, node_name):
 		return render(request, 'ndf/node_details.html', {'is_list':0, 'list_nodes':'', 'all_fields':results, 'groupid':group_id})
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_node_info2(request, group_id, node_id):
 	"""
 	This view displays the info about a node - the basic fields - name, created_by, last_update as well as all the GAttributes.
@@ -1204,7 +1202,7 @@ def get_node_info2(request, group_id, node_id):
 	results = json.dumps(results, cls=Encoder)
 	return render(request, 'ndf/node_details.html', {'is_list':0, 'list_nodes':'', 'all_fields':results, 'groupid':group_id})
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_relations_for_autoSuggest(request, group_id):
 	"""
 	This function returns a list of names of RelationsTypes, GSystemTypes and GSYstems in the database according to the search query already typed by the user.
@@ -1246,7 +1244,7 @@ def get_relations_for_autoSuggest(request, group_id):
 
 # 	return render(request, 'ndf/ra_search.html', {"groupid":group_id})
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def ra_search_results(request, group_id):
 	"""
 	This function implements the graph search.
@@ -1568,7 +1566,6 @@ def ra_search_results(request, group_id):
 
 	return render(request, 'ndf/search_page.html', context_to_return)
 
-
 def get_max_match(sorted_rel, word_reqd, max_length):
 	"""
 	Helper function for the graph search function.
@@ -1604,7 +1601,6 @@ def get_max_match(sorted_rel, word_reqd, max_length):
 #######################################################SEMANTIC SEARCH 8TH JULY########################################################
 
 ################################### PRE PROCESSING FOR MAP REDUCE #################################################################	
-
 def pre_process_for_map_reduce(text):
 	
 	grammar = r"""
@@ -1622,7 +1618,6 @@ def pre_process_for_map_reduce(text):
 	
 	terms = get_terms(tree) 
 	return terms
-
 
 def leaves(tree):
     """Finds NP (nounphrase) leaf nodes of a chunk tree."""
@@ -1656,7 +1651,6 @@ def acceptable_word(word):
     max_word_length = 40
     accepted = bool(2 <= len(word) <= max_word_length and word.lower() not in stopwords)
     return accepted
-    
 def get_terms(tree):
     result = []	
     ALLOWED_LIST = ['CD','FW','JJ','JJR','JJS','NN','NNS','NNP','NNPS','VB','VBD','VBG','VBN','VBP','VBZ']	
@@ -1678,7 +1672,6 @@ def remove_punctuation(s):
 			s = unicode(s)			
 	translate_table = dict((ord(c),None) for c in string.punctuation)	
 	return s.translate(translate_table)
-
 def mapper(input_value):
 	input_value = remove_punctuation(input_value)	
 	input_value_l = pre_process_for_map_reduce(input_value)		#This performs pre_processing for map reduce
@@ -1690,10 +1683,8 @@ def mapper(input_value):
 
 	return l
 	
-
 def reducer(intermediate_key,intermediate_value_list):
 	return(intermediate_key,sum(intermediate_value_list))
-
 def map_reduce(x,mapper,reducer):
 	groups = {}
 	for key,group in itertools.groupby(sorted(mapper(x)),lambda x:x[0]):
@@ -1723,7 +1714,7 @@ def perform_map_reduce(request,group_id):
 		particular_instance.delete()		
 	return HttpResponse("Map Reduce was performed successfully")
 """
-
+@cache_control(must_revalidate=True, max_age=6)
 def perform_map_reduce(request,group_id):
 	#connection.register([MyDocs])
 	#connection.register([ReducedDocs])
@@ -1767,7 +1758,6 @@ def perform_map_reduce(request,group_id):
 import numpy
 #import sparsesvd
 from math import sqrt
-
 
 def td_doc():
 	"""
@@ -1816,7 +1806,6 @@ def td_doc():
 	for pmrd in mrdl:
 		pmrd.is_indexed = True
 		pmrd.save()
-		
 def generate_big_dict():
 	#This function will generate a big dictionary i.e. it will simply go and combine all the dictionaries together
 	#connection.register([IndexedWordList])
@@ -1867,7 +1856,6 @@ def sim_distance(prefs,d1,d2):
 	##print "SUM OF SQUARES :):)",sum_of_squares,(1.0/(1+sum_of_squares))
 	return (1.0/(1+sum_of_squares))	
 
-	
 def sim_pearson(prefs,d1,d2):
 	#Theoretically --- The results of pearson similarity should be better, but practically the results are much worse
 	#Get the list of mutually rated items
@@ -1900,14 +1888,12 @@ def sim_pearson(prefs,d1,d2):
 
 	r = num/den		
 	return r
-
 def topMatches(prefs,document,n=5,similarity=sim_distance):
 	#This function returns the words which are closest to the word which are given to this function
 	scores = [(similarity(prefs,document,other),other) for other in prefs if other != document]
 	scores.sort()
 	scores.reverse()
 	return scores[0:n]
-	
 def recommend(prefs,term,similarity = sim_distance):
 	#This function returns the documents which will be closer to the given document
 	each_item_total = {}
@@ -1964,7 +1950,7 @@ def recommend(prefs,term,similarity = sim_distance):
 
 	
 # 	return render(request,'ndf/semantic_search.html',{"groupid":group_id})
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_nearby_words(request,group_id):
 	td_doc()
 	prefs = generate_big_dict()
@@ -2005,7 +1991,6 @@ def get_nearby_words(request,group_id):
 	context_to_return['search_type'] = SEMANTIC_SEARCH
 
 	return render(request, 'ndf/search_page.html', context_to_return)
-	
 def sort_n_avg(l):
 	"""
 		Helper Function for: get_nearby_words()

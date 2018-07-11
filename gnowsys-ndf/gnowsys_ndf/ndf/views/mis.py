@@ -14,6 +14,9 @@ from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 # from mongokit import paginator
 
 try:
@@ -34,6 +37,7 @@ from gnowsys_ndf.ndf.views.methods import get_execution_time
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     custom view for custom GAPPS
@@ -350,6 +354,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     create new instance of app_set of apps view for custom GAPPS
@@ -805,6 +810,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Redirects to student_enroll function of person-view.
@@ -841,6 +847,7 @@ def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_mis_reports(request, group_id, **kwargs):
     title = "Reports"
     group_name, group_id = get_group_name_id(group_id)

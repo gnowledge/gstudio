@@ -9,7 +9,8 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from mongokit import paginator
 
 try:
@@ -34,6 +35,7 @@ app = node_collection.one({'name': u'Topics', '_type': 'GSystemType'})
 #######################################################################################################################################
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def curriculum(request, group_id, app_id=None, app_set_id=None):
 
     try:
@@ -52,10 +54,10 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
     # Code for user shelf
     shelves = []
     shelf_list = {}
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
     # --- shelf commented for time being ---
-    # 
+    #
     # if auth:
     #   has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
     #   shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
@@ -63,7 +65,7 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
 
     #   if shelf:
     #     for each in shelf:
-    #         shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
+    #         shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
     #         shelves.append(shelf_name)
 
     #         shelf_list[shelf_name.name] = []
@@ -91,18 +93,18 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
 
     # topics_GST = node_collection.find_one({'_type': 'GSystemType', 'name': 'Topics'})
     topics_GST = app
-    
+
     if unfold_tree:
         unfold = unfold_tree
-    
+
     if app_set_id:
         themes_list_items = True
         app_GST = node_collection.find_one({"_id": ObjectId(app_set_id)})
-        
+
         if app_GST:
             title = theme_GST.name
             nodes = list(node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
-            
+
             nodes_dict = []
             for each in nodes:
                 nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
@@ -122,7 +124,7 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
         # else:
         #     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
-        
+
     lang = list(get_language_tuple(request.LANGUAGE_CODE))
     nodes_dict = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}, 'language': lang})
 
@@ -134,11 +136,11 @@ def curriculum(request, group_id, app_id=None, app_set_id=None):
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
                                 'appId':app._id,
                                },
-                             
+
                               context_instance = RequestContext(request)
-    )       
+    )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def list_themes(request, group_id):
 
     try:
@@ -147,15 +149,15 @@ def list_themes(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     title = theme_GST.name
-    
+
     nodes = node_collection.find({
         'member_of': {'$all': [theme_GST._id]},
         'group_set':{'$all': [ObjectId(group_id)]}
         },
         {'_id': 1, 'name': 1, 'created_by': 1, 'created_at': 1})
-    
+
     return render_to_response("ndf/list_themes.html",
-                            { 
+                            {
                                 'groupid': group_id,
                                 'group_id': group_id,
                                 'nodes': nodes,
@@ -163,7 +165,7 @@ def list_themes(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def curriculum_list(request, group_id):
 
     try:
@@ -172,14 +174,14 @@ def curriculum_list(request, group_id):
         group_name, group_id = get_group_name_id(group_id)
 
     title = theme_GST.name
-    
+
     nodes = node_collection.find({
         'member_of': {'$all': [theme_GST._id]},
         'group_set':{'$all': [ObjectId(group_id)]}
         })
-    
+
     return render_to_response("ndf/curriculum_listing.html",
-                            { 
+                            {
                                 'groupid': group_id,
                                 'group_id': group_id,
                                 'nodes': nodes,
@@ -187,6 +189,7 @@ def curriculum_list(request, group_id):
                             },
                             context_instance = RequestContext(request) )
 
+@cache_control(must_revalidate=True, max_age=6)
 def curriculum_create_edit(request, group_id,curriculum_id=None):
     def _update_curr_hierarchy(hierarchy_obj):
         # d is list fo dict
@@ -226,8 +229,8 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
             theme_gs_obj = node_collection.collection.GSystem()
             theme_gs_obj.fill_gstystem_values(request=request,
                                     name=str(curr_name),
-                                    group_set=group_id,content_org=unicode(curr_desc),member_of=theme_GST._id) 
-            theme_gs_obj.save(group_id=group_id)           
+                                    group_set=group_id,content_org=unicode(curr_desc),member_of=theme_GST._id)
+            theme_gs_obj.save(group_id=group_id)
             return HttpResponse(theme_gs_obj._id)
     else:
             # data = ""
@@ -256,7 +259,7 @@ def curriculum_create_edit(request, group_id,curriculum_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def delete_theme(request, group_id, theme_id):
 
     try:
@@ -279,6 +282,7 @@ list_trans_coll = []
 coll_set_dict={}
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     #####################
@@ -299,8 +303,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     except:
         group_name, group_id = get_group_name_id(group_id)
 
-    ###################### 
-    
+    ######################
+
     nodes_dict = []
     create_edit = True
     themes_hierarchy = False
@@ -315,7 +319,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     nodes_list = []
     parent_nodes_collection = ""
     translate=request.GET.get('translate','')
-    
+
     app_GST = node_collection.find_one({"_id":ObjectId(app_set_id)})
     if app_GST._id != theme_GST._id:
     	app_obj = node_collection.one({'_id': ObjectId(app_GST.member_of[0])})
@@ -328,8 +332,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     shelves = []
     shelf_list = {}
-    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-    
+    auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
     if auth:
       has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
       shelf = triple_collection.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': has_shelf_RT._id})
@@ -337,10 +341,10 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
       if shelf:
         for each in shelf:
-            shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
+            shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
             shelves.append(shelf_name)
 
-            shelf_list[shelf_name.name] = []         
+            shelf_list[shelf_name.name] = []
             for ID in shelf_name.collection_set:
               shelf_item = node_collection.one({'_id': ObjectId(ID) })
               shelf_list[shelf_name.name].append(shelf_item.name)
@@ -348,11 +352,11 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
       else:
         shelves = []
 
-	
+
     if request.method == "POST":
- 
+
         if app_GST:
-            
+
             create_edit = True
             themes_list_items = ""
             root_themes = []
@@ -363,25 +367,25 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             prior_node_list = request.POST.get('prior_node_list','')
             teaches_list = request.POST.get('teaches_list','')
             assesses_list = request.POST.get('assesses_list','')
-	    
-            
+
+
             # To find the root nodes to maintain the uniquness while creating and editing themes
             nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
             for each in nodes:
                 if each.collection_set:
                     for k in each.collection_set:
                         nodes_list.append(k)
-                        
+
             nodes.rewind()
             for each in nodes:
                 if each._id not in nodes_list:
                     root_themes.append(each.name)
                     root_themes_id.append(each._id)
 
-            
+
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == "true":
                 # For creating new themes & Topics
-                themes_list_items = False				
+                themes_list_items = False
                 create_edit = False
                 themes_hierarchy = False
                 themes_cards = True
@@ -398,7 +402,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             coll_set1=get_coll_set(app_GST._id)
                             for each in coll_set1:
                                 theme_topic_node = node_collection.collection.GSystem()
-                            
+
                                 if "Theme" in each.member_of_names_list:
                                     app_obj = theme_GST
                                 if "theme_item" in each.member_of_names_list:
@@ -426,63 +430,63 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                         sub_node = node_collection.one({'_id':ObjectId(str(n))})
                                         parent_node.collection_set.append(sub_node._id)
                                         parent_node.save(groupid=group_id)
-                                        
 
-                        
-                
+
+
+
                 # To return themes card view for listing theme nodes after creating new Themes
                 nodes.rewind()
                 nodes_dict = nodes
-				
+
             else:
-                themes_list_items = False				
+                themes_list_items = False
                 create_edit = False
                 themes_hierarchy = True
 
                 theme_topic_node = node_collection.one({'_id': ObjectId(app_GST._id)})
-                
-                # For edititng themes 
+
+                # For edititng themes
                 if theme_GST._id in app_GST.member_of and translate != "true":
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme name
-                    root_themes = [] 
+                    root_themes = []
                     nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:
                         root_themes.append(each.name)
-                                
+
                     if name:
                         if name.upper() != theme_topic_node.name.upper():
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                 # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)
-                                
+
                         else:
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST),groupid=group_id)
-                            
+
 
                     if translate != "true":
                         # For storing and maintaning collection order
                         if collection_list != '':
                             theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
-                            
+
                         i = 0
                         while (i < len(collection_list)):
                             node_id = ObjectId(collection_list[i])
-                            
+
                             if node_collection.one({"_id": node_id}):
                                 theme_topic_node.collection_set.append(node_id)
-                                
+
                             i = i+1
-                            
-                        theme_topic_node.save(groupid=group_id) 
-                       
+
+                        theme_topic_node.save(groupid=group_id)
+
                         # End of storing collection
 
                     title = theme_GST.name
                     nodes.rewind()
                     nodes_dict = nodes
-                    # This will return to Themes Hierarchy  
-                    themes_list_items = False               
+                    # This will return to Themes Hierarchy
+                    themes_list_items = False
                     create_edit = False
                     themes_hierarchy = False
                     themes_cards = True
@@ -494,13 +498,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     dict_drawer = {}
                     dict2 = []
                     node = app_GST
-                    prior_theme_collection = [] 
+                    prior_theme_collection = []
                     parent_nodes_collection = ""
                     # To display the theme-topic drawer while create or edit theme
                     checked = "theme_item"
                     # drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 
-                    # Code for fetching drawer2 
+                    # Code for fetching drawer2
                     for k in node.collection_set:
                         obj = node_collection.one({'_id': ObjectId(k) })
                         dict2.append(obj)
@@ -511,7 +515,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of code for drawer2
 
                     drawer = dict_drawer['2']
-                    
+
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme item
                     nodes = node_collection.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:
@@ -519,11 +523,11 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             for k in each.collection_set:
                                 prior_theme = node_collection.one({'_id': ObjectId(k) })
                                 prior_theme_collection.append(prior_theme.name)
-                                
-                    parent_nodes_collection = json.dumps(prior_theme_collection)   
+
+                    parent_nodes_collection = json.dumps(prior_theme_collection)
 
                     if not prior_theme_collection:
-                        root_nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})     
+                        root_nodes = node_collection.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                         for k in root_nodes:
                             if app_GST._id in k.collection_set:
                                 root_themes = []
@@ -531,152 +535,152 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 for l in k.collection_set:
                                     objs = node_collection.one({'_id': ObjectId(l)})
                                     root_themes.append(objs.name)
-                                    root_themes_id.append(objs._id) 
+                                    root_themes_id.append(objs._id)
                     # End of finding unique theme names for editing name
-                    
+
                     # For adding a sub-theme-items and maintianing their uniqueness within their context
                     nodes_list = []
                     for each in app_GST.collection_set:
                         sub_theme = node_collection.one({'_id': ObjectId(each) })
                         nodes_list.append(sub_theme.name)
-                    
+
                     nodes_list = json.dumps(nodes_list)
                     # End of finding unique sub themes
 
-                                
+
                     if name:
                         if name.upper() != theme_topic_node.name.upper():
-                            # If "Name" has changed 
+                            # If "Name" has changed
 
-                            if theme_topic_node._id in root_themes_id:  
+                            if theme_topic_node._id in root_themes_id:
                                 # If editing node in root theme items
                                 if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                     # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                     theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)
                             else:
-                                # If editing theme item in prior_theme_collection hierarchy 
-                                if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
+                                # If editing theme item in prior_theme_collection hierarchy
+                                if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection):
                                     # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id) 
-                           
+                                    theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)
+
                         else:
                             # If name not changed but other fields has changed
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)  
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_item_GST),groupid=group_id)
 
 
                     if translate != "true" and collection_list:
-                        # For storing and maintaning collection order         
+                        # For storing and maintaning collection order
                         if collection_list != '':
                             theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
-                            
+
                         i = 0
                         while (i < len(collection_list)):
                             node_id = ObjectId(collection_list[i])
-                            
+
                             if node_collection.one({"_id": node_id}):
                                 theme_topic_node.collection_set.append(node_id)
-                                
+
                             i = i+1
-                        theme_topic_node.save(groupid=group_id) 
+                        theme_topic_node.save(groupid=group_id)
                         # End of storing collection
 
-                    # This will return to Themes items edit  
+                    # This will return to Themes items edit
                     if theme_topic_node:
                         theme_topic_node.reload()
                         node = theme_topic_node
                         create_edit = True
                         themes_hierarchy = False
-                        
-                        
+
+
                 # For editing topics
                 elif topic_GST._id in app_GST.member_of:
                     root_topics = []
                     nodes_list = []
-                    
+
                     # To find the root nodes to maintain the uniquness while creating and editing topics
                     nodes = node_collection.find({'member_of': {'$all': [topic_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:
                         if each.collection_set:
                             for k in each.collection_set:
                                 nodes_list.append(k)
-                                
+
                     nodes.rewind()
                     for each in nodes:
                         if each._id not in nodes_list:
                             root_topics.append(each.name)
                     # End of finding the root nodes
-                    
+
                     if name:
                         if theme_topic_node.name != name:
                             topic_name = theme_topic_node.name
                             if not name.upper() in (theme_name.upper() for theme_name in root_topics):
 
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
-                                
+
                             elif topic_name.upper() == name.upper():
-                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)               
-                                
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
+
                         else:
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST),groupid=group_id)
-                                                                                                                
+
                         if collection_list:
                             # For storing and maintaning collection order
                             if collection_list != '':
                                 theme_topic_node.collection_set = []
                                 collection_list = collection_list.split(",")
-            
+
                             i = 0
                             while (i < len(collection_list)):
                                 node_id = ObjectId(collection_list[i])
-                                
+
                                 if node_collection.one({"_id": node_id}):
                                     theme_topic_node.collection_set.append(node_id)
-                                    
+
                                 i = i+1
                             theme_topic_node.save(groupid=group_id)
-                            
-                        title = topic_GST.name 
-                        
+
+                        title = topic_GST.name
+
                         # To fill the metadata info while creating and editing topic node
-                        metadata = request.POST.get("metadata_info", '') 
+                        metadata = request.POST.get("metadata_info", '')
                         if metadata:
                           # Only while metadata editing
                           if metadata == "metadata":
                             if theme_topic_node:
                               get_node_metadata(request,theme_topic_node)
                         # End of filling metadata
-                        
-                        
+
+
                         if prior_node_list != '':
                             theme_topic_node.prior_node = []
                             prior_node_list = prior_node_list.split(",")
-                            
+
                         i = 0
                         while (i < len(prior_node_list)):
                             node_id = ObjectId(prior_node_list[i])
                             if node_collection.one({"_id": node_id}):
                                 theme_topic_node.prior_node.append(node_id)
-                                
+
                             i = i+1
-                        
+
 
                         theme_topic_node.save(groupid=group_id)
-                        
+
                         if teaches_list !='':
                             teaches_list=teaches_list.split(",")
-                            
+
                             create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
-                        
-                        
-                        
+
+
+
                         if assesses_list !='':
                             assesses_list=assesses_list.split(",")
-                            
-                            create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
-				
 
-                        # This will return to edit topic  
+                            create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
+
+
+                        # This will return to edit topic
                         if theme_topic_node:
                             theme_topic_node.reload()
                             node = theme_topic_node
@@ -687,52 +691,52 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     else:
         app_node = None
         nodes_list = []
-        
+
         app_GST = node_collection.find_one({"_id":ObjectId(app_set_id)})
         # print "\napp_GST in else: ",app_GST.name,"\n"
-        
+
         if app_GST:
             # For adding new Theme & Topic
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
                 title = app_GST.name
                 node = ""
                 root_themes = []
-            
+
                 # To find the root nodes to maintain the uniquness while creating new themes
                 nodes = node_collection.find({'member_of': {'$all': [app_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                 for each in nodes:
                     if each.collection_set:
                         for k in each.collection_set:
                             nodes_list.append(k)
-                            
+
                 nodes.rewind()
                 for each in nodes:
                     if each._id not in nodes_list:
                         root_themes.append(each.name)
-                        
-                        
+
+
                 root_themes = json.dumps(root_themes)
                 nodes_list = root_themes
                 # End of finding unique root level Themes
-                
+
             else:
 
                 if theme_GST._id in app_GST.member_of:
                     title = "Theme"
                     node = app_GST
-                    prior_theme_collection = [] 
+                    prior_theme_collection = []
                     parent_nodes_collection = ""
                     drawer = []
                 # End of editing Themes
-                    
-                
+
+
                 # For editing theme item
                 if theme_item_GST._id in app_GST.member_of:
                     title = "Theme Item"
                     dict_drawer = {}
                     dict2 = []
                     node = app_GST
-                    prior_theme_collection = [] 
+                    prior_theme_collection = []
                     parent_nodes_collection = ""
                     # To display the theme-topic drawer while create or edit theme
                     checked = "theme_item"
@@ -744,7 +748,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     dict_drawer['2'] = dict2
 
                     drawer = dict_drawer['2']
-                    
+
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme name
                     nodes = node_collection.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:
@@ -752,23 +756,23 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             for k in each.collection_set:
                                 prior_theme = node_collection.one({'_id': ObjectId(k) })
                                 prior_theme_collection.append(prior_theme.name)
-                                
-                    parent_nodes_collection = json.dumps(prior_theme_collection)	
+
+                    parent_nodes_collection = json.dumps(prior_theme_collection)
                     # End of finding unique theme names for editing name
-                    
+
                     # For adding a sub-themes and maintianing their uniqueness within their context
                     for each in app_GST.collection_set:
                         sub_theme = node_collection.one({'_id': ObjectId(each) })
                         nodes_list.append(sub_theme.name)
-                        
+
                     nodes_list = json.dumps(nodes_list)
                     # End of finding unique sub themes
-                    
+
                 # for editing topic
                 elif topic_GST._id in app_GST.member_of:
                     title = topic_GST.name
                     node = app_GST
-                    prior_theme_collection = [] 
+                    prior_theme_collection = []
                     parent_nodes_collection = ""
 
                     node.get_neighbourhood(node.member_of)
@@ -780,7 +784,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             for k in each.collection_set:
                                 prior_theme = node_collection.one({'_id': ObjectId(k) })
                                 prior_theme_collection.append(prior_theme.name)
-                                
+
                     parent_nodes_collection = json.dumps(prior_theme_collection)
                     # End of finding unique theme names for editing name
 
@@ -788,12 +792,12 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 global list_trans_coll
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
-                print LANGUAGES 
+                print LANGUAGES
                 return render_to_response("ndf/translation_page.html",
 	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
 	        )
-        
+
     if title == "Topic":
         return render_to_response("ndf/node_edit_base.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
@@ -804,7 +808,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LANGUAGES
 
                        },context_instance = RequestContext(request)
-                              
+
         )
 
     return render_to_response("ndf/curriculum.html",
@@ -816,7 +820,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LANGUAGES
 
                        },context_instance = RequestContext(request)
-                              
+
     )
 
 
@@ -824,24 +828,25 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 def get_coll_set(node):
   obj = node_collection.one({'_id': ObjectId(node)})
   #print obj.member_of_names_list
-  if "Topic" not in obj.member_of_names_list:  
+  if "Topic" not in obj.member_of_names_list:
       if  obj.collection_set:
           if obj not in list_trans_coll:
               list_trans_coll.append(obj)
           for each in obj.collection_set:
               n = node_collection.one({'_id':each})
-              if "Topic" not in n.member_of_names_list:  
-  
+              if "Topic" not in n.member_of_names_list:
+
                   if n not in list_trans_coll:
                       list_trans_coll.append(n)
                       if n.collection_set:
-                          if "Topic" not in n.member_of_names_list:  
-  
+                          if "Topic" not in n.member_of_names_list:
+
                               get_coll_set(n._id)
   return list_trans_coll
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def topic_detail_view(request, group_id, app_Id=None):
 
   try:
@@ -869,7 +874,7 @@ def topic_detail_view(request, group_id, app_Id=None):
     for each in nav_l:
         each_obj = node_collection.one({'_id': ObjectId(each) })
         # Theme object needs to be added in breadcrumbs for full navigation path from theme to topic
-        # "nav_l" doesnt includes theme object since its not in tree hierarchy level, 
+        # "nav_l" doesnt includes theme object since its not in tree hierarchy level,
         # hence Match the first element and get its prior node which is theme object, to include it in breadcrumbs list
         # print "!!!!!!!!! ", each_obj.name
         if each == nav_l[0]:
@@ -892,7 +897,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   #a temp. variable which stores the lookup for append method
   shelves_append_temp=shelves.append
   shelf_list = {}
-  auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+  auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })
 
   if auth:
 	  has_shelf_RT = node_collection.one({'_type': 'RelationType', 'name': u'has_shelf' })
@@ -901,7 +906,7 @@ def topic_detail_view(request, group_id, app_Id=None):
 
 	  if shelf:
 	    for each in shelf:
-	        shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)}) 
+	        shelf_name = node_collection.one({'_id': ObjectId(each.right_subject)})
 	        shelves_append_temp(shelf_name)
 
 	        shelf_list[shelf_name.name] = []
@@ -913,17 +918,17 @@ def topic_detail_view(request, group_id, app_Id=None):
 
 	  else:
 	    shelves = []
-  
+
   # print "theme_id: ", theme_id
-  return render_to_response('ndf/topic_details.html', 
+  return render_to_response('ndf/topic_details.html',
 	                                { 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
 	                                  'group_id': group_id,'shelves': shelves,'topic': topic, 'nav_list':nav_li,
-	                                  'groupid':group_id,'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list 
+	                                  'groupid':group_id,'shelf_list': shelf_list,'breadcrumbs_list': breadcrumbs_list
 	                                },
 	                                context_instance = RequestContext(request)
   )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_filtered_topic_resources(request, group_id, node_id):
 
     selfilters = request.POST.get('filters', None)
@@ -939,7 +944,7 @@ def get_filtered_topic_resources(request, group_id, node_id):
                                         'relation_set.taught_by': 1, '_id': 0
                                     }
                                 )
-    
+
     node_rel_list = node_rel_cur.relation_set[0].get('taught_by', [])
 
     filtered_taught_by_res = node_collection.find({
@@ -985,8 +990,8 @@ def get_filtered_topic_resources(request, group_id, node_id):
     # return HttpResponse({'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse })
 
 
-    return render_to_response('ndf/curriculum_resources_listing.html', 
-                                    { 
+    return render_to_response('ndf/curriculum_resources_listing.html',
+                                    {
                                     'primary_lang_resources': primary_lang_resources, 'other_lang_resources': other_lang_resources, 'all_educationaluse': all_educationaluse,
                                     # 'node': obj,'app_id': app_id,"theme_id": theme_id, "prior_obj": prior_obj,
                                       'group_id': group_id,'groupid':group_id,
@@ -997,9 +1002,8 @@ def get_filtered_topic_resources(request, group_id, node_id):
                                     context_instance = RequestContext(request)
                             )
 
-
 def get_curriculum_hierarchy(currciculum_obj):
-    
+
     curriculum_structure = []
     if currciculum_obj:
         for each in currciculum_obj.collection_set:
@@ -1009,7 +1013,7 @@ def get_curriculum_hierarchy(currciculum_obj):
                 section_dict['name'] = section.name
                 section_dict['id'] = str(section._id)
                 section_dict['type'] = 'branch'
-                section_dict['children'] = [] 
+                section_dict['children'] = []
                 if section.collection_set:
                     for each_section in section.collection_set:
                         subsection_dict ={}
@@ -1019,14 +1023,14 @@ def get_curriculum_hierarchy(currciculum_obj):
                             subsection_dict['name'] = subsection.name
                             subsection_dict['type'] = 'division'
                             subsection_dict['id'] = str(subsection._id)
-                            if "Topic" in subsection.member_of_names_list: 
+                            if "Topic" in subsection.member_of_names_list:
                                 # subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
                                 subsection_dict['isLeaf'] = True
                             else:
                                 subsection_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
-                            
+
                             if subsection.collection_set:
-                                for each_subsection in subsection.collection_set:   
+                                for each_subsection in subsection.collection_set:
                                     subsection_1_dict = {}
                                     subsection_1 = Node.get_node_by_id(each_subsection)
                                     if subsection_1:
@@ -1034,7 +1038,7 @@ def get_curriculum_hierarchy(currciculum_obj):
                                         subsection_1_dict['name'] = subsection_1.name
                                         subsection_1_dict['type'] = 'division'
                                         subsection_1_dict['id'] = str(subsection_1._id)
-                                        if "Topic" in subsection_1.member_of_names_list: 
+                                        if "Topic" in subsection_1.member_of_names_list:
                                             # subsection_1_dict['children'].append({"name":"Add Division","class":"create_division","type":"division"})
                                             subsection_1_dict['isLeaf'] = True
                                         else:
@@ -1047,7 +1051,6 @@ def get_curriculum_hierarchy(currciculum_obj):
                 curriculum_structure.append(section_dict)
         curriculum_structure.append({"name":"Add Branch","class":"create_branch"})
     return curriculum_structure
-
 
 @get_execution_time
 def get_collection_list(collection_list, node):
@@ -1071,8 +1074,8 @@ def get_collection_list(collection_list, node):
                             else:
                                 inner_list_append_temp(inner_sub_dict)
 
-                            cl.update({'children': inner_list })                        
-            else:        
+                            cl.update({'children': inner_list })
+            else:
                 error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
                 print "\n " + error_message
         inner_list.append({"name":"Add Division","class":"create_division","type":"division"})
