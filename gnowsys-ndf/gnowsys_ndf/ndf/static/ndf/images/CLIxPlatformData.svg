@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="650" height="500" version="1.1" viewBox="0 0 650.00001 500.00001" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <marker id="h" overflow="visible" orient="auto">
+   <path transform="scale(.2) translate(7.4 1)" d="m-2.5-1c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill="#62d5e9" fill-rule="evenodd" stroke="#62d5e9" stroke-width="1pt"/>
+  </marker>
+  <marker id="g" overflow="visible" orient="auto">
+   <path transform="scale(.2) translate(7.4 1)" d="m-2.5-1c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill="#62d5e9" fill-rule="evenodd" stroke="#62d5e9" stroke-width="1pt"/>
+  </marker>
+  <marker id="e" overflow="visible" orient="auto">
+   <path transform="scale(.2) translate(7.4 1)" d="m-2.5-1c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill="#62d5e9" fill-rule="evenodd" stroke="#62d5e9" stroke-width="1pt"/>
+  </marker>
+  <filter id="f" x="-.068536" y="-.10456" width="1.1371" height="1.2091" color-interpolation-filters="sRGB">
+   <feGaussianBlur stdDeviation="13.463792"/>
+  </filter>
+ </defs>
+ <g transform="translate(0 -552.36)">
+  <rect y="552.36" width="650" height="500" fill="#6dd4c7"/>
+ </g>
+ <rect x="89.262" y="110.62" width="471.48" height="309.03" ry="0" fill-opacity=".090426" filter="url(#f)"/>
+ <rect x="89.262" y="95.484" width="471.48" height="309.03" ry="0" fill="#fff"/>
+ <rect x="89.262" y="95.484" width="471.48" height="16.293" fill="#ededed"/>
+ <circle cx="97.408" cy="103.63" r="2.812" fill="#62d5e9"/>
+ <circle cx="114.28" cy="103.63" r="2.812" fill="#ff8d72"/>
+ <circle cx="105.84" cy="103.63" r="2.812" fill="#58f9a2"/>
+ <g transform="matrix(.78849 0 0 .78849 -57.868 14.298)">
+  <path d="m438.93 275.9a92.148 92.148 0 0 1 -84.776 91.853 92.148 92.148 0 0 1 -98.341 -77.156l90.969-14.697z" fill="#58f9a2"/>
+  <path d="m264.69 225.71a92.148 92.148 0 0 1 66.136 -45.138l13.719 91.121z" fill="#ff8d72"/>
+  <path d="m337.94 181.3a92.148 92.148 0 0 1 70.338 21.558 92.148 92.148 0 0 1 32.142 66.175l-92.069 3.8257z" fill="#62d5e9"/>
+  <path d="m244.21 287.21a92.148 92.148 0 0 1 -0.55826 -15.453l92.043 4.4113z" fill-opacity=".090196"/>
+  <path d="m247.94 265.78a92.148 92.148 0 0 1 10.38 -35.315l81.437 43.12z" fill="#f0ef94"/>
+ </g>
+ <g transform="translate(3.8713)">
+  <rect x="384.03" y="273.49" width="24.768" height="31.011" fill="#ff8d72"/>
+  <rect x="418.43" y="257.38" width="24.768" height="47.122" fill="#62d5e9"/>
+  <rect x="452.83" y="268.93" width="24.768" height="35.571" fill="#f0ef94"/>
+  <rect x="487.23" y="208.29" width="24.768" height="96.213" fill="#58f9a2"/>
+ </g>
+ <path d="m134.13 362.6 54.533-15.812 54.533 13.086 54.533 9.2694 54.533-25.082 54.533 11.45 54.533 0.54525 54.533-14.177" fill="none" marker-end="url(#g)" marker-mid="url(#e)" marker-start="url(#h)" stroke="#62d5e9" stroke-width="3"/>
+</svg>
