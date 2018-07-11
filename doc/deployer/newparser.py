@@ -9,7 +9,7 @@ stack=["/explore/courses"]
 visited=[]
 browser = webdriver.Firefox()
 
-while(len(stack)>0 and len(visited)<2):
+while(len(stack)>0):
     str=stack.pop()
     visited.append(str)
     print(str)
