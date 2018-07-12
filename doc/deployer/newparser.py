@@ -1,18 +1,22 @@
 #newparser
 import logging
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from collections import deque
 from bs4 import BeautifulSoup
 
-url="doer.metastudio.org"
+url="http://doer.metastudio.org"
 stack=["/explore/courses"]
 visited=[]
-browser = webdriver.Firefox()
+options=Options()
+options.add_argument("--headless")
+browser = webdriver.Firefox(firefox_options=options)
 
-while(len(stack)>0):
+
+while(len(stack)>0 and len(visited)<100000):
     str=stack.pop()
     visited.append(str)
-    print(str)
+    #print(str)
     print(url+str)
     print(len(visited))
 
