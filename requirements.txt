@@ -65,5 +65,10 @@ checksumdir==1.1.0
 cryptography==1.4
 diskcache==3.0.1
 
+# dependencies for full-site caching script
+firefox==61.0
+selenium==3.13.0
+geckodriver==0.20.1
+
 # version needed to overwrite on all above intermediate installs
 pymongo==2.8
