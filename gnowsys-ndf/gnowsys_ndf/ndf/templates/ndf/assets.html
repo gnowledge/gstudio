@@ -14,13 +14,14 @@
  -->    
     {% include 'ndf/widget_user_access_modal.html' %}
        <div class ="row">
-           
+           {% comment %}
             {% if title == "raw material" and is_gstaff %}
                 <input type="hidden"  class="title-for-filters" value="raw_material_lms">
                 {% get_course_filters group_id "raw_material_lms" as filter_dict %}
                 {% include "ndf/filters.html" with filter_dict=filter_dict %}
 
             {% endif %}
+            {% endcomment %}
             {% if title == "gallery"  %}
                 <input type="hidden"  class="title-for-filters" value="gallery_lms">
                 {% get_course_filters group_id "gallery_lms" as filter_dict %}
@@ -36,11 +37,13 @@
        
         <div class="row">
         {% if user.is_authenticated  %}
+          {% comment %}
             {% if title == "raw material" and is_gstaff %}
                 <button type="button" class="right orange-button createAsset" style="margin-right:70px;">
                     <i class="fi-plus"> </i>{% trans "Add Folder" %} 
                 </button>
             {% endif %}
+            {% endcomment %}
             {% if title == "gallery"  %}
                 <button {% if user_access_priv == "allow" %} type="button" class="right orange-button createAsset" style="margin-right:70px;" {% else %} class=" right orange-button user_not_enrolled" {% endif %}>
                     <i class="fi-plus"> </i>{% trans "Add Folder" %} 

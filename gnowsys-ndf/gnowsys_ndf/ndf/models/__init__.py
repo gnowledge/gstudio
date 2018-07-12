@@ -19,7 +19,7 @@ from .history_manager import *
 from .analytics import *
 from .models_utils import *
 from .db_utils import *
-
+from gnowsys_ndf.tasks import *
 
 node_collection = db["Nodes"].Node
 triple_collection = db["Triples"].Triple

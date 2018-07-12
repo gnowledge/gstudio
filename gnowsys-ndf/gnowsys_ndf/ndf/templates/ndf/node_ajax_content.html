@@ -713,7 +713,7 @@ Still keeping for future ref (if needed).
                 {% endif %}
             {% endif %}                   
 
-            
+            {% comment %}
 
 <!--             {% if node.if_file.mime_type %}
                 {% if not node.collection_set and "Jsmol" not in node.member_of_names_list%}
@@ -740,7 +740,7 @@ Still keeping for future ref (if needed).
 
 
             {% endif %} -->
-            {% comment %}
+
           {%  else %}
             {% if node.if_file.mime_type and "Jsmol" not in node.member_of_names_list %}
               {% if 'video' in node.if_file.mime_type  %}

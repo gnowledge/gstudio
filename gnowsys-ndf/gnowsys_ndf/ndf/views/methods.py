@@ -114,18 +114,22 @@ def get_execution_time(f):
             path = unicode(args[0].path)
             # except :
             #     pass
-
-        record_in_benchmark(kwargs_len=len(kwargs),
-                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
-                            total_param_size=None,
-                            post_bool=post_bool,
-                            get_bool=get_bool,
-                            sessionid=sessionid,
-                            user_name=user_name,
-                            path=path,
-                            funct_name=f.func_name,
-                            time_taken=unicode(str(time2 - time1))
-                        )
+        kwargs_len = len(kwargs)
+        total_param_size=None
+        post_bool=post_bool
+        get_bool=get_bool
+        sessionid=sessionid
+        user_name=user_name
+        path=path
+        funct_name=f.func_name
+        time_taken=unicode(str(time2 - time1))
+        record_in_benchmark.apply_async((kwargs_len,total_param_size,post_bool,
+                            get_bool,
+                            sessionid,
+                            user_name,
+                            path,
+                            funct_name,
+                            time_taken), countdown=1)
         return ret
     return wrap
 
