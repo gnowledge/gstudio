@@ -31829,3 +31829,11 @@ div.card.show {
     margin-left: 70px;
   }
 }
+
+/* line 8643, ../../../scss/_app_styles.scss */
+.login-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  margin: 100px 0;
+  padding: 40px 20px 0 20px;
+}

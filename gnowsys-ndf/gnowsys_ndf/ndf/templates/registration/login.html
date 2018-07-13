@@ -22,15 +22,18 @@ position: relative !important;
 {% url 'auth_password_reset' as auth_pwd_reset_url %}
 {% url 'registration_register' as register_url %}
 
-<div class="row" style="margin: 1.2rem 0;">
-	<div class="small-8 medium-8 large-8 small-centered medium-centered large-centered columns">
-		<div class="row">
-			<div class="small-8 medium-8 large-8  end text-center">
+<div class="row">
+	<div class="small-12 medium-10 large-10 large-offset-1 medium-offset-1 columns">
+<!-- 		<div class="row">
+			<div class="small-12 medium-8 large-8  end text-center small-centered medium-centered large-centered columns">
 				<h2 class="text-center">{% trans "Log In" %}</h2>
 			</div>
-		</div>
+		</div> -->
 
-		<div class="small-12 medium-6 large-6 small-centered medium-centered large-centered columns">
+		<div class="small-12 medium-6 large-6 large-offset-4 medium-offset-3 small-centered medium-centered large-centered columns">
+			
+			 <div class="login-box">
+			 <div class="row">	
 			<br/>
 			{% if form.errors %}
 			<small class="small-10 medium-8 large-8 small-centered medium-centered columns error all-error">{% trans "Either your email or password is incorrect !" %}</small>
@@ -48,7 +51,7 @@ position: relative !important;
 				<!-- Email -->
 			{% if site.SITE_NAME == "NROER" %}
 				<div class="row">
-					<div class="small-10 medium-8 large-8 columns end">
+					<div class="small-10 medium-8 large-8 small-centered medium-centered columns end">
 						<label class="left">
 							<center>{{error_msg_flag}}</center>
 							E-mail 
@@ -57,7 +60,7 @@ position: relative !important;
 				</div>
 			{% else %}
 				<div class="row">
-					<div class="small-10 medium-8 large-8 columns end">
+					<div class="small-10 medium-8 large-8 small-centered medium-centered  columns end">
 						<label class="left">
 							E-mail or {{ form.username.label }} 
 						</label>
@@ -65,7 +68,7 @@ position: relative !important;
 				</div>
 			{% endif %}
 				<div class="row">
-					<div class="small-10 medium-8 large-8 columns end">
+					<div class="small-10 medium-8 large-8 small-centered medium-centered columns columns end">
 						<!-- {{ form.username }} -->
 						<input type="text" id="username" name="username"  placeholder="Email">
 					</div>
@@ -73,7 +76,7 @@ position: relative !important;
 
 				<!-- Password -->
 				<div class="row">
-					<div class="small-10 medium-10 large-4 columns">
+					<div class="small-10 medium-10 large-8 small-centered medium-centered columns">
 						<label class="left">
 							Password
 							<!-- {{ form.password.label_tag }} -->
@@ -82,13 +85,13 @@ position: relative !important;
 					
 				</div>
 				<div class="row">
-					<div class="small-10 medium-8 large-8 columns end">
+					<div class="small-10 medium-8 large-8 small-centered medium-centered columns end">
 						<!-- {{ form.password }} -->
 						<input type="password" name="password" id="password" placeholder="Password">
 					</div>
 				</div>
 				<div class="row">
-					<div class="medium-6 large-6 small-text-left  medium-offset-2 large-offset-2 columns end">
+					<div class="small-10 medium-8 large-10 small-text-left small-centered medium-centered medium-offset-2 large-offset-2 columns end">
 						<label>
 							<a title={% trans "Recover your password" %} href="{{ auth_pwd_reset_url }}">{% trans "Forgot your password?" %}</a>
 						</label>
@@ -96,7 +99,7 @@ position: relative !important;
 				</div>
 				{% get_is_captcha_visible as is_captcha %}
 				{% if is_captcha %}
-				<div class = "captcha-feild">
+				<div class = "small-10 medium-8 large-10 small-text-left small-centered medium-centered medium-offset-2 large-offset-2 columns end captcha-feild">
 					{% include "ndf/Captcha.html" %}
 				</div>	
 				{% endif %}
@@ -110,16 +113,16 @@ position: relative !important;
 				<!-- Forgot password link & New Registration link -->
 				{# {% if site.SITE_NAME != "NROER" %}  #}
 				<div class="row">
-					<div class="small-6 medium-6 large-6 small-offset-3 large-offset-1 columns end">
+					<div class="small-10 medium-8 large-10 small-text-left small-centered medium-centered columns end">
 						<center>
 							<label>
-								<a title={% trans "Click here to register" %} href="{{ register_url }}">
+								<a title="Click here to register"  href="{{ register_url }}">
 									{% trans "Don't have an account? Register yourself now." %}
 								</a>
 							</label>
 							{% if site.SITE_NAME == "NROER" %}
 							<br/>
-							<a href="mailto:nroer.support@gnowledge.org">
+							<a href="mailto:nroer.support@gnowledge.org" title="Contact us">
 								Can't register? Contact us for help.
 							</a>  
 							{% endif %}
@@ -129,8 +132,8 @@ position: relative !important;
 				{# {% endif %} #}
 				<input type="hidden" name="next" value="{{ next }}" />
 			</form>
-
 		</div>
+		</div></div>
 	</div>
 	</div>
 	{% endblock %}
