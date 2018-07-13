@@ -8634,5 +8634,8 @@ div.card.show {
   margin-left: 0px;
     @media only screen and (max-width: 320px) {
       margin-left: 52px;
+    }
+    @media screen and (min-width: 321px) and (max-width: 850px) {
+      margin-left: 70px;
     }  
 } 

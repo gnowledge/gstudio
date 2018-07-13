@@ -31800,6 +31800,12 @@ div.card.show {
     margin-left: 52px;
   }
 }
+@media screen and (min-width: 321px) and (max-width: 850px) {
+  /* line 8633, ../../../scss/_app_styles.scss */
+  .reg-users-box {
+    margin-left: 70px;
+  }
+}
 
 /*
 *  CLIx Platform Stylesheet

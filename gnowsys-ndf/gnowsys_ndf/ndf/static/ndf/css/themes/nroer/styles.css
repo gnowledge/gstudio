@@ -23433,6 +23433,9 @@ th.hide-for-touch {
 /* line 6, ../../../scss/_nroer_styles.scss */
 .workspace {
   background: url("watermark.png") no-repeat 0% 88%;
+  /*    @media screen and (min-width: 321px) and (max-width: 850px) {
+          background: url("watermark.png") no-repeat 70% 70%;
+      }*/
   min-height: 100%;
   margin-bottom: -130px !important;
   margin-top: 0px;
@@ -23456,33 +23459,33 @@ th.hide-for-touch {
     margin-bottom: 20px !important;
   }
 }
-/* line 28, ../../../scss/_nroer_styles.scss */
+/* line 32, ../../../scss/_nroer_styles.scss */
 .workspace:after {
   content: "";
   display: block;
   height: 130px;
 }
 
-/* line 38, ../../../scss/_nroer_styles.scss */
+/* line 42, ../../../scss/_nroer_styles.scss */
 .landing {
   position: relative;
 }
-/* line 41, ../../../scss/_nroer_styles.scss */
+/* line 45, ../../../scss/_nroer_styles.scss */
 .landing h2 {
   margin-top: 2rem;
 }
 
-/* line 47, ../../../scss/_nroer_styles.scss */
+/* line 51, ../../../scss/_nroer_styles.scss */
 div.banner {
   padding: 0 2rem;
 }
-/* line 52, ../../../scss/_nroer_styles.scss */
+/* line 56, ../../../scss/_nroer_styles.scss */
 div.banner > * {
   background-color: #03a9f4;
   color: #eee;
   margin: 0;
 }
-/* line 54, ../../../scss/_nroer_styles.scss */
+/* line 58, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   margin: 0;
@@ -23490,7 +23493,7 @@ div.banner > * .slide {
   height: 24em !important;
   min-height: 50vh !important;
 }
-/* line 61, ../../../scss/_nroer_styles.scss */
+/* line 65, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .slide-back-image {
   position: absolute;
   font-size: 17rem;
@@ -23500,63 +23503,63 @@ div.banner > * .slide .slide-back-image {
   opacity: 0.08;
   right: 7%;
 }
-/* line 70, ../../../scss/_nroer_styles.scss */
+/* line 74, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box {
   font-size: 120%;
   font-size: 1.35vw;
   opacity: 0.8;
   padding-bottom: 1em;
 }
-/* line 76, ../../../scss/_nroer_styles.scss */
+/* line 80, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box .count {
   font-size: 1.75vw;
   padding-right: 5px;
 }
-/* line 80, ../../../scss/_nroer_styles.scss */
+/* line 84, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .count-box a {
   font-size: 1.35vw;
 }
-/* line 85, ../../../scss/_nroer_styles.scss */
+/* line 89, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .quotes {
   opacity: 0.75;
   font-family: "Times new Roman";
   font-size: 200%;
   font-size: 3vw;
 }
-/* line 92, ../../../scss/_nroer_styles.scss */
+/* line 96, ../../../scss/_nroer_styles.scss */
 div.banner > * .slide .slide-2-icons {
   opacity: 0.5;
   font-size: 280%;
   font-size: 3vw;
 }
-/* line 100, ../../../scss/_nroer_styles.scss */
+/* line 104, ../../../scss/_nroer_styles.scss */
 div.banner > * h2, div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 103, ../../../scss/_nroer_styles.scss */
+/* line 107, ../../../scss/_nroer_styles.scss */
 div.banner > * h2 {
   font-size: 280%;
   font-size: 3vw;
 }
-/* line 107, ../../../scss/_nroer_styles.scss */
+/* line 111, ../../../scss/_nroer_styles.scss */
 div.banner > * h3 {
   font-size: 180%;
   font-size: 2vw;
 }
-/* line 111, ../../../scss/_nroer_styles.scss */
+/* line 115, ../../../scss/_nroer_styles.scss */
 div.banner > * blockquote {
   font-size: 120%;
   font-size: 1.35vw;
   font-style: italic;
 }
-/* line 116, ../../../scss/_nroer_styles.scss */
+/* line 120, ../../../scss/_nroer_styles.scss */
 div.banner > * p {
   color: white;
   font-size: 120%;
   font-size: 1.35vw;
 }
 
-/* line 128, ../../../scss/_nroer_styles.scss */
+/* line 132, ../../../scss/_nroer_styles.scss */
 .curriculum_creator {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
@@ -23567,7 +23570,7 @@ div.banner > * p {
   padding: 15px;
 }
 
-/* line 137, ../../../scss/_nroer_styles.scss */
+/* line 141, ../../../scss/_nroer_styles.scss */
 .curriculum_creator_header {
   width: 100%;
   height: 60px;
@@ -23575,13 +23578,13 @@ div.banner > * p {
   padding: 5px 15px;
   box-shadow: 1px 0px 13px #000;
 }
-/* line 144, ../../../scss/_nroer_styles.scss */
+/* line 148, ../../../scss/_nroer_styles.scss */
 .curriculum_creator_header .course_heading span {
   letter-spacing: 0.9px;
   font-weight: 600;
   line-height: 50px;
 }
-/* line 154, ../../../scss/_nroer_styles.scss */
+/* line 158, ../../../scss/_nroer_styles.scss */
 .curriculum_creator_header .course_actions ul li {
   list-style-type: none;
   display: inline-block;
@@ -23590,12 +23593,12 @@ div.banner > * p {
   cursor: pointer;
   letter-spacing: 0.8px;
 }
-/* line 164, ../../../scss/_nroer_styles.scss */
+/* line 168, ../../../scss/_nroer_styles.scss */
 .curriculum_creator_header .course_actions ul li.active, .curriculum_creator_header .course_actions ul li:hover {
   border-bottom: 3px solid #ffc14e;
 }
 
-/* line 172, ../../../scss/_nroer_styles.scss */
+/* line 176, ../../../scss/_nroer_styles.scss */
 .curriculum_list {
   width: 100%;
   height: 60px;
@@ -23604,14 +23607,14 @@ div.banner > * p {
   box-shadow: 0px 1px 4px #004;
   color: #2b78e4;
 }
-/* line 179, ../../../scss/_nroer_styles.scss */
+/* line 183, ../../../scss/_nroer_styles.scss */
 .curriculum_list a {
   color: #164A7B;
   font-size: 20px;
   font-weight: 600;
 }
 
-/* line 186, ../../../scss/_nroer_styles.scss */
+/* line 190, ../../../scss/_nroer_styles.scss */
 .curriculum_list_header {
   max-width: 1176px !important;
   margin: 0 auto !important;
@@ -23634,7 +23637,7 @@ div.banner > * p {
   box-shadow: 0px 3px 6px #000;
   background-color: #ffffff;
 }
-/* line 207, ../../../scss/_nroer_styles.scss */
+/* line 211, ../../../scss/_nroer_styles.scss */
 .curriculum_list_header .title-curriculum {
   font-family: inherit !important;
   font-weight: bold !important;
@@ -23644,7 +23647,7 @@ div.banner > * p {
   font-weight: 500 !important;
   font-size: 20px !important;
 }
-/* line 217, ../../../scss/_nroer_styles.scss */
+/* line 221, ../../../scss/_nroer_styles.scss */
 .curriculum_list_header .add-curriculum {
   position: relative !important;
   display: -moz-box !important;
@@ -23660,7 +23663,7 @@ div.banner > * p {
   font-weight: 500 !important;
 }
 
-/* line 233, ../../../scss/_nroer_styles.scss */
+/* line 237, ../../../scss/_nroer_styles.scss */
 .curriculum_listing {
   max-width: 1176px !important;
   margin: 0 auto !important;
@@ -23678,7 +23681,7 @@ div.banner > * p {
   background: #fff;
   box-shadow: 0px 2px 6px #000;
 }
-/* line 250, ../../../scss/_nroer_styles.scss */
+/* line 254, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -23699,11 +23702,11 @@ div.banner > * p {
   -ms-flex-pack: justify !important;
   -webkit-box-pack: justify !important;
 }
-/* line 269, ../../../scss/_nroer_styles.scss */
+/* line 273, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content:hover {
   background: #F0F1F2 !important;
 }
-/* line 272, ../../../scss/_nroer_styles.scss */
+/* line 276, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -23716,7 +23719,7 @@ div.banner > * p {
   -ms-flex-align: center !important;
   -webkit-box-align: center !important;
 }
-/* line 283, ../../../scss/_nroer_styles.scss */
+/* line 287, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details {
   display: -moz-box !important;
   display: -ms-flexbox !important;
@@ -23735,13 +23738,13 @@ div.banner > * p {
   -webkit-box-orient: vertical !important;
   -webkit-box-direction: normal !important;
 }
-/* line 300, ../../../scss/_nroer_styles.scss */
+/* line 304, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-user {
   border: 2px solid #b9b9b9;
   height: 50px;
   width: 50px;
 }
-/* line 305, ../../../scss/_nroer_styles.scss */
+/* line 309, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-style {
   text-decoration: none !important;
   font-family: inherit !important;
@@ -23754,7 +23757,7 @@ div.banner > * p {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
-/* line 318, ../../../scss/_nroer_styles.scss */
+/* line 322, ../../../scss/_nroer_styles.scss */
 .curriculum_listing .curriculum_content .curriculum_content_left .curriculum_content_details .hyperlink-info {
   text-decoration: none !important;
   font-family: inherit !important;
@@ -32135,5 +32138,11 @@ div.card.show {
   /* line 8633, ../../../scss/_app_styles.scss */
   .reg-users-box {
     margin-left: 52px;
+  }
+}
+@media screen and (min-width: 321px) and (max-width: 850px) {
+  /* line 8633, ../../../scss/_app_styles.scss */
+  .reg-users-box {
+    margin-left: 70px;
   }
 }
