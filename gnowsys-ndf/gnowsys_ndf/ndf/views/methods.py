@@ -114,18 +114,22 @@ def get_execution_time(f):
             path = unicode(args[0].path)
             # except :
             #     pass
-
-        record_in_benchmark(kwargs_len=len(kwargs),
-                            # total_param_size=sum([getsizeof(each_kwarg) for each_kwarg in kwargs.values()]),
-                            total_param_size=None,
-                            post_bool=post_bool,
-                            get_bool=get_bool,
-                            sessionid=sessionid,
-                            user_name=user_name,
-                            path=path,
-                            funct_name=f.func_name,
-                            time_taken=unicode(str(time2 - time1))
-                        )
+        kwargs_len = len(kwargs)
+        total_param_size=None
+        post_bool=post_bool
+        get_bool=get_bool
+        sessionid=sessionid
+        user_name=user_name
+        path=path
+        funct_name=f.func_name
+        time_taken=unicode(str(time2 - time1))
+        record_in_benchmark.apply_async((kwargs_len,total_param_size,post_bool,
+                            get_bool,
+                            sessionid,
+                            user_name,
+                            path,
+                            funct_name,
+                            time_taken), countdown=1)
         return ret
     return wrap
 
@@ -2085,7 +2089,10 @@ def cast_to_data_type(value, data_type):
     # print "\n\t\tin method: ", value, " == ", data_type
 
     if data_type != "list":
-      value = value.strip()
+        try:
+            value = value.strip()
+        except Exception as e:
+            pass
     casted_value = value
     if data_type == "unicode":
         casted_value = unicode(value)
@@ -2126,11 +2133,20 @@ def cast_to_data_type(value, data_type):
             casted_value = [i.strip() for i in value if i]
             # print "casted_value",casted_value
 
-    elif data_type == "datetime.datetime":
-        # "value" should be in following example format
-        # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
-        # Out[10]: datetime(2014, 12, 11, 0, 0)
-        casted_value = datetime.strptime(value, "%d/%m/%Y")
+    elif (data_type == "datetime.datetime") or (str(data_type) == "<type 'datetime.datetime'>"):
+        try:
+            # "value" should be in following example format
+            # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
+            # Out[10]: datetime(2014, 12, 11, 0, 0)
+            casted_value = datetime.strptime(value, "%d/%m/%Y")
+        except Exception as e:
+            casted_value = datetime.strptime(value, "%d/%m/%Y %H:%M:%S:%f")
+    elif (str(data_type) == "<class 'bson.objectid.ObjectId'>") or isinstance(data_type, (ObjectId, bson.objectid.ObjectId)):
+        try:
+            casted_value = ObjectId(value)
+        except Exception as e:
+            pass
+
 
     return casted_value
 

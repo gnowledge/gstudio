@@ -365,7 +365,7 @@ class Filehive(DjangoDocument):
             esearch.save_to_es(self)
 
         # --- END of storing Filehive JSON in RSC system ---
-    @task
+    # @task
     def rcs_function(self,is_new,**kwargs):
         # storing Filehive JSON in RSC system:
         history_manager = HistoryManager()

@@ -204,7 +204,7 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 		q = Q('match',name=dict(query='Jsmol',type='phrase'))
 		GST_JSMOL = Search(using=es, index="nodes",doc_type="gsystemtype").query(q)
 		GST_JSMOL1 = GST_JSMOL.execute()
-		
+		search_text = ""
 		if request.GET.get('search_text',None) in (None,''):
 
 			q = Q('bool', must=[Q('match', member_of=GST_FILE1.hits[0].id),Q('match', str(group_id)),~Q('exists',field='content')])
@@ -214,24 +214,24 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			search_str_user=""
 
 		else:
-			search_str_user = str(request.GET['search_text']).strip()
+			search_text = str(request.GET['search_text']).strip()
 
 
-			if name != "on" and content != "on" and fields != "on":
-				q = MultiMatch(query=search_str_user, fields=['name', 'tags','content'])
-			else:	
-				temp = True
-				q = MultiMatch(query=search_str_user, fields=fields)
+			# # if name != "on" and content != "on" and fields != "on":
+			# # 	q = MultiMatch(query=search_str_user, fields=['name', 'tags','content'])
+			# # else:	
+			# # 	temp = True
+			# # 	q = MultiMatch(query=search_str_user, fields=fields)
 				
 				
-				for value in fields:
-					value=value+"=on&"
-					strconcat = strconcat + value
+			# 	for value in fields:
+			# 		value=value+"=on&"
+			# 		strconcat = strconcat + value
 				
 
 			q = Q('bool', must=[Q('terms',attribute_set__educationaluse=['documents','images','audios','videos','interactives','ebooks']),Q('match', group_set=str(group_id)), Q('match',access_policy='public')],
-					should=[Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
-					minimum_should_match=1)
+					should=[Q('multi_match', query=search_text, fields=['content','name','tags','content_org']),Q('match',member_of=GST_FILE1.hits[0].id),Q('match',member_of=GST_IPAGE1.hits[0].id),Q('match',member_of=GST_JSMOL1.hits[0].id),Q('match',member_of=GST_PAGE1.hits[0].id)],
+					minimum_should_match=2)
 			search_result =Search(using=es, index="nodes",doc_type="gsystemtype,gsystem,metatype,relationtype,attribute_type,group,author").query(q)
 			# search_result = search_result.filter('match', group_set=str(group_id))
 			# search_result = search_result.filter('match', member_of=GST_FILE1.hits[0].id)
@@ -258,10 +258,10 @@ def results_search(request, group_id, page_no=1, return_only_dict = None):
 			#elif temp <= search_result.count():
 			#	has_next = False
 		if temp:
-			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'fields':strconcat},
+			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_text,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH,'fields':strconcat},
 				context_instance=RequestContext(request))
 		else:
-			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_str_user,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
+			return render_to_response('ndf/search_page.html', {'has_next':has_next,'page_no':page_no,'search_curr':search_result ,'search_text':search_text,'group_id':group_id,'groupid':group_id,'GSTUDIO_ELASTIC_SEARCH':GSTUDIO_ELASTIC_SEARCH},
 				context_instance=RequestContext(request))
 
 

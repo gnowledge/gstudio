@@ -9,7 +9,7 @@ import datetime
 
 from PIL import Image, ImageDraw
 from StringIO import StringIO
-from celery import task
+# from celery import task
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
@@ -23,8 +23,9 @@ try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-
-@task
+from gnowsys_ndf.celery import app
+from celery import Celery
+# @task
 def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
     '''
     Attach notification mail to celery task
@@ -61,7 +62,7 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
         return False
 
 
-@task
+# @task
 def convertVideo(userid, file_id, filename):
     """
     converting video into webm format, if video already in webm format ,then pass to create thumbnails
@@ -271,7 +272,7 @@ def convertVideo(userid, file_id, filename):
 
 #     return 'Both scripts executed'
 
-
+from celery.task import task
 @task
 def record_in_benchmark(kwargs_len, total_param_size, post_bool, get_bool, sessionid, user_name, path, funct_name, time_taken):
     benchmark_node = benchmark_collection.Benchmark()

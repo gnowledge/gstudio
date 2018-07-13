@@ -484,13 +484,18 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 djcelery.setup_loader()
 # # CELERY_RESULT_BACKEND = "mongodb"
-CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+CELERY_RESULT_BACKEND = "rpc://"
 
 CELERY_TASK_SERIALIZER = "json"
-CELERY_IMPORTS = ("gnowsys_ndf.ndf.views.tasks")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IMPORTS = ("gnowsys_ndf.tasks","gnowsys_ndf.ndf.views.tasks")
 # # BROKER_URL = 'mongodb://localhost:27017/' + DATABASES['mongodb']['NAME']
-BROKER_URL = 'amqp://'
+# BROKER_URL = 'amqp://'
+BROKER_URL = 'amqp://nroer_user:nroer_user123@127.0.0.1:5672/nroer_user_vhost'
 
 INSTALLED_APPS = (
     'gnowsys_ndf.ndf',

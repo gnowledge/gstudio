@@ -161,6 +161,7 @@ class RCS:
         Any output from co goes to directly to stdout.
 
         """
+        # print "checkout"
         name, rev = self.checkfile(name_rev)
 
         lockflag = "-q"
@@ -187,6 +188,8 @@ class RCS:
         Any output from ci goes to directly to stdout.
 
         """
+        # print "called checkin method======================================================"
+        # print name_rev
         name, rev = self._unmangle(name_rev)
         new = not self.isvalid(name)
 
@@ -275,7 +278,11 @@ class RCS:
         (a) string: _unmangle('5252648f5a40920c160bc774.json')
         (b) tuple : _unmangle(('5252648f5a40920c160bc774.json', '1.3'))
         """
+        # print "_unmangle method called"
+        # print name_rev
         if type(name_rev) == type(''):
+            name_rev = name, rev = name_rev, ''
+        elif isinstance(name_rev,basestring):
             name_rev = name, rev = name_rev, ''
         else:
             name, rev = name_rev

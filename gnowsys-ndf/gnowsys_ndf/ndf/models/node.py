@@ -2,8 +2,11 @@ from base_imports import *
 from history_manager import HistoryManager
 from gnowsys_ndf.ndf.gstudio_es.es import esearch
 from gnowsys_ndf.settings import GSTUDIO_ELASTIC_SEARCH,GSTUDIO_ELASTIC_SEARCH_IN_NODE_CLASS
-
-
+from gnowsys_ndf.celery import app
+from celery.contrib.methods import task_method
+from celery.contrib.methods import task
+from gnowsys_ndf.ndf.models.models_utils import NodeJSONEncoder,CustomNodeJSONEncoder
+from gnowsys_ndf.tasks import *
 @connection.register
 class Node(DjangoDocument):
     '''Everything is a Node.  Other classes should inherit this Node class.
@@ -653,11 +656,30 @@ class Node(DjangoDocument):
             z.save()
 
         #If you create/edit anything then this code shall add it in the URL
-
-        self.rcs_function(self,is_new,**kwargs)
+        # print "longtime_add method not called"
+        # longtime_add.apply_async((2, 2), countdown=3)
+        temp = self
+        temp.update({"collection_name":"Nodes"})
+        model_name = self._meta.model_name
+        temp.update({"model_name":model_name})
+        from bson import json_util
+        data_save_into_file = json.dumps(temp,cls=CustomNodeJSONEncoder)
+        json_data = json.dumps(temp,cls=NodeJSONEncoder)
+        kwargs = json.dumps(kwargs,cls=NodeJSONEncoder)
+        # kwargs1 = json.loads(kwargs)
+        # print kwargs1
+        # kwargs1 = False
+        # print temp
+        # kew_args = **kwargs
+        # kew_args = False
+        # print kwargs
+        rcs_function.apply_async((is_new,data_save_into_file,json_data,kwargs), countdown=1)
+        # print is_new
+        # rcs_function.apply_async((is_new,), countdown=3)
+        # print "longtime_add method completed"
         # history_manager = HistoryManager()
         # rcs_obj = RCS()
-
+        # print self
         # if is_new:
         #     # Create history-version-file
         #     try:
@@ -974,72 +996,73 @@ class Node(DjangoDocument):
             self.structure[key] = value['subject_or_object_type']
             self[key] = value['subject_or_right_subject_list']
 
-    @task
-    def rcs_function(self,is_new,**kwargs):
-        history_manager = HistoryManager()
-        rcs_obj = RCS()
-        if True:
-            if is_new:
-                # Create history-version-file
-                try:
-                    if history_manager.create_or_replace_json_file(self):
-                        fp = history_manager.get_file_path(self)
-                        user_list = User.objects.filter(pk=self.created_by)
-                        user = user_list[0].username if user_list else 'user'
-                        # user = User.objects.get(pk=self.created_by).username
-                        if self.created_at:
-                            message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                            rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-                        else:
-                            pass
-                except Exception as err:
-                    print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be created!!!\n"
-                    node_collection.collection.remove({'_id': self._id})
-                    raise RuntimeError(err)
+    # @task()
+    # def rcs_function(self,is_new,**kwargs):
+    #     history_manager = HistoryManager()
+    #     rcs_obj = RCS()
+    #     if True:
+    #         print "-------------===================--------------Node------------------"
+    #         if is_new:
+    #             # Create history-version-file
+    #             try:
+    #                 if history_manager.create_or_replace_json_file(self):
+    #                     fp = history_manager.get_file_path(self)
+    #                     user_list = User.objects.filter(pk=self.created_by)
+    #                     user = user_list[0].username if user_list else 'user'
+    #                     # user = User.objects.get(pk=self.created_by).username
+    #                     if self.created_at:
+    #                         message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+    #                         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+    #                     else:
+    #                         pass
+    #             except Exception as err:
+    #                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be created!!!\n"
+    #                 node_collection.collection.remove({'_id': self._id})
+    #                 raise RuntimeError(err)
 
-            else:
-                # Update history-version-file
-                fp = history_manager.get_file_path(self)
+    #         else:
+    #             # Update history-version-file
+    #             fp = history_manager.get_file_path(self)
 
-                try:
-                    rcs_obj.checkout(fp, otherflags="-f")
-                except Exception as err:
-                    try:
-                        if history_manager.create_or_replace_json_file(self):
-                            fp = history_manager.get_file_path(self)
-                            # user = User.objects.get(pk=self.created_by).username
-                            user_list = User.objects.filter(pk=self.created_by)
-                            user = user_list[0].username if user_list else 'user'
-                            if self.created_at:
-                                message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-                            else:
-                                pass
+    #             try:
+    #                 rcs_obj.checkout(fp, otherflags="-f")
+    #             except Exception as err:
+    #                 try:
+    #                     if history_manager.create_or_replace_json_file(self):
+    #                         fp = history_manager.get_file_path(self)
+    #                         # user = User.objects.get(pk=self.created_by).username
+    #                         user_list = User.objects.filter(pk=self.created_by)
+    #                         user = user_list[0].username if user_list else 'user'
+    #                         if self.created_at:
+    #                             message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+    #                             rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+    #                         else:
+    #                             pass
 
-                    except Exception as err:
-                        print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
-                        node_collection.collection.remove({'_id': self._id})
-                        raise RuntimeError(err)
+    #                 except Exception as err:
+    #                     print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
+    #                     node_collection.collection.remove({'_id': self._id})
+    #                     raise RuntimeError(err)
 
-                try:
-                    if history_manager.create_or_replace_json_file(self):
-                        # user = User.objects.get(pk=self.modified_by).username
-                        user_list = User.objects.filter(pk=self.created_by)
-                        user = user_list[0].username if user_list else 'user'
-                        if self.last_update:
-                            message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
-                            rcs_obj.checkin(fp, 1, message.encode('utf-8'))
-                        else:
-                            pass
+    #             try:
+    #                 if history_manager.create_or_replace_json_file(self):
+    #                     # user = User.objects.get(pk=self.modified_by).username
+    #                     user_list = User.objects.filter(pk=self.created_by)
+    #                     user = user_list[0].username if user_list else 'user'
+    #                     if self.last_update:
+    #                         message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
+    #                         rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+    #                     else:
+    #                         pass
 
-                except Exception as err:
-                    print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
-                    raise RuntimeError(err)
-                    #update the snapshot feild
-            if kwargs.get('groupid'):
-                # gets the last version no.
-                rcsno = history_manager.get_current_version(self)
-                node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
+    #             except Exception as err:
+    #                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
+    #                 raise RuntimeError(err)
+    #                 #update the snapshot feild
+    #         if kwargs.get('groupid'):
+    #             # gets the last version no.
+    #             rcsno = history_manager.get_current_version(self)
+    #             node_collection.collection.update({'_id':self._id}, {'$set': {'snapshot'+"."+str(kwargs['groupid']):rcsno }}, upsert=False, multi=True)
 
 # DATABASE Variables
 node_collection     = db[Node.collection_name].Node

@@ -129,7 +129,7 @@ class HistoryManager():
         #                   "created @ following path:\n {1}\n"\
         #                   .format(collection, rcs_repo_collection))
 
-    def create_or_replace_json_file(self, document_object=None):
+    def create_or_replace_json_file(self, document_object=None,data_save_into_file=None):
         """Creates/Overwrites a json-file for passed document object in
         its respective hashed-directory structure.
 
@@ -150,17 +150,25 @@ class HistoryManager():
         # from Filehive import Filehive
         # from Buddy import Buddy
         # Counter
-
+        if data_save_into_file:
+            model_name = document_object.model_name
+        else:
+            model_name = document_object._meta.model_name
         # collection_list = ('MetaType', 'GSystemType', 'GSystem', 'AttributeType', 'GAttribute', 'RelationType', 'GRelation', 'Filehive', 'Buddy', 'Counter')
         collection_list = get_all_collection_child_names() 
         file_res = False    # True, if no error/exception occurred
         if document_object is not None and \
-                (document_object._meta.model_name in collection_list):
+                (model_name in collection_list):
                 # isinstance(document_object, collection_list):
-
             file_path = self.get_file_path(document_object)
-
-            json_data = document_object.to_json_type()
+            if  data_save_into_file:
+                json_data = json.loads(data_save_into_file)
+                if json_data.get("model_name"):
+                    del json_data["model_name"]
+                if json_data.get("collection_name"):
+                    del json_data["collection_name"]
+            else:
+                json_data = document_object.to_json_type()
             #------------------------------------------------------------------
             # Creating/Overwriting data into json-file and rcs-file
             #------------------------------------------------------------------

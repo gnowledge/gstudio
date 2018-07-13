@@ -1,12 +1,12 @@
 from base_imports import *
-
+from bson import json_util
 class NodeJSONEncoder(json.JSONEncoder):
   def default(self, o):
     if isinstance(o, ObjectId):
       return str(o)
 
     if isinstance(o, datetime.datetime):
-      return o.strftime("%d/%m/%Y %H:%M:%S")
+      return o.strftime("%d/%m/%Y %H:%M:%S:%f")
 
     return json.JSONEncoder.default(self, o)
 
@@ -169,3 +169,16 @@ class node_holder(DjangoDocument):
 #     @classmethod
 #     def get_all_user_set_ids_list(cls):
 #         return cls.active_loggedin_and_buddy_users_group.user_set.values_list('id', flat=True)
+
+class CustomNodeJSONEncoder(json.JSONEncoder):
+  def default(self, o):
+    if isinstance(o, ObjectId):
+        return json_util.default(o)
+
+    if isinstance(o, datetime.datetime):
+
+        temp = json_util.dumps(o)
+        temp = json.loads(temp)
+        return temp["$date"]
+
+    return json.JSONEncoder.default(self, o)

@@ -1,5 +1,5 @@
-BROKER_URL = 'amqp://'
-
+#BROKER_URL = 'amqp://'
+#BROKER_URL= 'amqp://siddhu:siddhu@172.17.0.3:5672/siddhu_vhost'
 # from datetime import timedelta
 # from gnowsys_ndf.local_settings import SYNCDATA_DURATION
 
@@ -11,5 +11,6 @@ BROKER_URL = 'amqp://'
 #     },
 # }
 
-CELERY_TIMEZONE = 'UTC'
-
+#CELERY_TIMEZONE = 'UTC'
+#result_backend = 'rpc://'
+#result_persistent = True

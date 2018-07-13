@@ -458,7 +458,7 @@ class Counter(DjangoDocument):
 
         self.rcs_function(self,is_new,**kwargs)
 
-    @task
+    #@task
     def rcs_function(self,is_new,**kwargs):
         # storing Filehive JSON in RSC system:
         history_manager = HistoryManager()

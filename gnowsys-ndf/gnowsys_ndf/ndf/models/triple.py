@@ -1,6 +1,7 @@
 from base_imports import *
 from node import *
 from db_utils import get_model_name
+#from gnowsys_ndf.celery import app
 
 #  TRIPLE CLASS DEFINITIONS
 @connection.register
@@ -259,45 +260,58 @@ class Triple(DjangoDocument):
     #end of data_type_check
 
     super(Triple, self).save(*args, **kwargs)
-    self.rcs_function(self,is_new,**kwargs)
+    temp = self
+    temp.update({"collection_name":"Triples"})
+    model_name = self._meta.model_name
+    temp.update({"model_name":model_name})
+    # print dir_path
+    # temp.update({"model_name":model_name}})
+    from bson import json_util
+    data_save_into_file = json.dumps(temp,cls=CustomNodeJSONEncoder)
+    json_data = json.dumps(temp,cls=NodeJSONEncoder)
+    kwargs = json.dumps(kwargs,cls=NodeJSONEncoder)
+    rcs_function.apply_async((is_new,data_save_into_file,json_data,kwargs), countdown=1)
+    # self.rcs_function(self,is_new,*args,**kwargs)
 
-  @task
-  def rcs_function(self,is_new,**kwargs):
-    history_manager = HistoryManager()
-    rcs_obj = RCS()
-    if is_new:
-      # Create history-version-file
-      if history_manager.create_or_replace_json_file(self):
-        fp = history_manager.get_file_path(self)
-        message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
-        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+  # def rcs_function(self,is_new,*args,**kwargs):
+  #   print args
+  #   print kwargs
+  #   history_manager = HistoryManager()
+  #   rcs_obj = RCS()
+  #   if True:
+  #     if is_new:
+  #       # Create history-version-file
+  #       if history_manager.create_or_replace_json_file(self):
+  #         fp = history_manager.get_file_path(self)
+  #         message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
+  #         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
-    else:
-      # Update history-version-file
-      fp = history_manager.get_file_path(self)
+  #     else:
+  #       # Update history-version-file
+  #       fp = history_manager.get_file_path(self)
 
-      try:
-          rcs_obj.checkout(fp, otherflags="-f")
-      except Exception as err:
-          try:
-              if history_manager.create_or_replace_json_file(self):
-                  fp = history_manager.get_file_path(self)
-                  message = "This document (" + self.name + ") is re-created on " + datetime.datetime.now().strftime("%d %B %Y")
-                  rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+  #       try:
+  #           rcs_obj.checkout(fp, otherflags="-f")
+  #       except Exception as err:
+  #           try:
+  #               if history_manager.create_or_replace_json_file(self):
+  #                   fp = history_manager.get_file_path(self)
+  #                   message = "This document (" + self.name + ") is re-created on " + datetime.datetime.now().strftime("%d %B %Y")
+  #                   rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
-          except Exception as err:
-              print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
-              node_collection.collection.remove({'_id': self._id})
-              raise RuntimeError(err)
+  #           except Exception as err:
+  #               print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
+  #               node_collection.collection.remove({'_id': self._id})
+  #               raise RuntimeError(err)
 
-      try:
-          if history_manager.create_or_replace_json_file(self):
-              message = "This document (" + self.name + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
-              rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+  #       try:
+  #           if history_manager.create_or_replace_json_file(self):
+  #               message = "This document (" + self.name + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
+  #               rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
-      except Exception as err:
-          print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
-          raise RuntimeError(err)
+  #       except Exception as err:
+  #           print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
+  #           raise RuntimeError(err)
 
 
 triple_collection   = db["Triples"].Triple
