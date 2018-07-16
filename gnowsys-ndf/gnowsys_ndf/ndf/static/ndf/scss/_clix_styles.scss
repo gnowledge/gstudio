@@ -3642,8 +3642,13 @@ ul.jqtree-tree .jqtree-toggler {
 
 }
 .overlay-title{
-    margin: 15px 10px 10px 10px;
+    margin: 15px 10px 10px 14px;
     letter-spacing: -1px;
+    font-size: 24px;
+    @media only screen and (max-width: 320px) {
+      font-size:16px;
+    }
+
 }
 
 .custom_dropdown {

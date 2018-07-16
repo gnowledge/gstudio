@@ -10,7 +10,7 @@
 	{% if 'video' in video_obj.if_file.mime_type %}
 
 		<div class="vidbak">
-		<video id="{{video_obj.pk}}" class="video-js vjs-skin-colors-clix vjs-big-play-button center" controls="controls" data-setup='{ "playbackRates": [0.5, 1, 1.5, 2] }' height="360" width="480">
+		<video id="{{video_obj.pk}}" class="video-js vjs-skin-colors-clix vjs-big-play-button center widget_video" controls="controls" data-setup='{ "playbackRates": [0.5, 1, 1.5, 2] }'>
 		<source src="{{MEDIA_URL}}{{video_obj.if_file.original.relurl}}" type="video/mp4" crossorigin="anonymous" preload="metadata" codecs="avc1.42E01E, mp4a.40.2"/>
 		 
 		{% for each in subtitle_rel_node %}
