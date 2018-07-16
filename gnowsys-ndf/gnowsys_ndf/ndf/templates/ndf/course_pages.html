@@ -22,18 +22,19 @@
 
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
+      <div class="small-12 columns">
         <div class="row">
             <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
             <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
             </div>
 
-            <div class="small-8 columns">
+            <div class="small-5 columns">
                 <h4 class="page-name">{% firstof activity_node.altnames activity_node.name %}</h4>
             </div>
               
             {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if activity_node.created_by == request.user.id or is_gstaff %}
-            <div class="small-3 columns right">
+            <div class="small-7 columns right">
                 <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
                     {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                 </span>
@@ -59,9 +60,10 @@
             </div>
             {% endif %}
         </div>
+      </div>
 
          <div class="row">
-            <div class="small-8 columns left">
+            <div class="small-6 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
                             <small><label class="tag-ele" style="margin-top: 13px;">
@@ -69,7 +71,7 @@
                     {% endfor %} 
                 {% endif %}   
             </div>
-            <div class="small-4 columns right">
+            <div class="small-6 columns right">
                 {% include 'ndf/rating.html' with node=activity_node %}
               
             </div>

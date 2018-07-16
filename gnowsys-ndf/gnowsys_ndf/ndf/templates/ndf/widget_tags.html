@@ -35,13 +35,13 @@
 						</h3>
 					</div>
 					{% endif %}
-					<div class="small-8 columns tag-input-ele">
+					<div class="small-12 columns tag-input-ele">
 						<div class="row collapse">
-							<div class="small-9 columns">
+							<div class="small-7 columns">
 						    	<input id="tags_id" tabindex="2" type="text" value="" placeholder="{% trans 'Add tag text and click on [Add Tag] button' %}">
 						    	<input type="hidden" value="{{node.tags|join:', '|default_if_none:""}}" name="tags">
 					        </div>
-					        <div class="small-3 columns">
+					        <div class="small-5 columns">
 					          <span tabindex="3" id="add-tag-btn" class="tiny button radius orange-button add-tag-btn">{% trans 'Add Tag' %}</span>
 					        </div>
 						</div>
