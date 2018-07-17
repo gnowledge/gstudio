@@ -359,14 +359,14 @@ class Filehive(DjangoDocument):
 
         super(Filehive, self).save(*args, **kwargs)
 
-        self.rcs_function(self,is_new,**kwargs)
+        self.rcs_function(self,is_new,*args,**kwargs)
         # data save into ES...
         if GSTUDIO_ELASTIC_SEARCH_IN_FILEHIVE_CLASS == True:
             esearch.save_to_es(self)
 
         # --- END of storing Filehive JSON in RSC system ---
     # @task
-    def rcs_function(self,is_new,**kwargs):
+    def rcs_function(self,is_new,*args,**kwargs):
         # storing Filehive JSON in RSC system:
         history_manager = HistoryManager()
         rcs_obj = RCS()
