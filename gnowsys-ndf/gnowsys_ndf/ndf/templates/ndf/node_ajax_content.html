@@ -614,7 +614,7 @@ Still keeping for future ref (if needed).
 
      {% if not topic and not is_group %}
              <div>
-              <small>License:</small>
+              
              {% if site.SITE_NAME != "NROER" %}
                <small class="text-gray">
                   [<em>{% trans "Contributed by" %} {{ node.user_details_dict.contributors|join:', ' }}</em> on {{node.last_update}}]
@@ -623,6 +623,7 @@ Still keeping for future ref (if needed).
               {% endif %}
 
                 {% if node.attribute_set.0.source  and site.SITE_NAME == "NROER" %}
+                <small>License:</small>
                 <small class="text-gray">
                   [<em>{% trans "Source" %} {{ node.attribute_set.0.source}}</em> ] {{node.last_update}}
                 </small>
