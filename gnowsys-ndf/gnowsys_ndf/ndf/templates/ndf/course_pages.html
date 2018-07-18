@@ -22,18 +22,19 @@
 
 {% if activity_node and not editor_view %}
     <div class="activity-detail-page">
+      <div class="small-12 medium-12 columns">
         <div class="row">
-            <div class="small-1 columns icon-widget" style="margin-top: 5.6px;">
+            <div class="small-1 medium-1 columns icon-widget" style="margin-top: 5.6px;">
             <a href="{% url 'course_pages' group_id %}"><i class="fa fa-chevron-left large" aria-hidden="true"></i></a>
             </div>
 
-            <div class="small-8 columns">
+            <div class="small-5 medium-5 columns">
                 <h4 class="page-name">{% firstof activity_node.altnames activity_node.name %}</h4>
             </div>
               
             {% check_is_gstaff groupid request.user as is_gstaff %}
             {% if activity_node.created_by == request.user.id or is_gstaff %}
-            <div class="small-3 columns right">
+            <div class="small-6 medium-3 medium-offset-2 columns right" style="margin-left: 200px";>
                 <span data-dropdown="activity-page-settings-drop" aria-controls="activity-page-settings-drop" aria-expanded="false" class="orange-button right">
                     {% trans "Actions" %} <i class="fa fa-chevron-down"></i>
                 </span>
@@ -52,16 +53,18 @@
                   </li>
                   <li><a title="add help page" class="add-help-page">{% trans "Link Help page" %}</a></li>
                 {% endif %}
-                <li><a class="crossPublish-{{activity_node.pk}}" title="Click to Cross Publish this Activty Page" ><i class="fa fa-external-link" aria-hidden="true"></i></a></li>
+                <li><a class="crossPublish-{{activity_node.pk}}" title="Click to Cross Publish this Activty Page" ><i class="fa fa-external-link" aria-hidden="true"></i>&nbsp;Cross Publish</a></li>
                 <li><a href="{% url 'all_translations' group_id activity_node.pk %}" target="_blank">{% trans "Alternate Language" %}</a></li>
                 
                 </ul>
             </div>
             {% endif %}
         </div>
+      </div>
 
          <div class="row">
-            <div class="small-8 columns left">
+          <div class="small-12 medium-12 columns left">
+            <div class="small-6 columns left">
                  {% if activity_node.tags %}
                     {% for tag in activity_node.tags %}
                             <small><label class="tag-ele" style="margin-top: 13px;">
@@ -69,10 +72,11 @@
                     {% endfor %} 
                 {% endif %}   
             </div>
-            <div class="small-4 columns right">
+            <div class="small-6 medium-3  columns right">
                 {% include 'ndf/rating.html' with node=activity_node %}
               
             </div>
+          </div>
         </div>
 
         <div class="row activity-detail-content">
@@ -113,16 +117,14 @@
             <button type="button" class="orange-button delete-activity right" title="Click on the checkbox on the files below to Delete"><i class="fa fa-trash"></i> {% trans "Delete" %}</button>
             {% endif %}
             {% if user.is_authenticated %}
-            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
               {% if site.SITE_NAME == 'NROER' %}
                 <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Cordinator's page" %}</a>
               {% else %}
                 <a class="right orange-button-template" href="{% url 'create_course_page_info'  group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Teacher's page" %}</a>
               {% endif %}
+            <a class="right orange-button-template" href="{% url 'create_course_page' group_id %}"><i class="fi-plus"></i> {% trans "Add Activity page" %}</a>
             <a class="right orange-button-template" href="{% url 'create_course_page_info' group_id 'Info' %}"><i class="fi-plus"></i> {% trans "Add Help page" %}</a>
             {% endif %}
-
-
             </div>
         </div>
     

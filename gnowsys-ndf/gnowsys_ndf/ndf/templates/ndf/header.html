@@ -129,7 +129,7 @@
                   <a title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> {% trans "My Desk" %} </a>
               </li>
             {% endif %}
-  
+              {% comment %}
               <li class="has-form">
               <!--  <form id = "search_form" {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                   name="search_form" method="GET" >
@@ -147,6 +147,7 @@
                   </div>
 
                 </form>-->
+                {%endcomment%}
               </li>
         </ul>
         <!-- -END of NROER level one menu -->

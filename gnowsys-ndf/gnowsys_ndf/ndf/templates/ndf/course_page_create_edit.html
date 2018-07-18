@@ -1,35 +1,37 @@
 {% load i18n %}
 {% load ndf_tags %}
+<div class="panel  radius">
     <div id="addActivityPage" >
         <form id ="course_page_form" enctype="multipart/form-data" method="post"  {%  if title == "create_asset_pages" %} action="{% url 'save_asset_page' group_id asset_id %}" {% else %} action="{% url 'save_course_page' group_id %}"  {% endif %} >{% csrf_token %}
             <div>
-                <div class="small-12 columns">
+                <div class="small-12 medium-12 medium-centered columns">
                     <div class="row">
-                        <div class="small-3 columns">
+                        <div class="small-2 medium-2 columns">
                             <label class="mid_label inner">{% trans "Unique Name: " %}</label><b class="compulsory"> *</b>
                         </div>
-                        <div class="small-8 columns">
+                        <div class="small-8 medium-6 columns">
                             <label class="node_name_empty hide inner" style="color:red">{% trans "Please enter Unique Name" %}</label>
                             <input type="text" class="node_name" name="name" placeholder="Enter name of Page" value="{{activity_node.name}}" style="border-radius: 5px;">
                         </div>
                     </div>
                     <div class="row">
-                        <div class="small-3 columns">
+                        <div class="small-3 medium-2 columns">
                             <label class="mid_label inner">{% trans "Display Name: " %}</label><b class="compulsory"> *</b>
                         </div>
-                        <div class="small-8 columns">
+                        <div class="small-8  medium-6 columns">
                             <label class="node_altname_empty hide inner" style="color:red">{% trans "Please enter Display Name" %}</label>
                             <input type="text" class="node_altname" name="alt_name" placeholder="Enter display name of Page"  value="{{activity_node.altnames}}" style="border-radius: 5px;">
                         </div>
                     </div>
+                </div>
 
                     <div class="row">
-                        <div class="small-5 columns text-center">
+                        <div class="small-12 medium-12 columns text-center">
                             <div class="row">
-                                <div class="small-6 columns">
+                                <div class="small-6 medium-2 columns">
                                     <label class="mid_label left">{% trans "Select Lanaguage: " %}</label>
                                 </div>
-                                <div class="small-6 columns">
+                                <div class="small-6 medium-3 columns">
                                     <select class="activity-lang select-drop" name="lan" id="activity_lang" >
                                         {% get_language_info_list for LANGUAGES as languages %}
                                         {% for language in languages %}
@@ -44,11 +46,10 @@
                                         {% endfor %}
                                       </select>
                                 </div>
-                            </div>
-                        </div>
+                        
 
-                        <div class="small-3 columns">
-                            <a class="orange-button-template existing-template">{% trans "Choose template" %}</a>
+                        <div class="small-7 medium-2 columns">
+                            <a class="orange-button-template existing-template" style="margin-left: -30px;">{% trans "Choose template" %}</a>
                             <!--
                             <div class="row">
                                 <div class="small-6 columns">
@@ -67,8 +68,8 @@
                             -->
                         </div>
                         {% if activity_node %}
-                            <div class="small-3 columns ">
-                                <a class="orange-button-template edit-activity-metadata">{% trans "Edit Metadata" %}</a>
+                            <div class="small-5 medium-2 columns">
+                                <a class="orange-button-template edit-activity-metadata" style="margin-left: -38px;">{% trans "Edit Metadata" %}</a>
                             </div>
                         {% endif %}
                     </div>
@@ -79,7 +80,7 @@
                         </div>
                     </div>
                     {% endif %} -->
-
+                </div>
                 </div>
                 <input type="hidden" name="node_id" class="form_node_id" value="{{activity_node.pk}}">
                 <input type="hidden" name="page_type" class="form_node_id" value="{{page_type}}">
@@ -89,22 +90,32 @@
                     </div>
                 </div>
 
-                <div class="row editor-div">
+                <div class="row editor-div" style="margin-top: 20px;">
+                    <div class="small-12 medium-8 medium-centered columns">
                     {% include "ndf/html_editor.html" with var_name="content_org" var_placeholder="Enter the content here" ckeditor_toolbar="GeneralToolbar" var_value=activity_node.content %}
-                </div>
+                    </div>
+                </div>    
                 <br/>
                 <div class="row">
                     <div class="asset-tags-container">
+                        <div class="small-12 medium-8 medium-centered columns">
                         <label>{% trans "Add Tags:" %}</label>
                          {% include 'ndf/widget_tags.html' with node=activity_node hide_lbl=True %}
+                        </div> 
                     </div>
                 </div>
                 <br/>
                 <div class="row">
-                    <input type="submit" class="button-save-new" class="saveActivityPage" value="Save">
+                    <div class=" small-12 medium-6 medium-centered columns">
+                    <div class="small-6 medium-3 columns" style="margin-left: -20px;">    
+                        <input type="submit" class="button-save-new" class="saveActivityPage" value="Save">
+                    </div>
+                    <div class="small-6 medium-3 columns">    
                     <button class="button-cancel-new">
                         <a href="{{cancel_activity_url}}" class="cancel-page-create">{% trans "Cancel" %}</a>
                     </button>
+                    </div>
+                    </div>
                 </div>
                 <br/>
                 <br/>
@@ -116,6 +127,7 @@
         <div class="templates-content"></div>
         <a class="close-reveal-modal" >&#215;</a>
     </div>
+</div>    
 
 <script type="text/javascript">
     $(document).ready(function(){

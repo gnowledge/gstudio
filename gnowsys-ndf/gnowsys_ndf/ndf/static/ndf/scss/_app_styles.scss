@@ -565,8 +565,9 @@ body>footer {
         max-height: 600px;
       }
       .flinks{
-        font-size: 22px;
+        font-size: 20px;
         color: #999;
+        line-height: 1px;
       }
       .social_links a{
         font-size: 24px; 
@@ -5559,7 +5560,10 @@ $unit-card-lines-to-show: 3;
 }
 
 .icon-widget{
-    font-size:24px;
+    font-size:20px;
+     @media only screen and (max-width: 320px) {
+      font-size:12px;
+    }
 
 }
 
@@ -7385,8 +7389,27 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     background: #ccc;
     border: 2px solid #999;
     width: 750px;
+    @media only screen and (max-width: 360px) {
+      width:390px;
+    }
     min-height: 445px;
-    margin-left: 14px;
+    @media only screen and (max-width: 360px) {
+      min-height: 20px;
+    }
+    margin-left: 0px;
+}
+
+.widget_video{
+  height:360px;
+  width:480px;
+  @media only screen and (max-width: 350px) {
+      width:290px;
+      height:230px;
+  }
+  @media screen and (min-width: 351px) and (max-width: 850px) {
+      width:340px;
+      height:280px;
+      } 
 }
 
 
@@ -7428,6 +7451,9 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);;
     background:#fff ;
     border: 1px solid #ce7869;
     font-size: 12px;
+    @media screen and  (max-width: 325px) {
+      font-size: 10px;
+    }  
     font-family: "OpenSans-Regular", serif;
     border-radius: 4px;
     margin-right: 20px;
@@ -8618,3 +8644,30 @@ div.card.show {
     overflow: hidden;
 }
 */
+
+.analytics-cards{
+
+  a,h4{
+      font-size: 16px;
+      @media only screen and (max-width: 320px) {
+        font-size: 12px;
+      }
+  }
+}
+
+.reg-users-box{
+  margin-left: 0px;
+    @media only screen and (max-width: 320px) {
+      margin-left: 52px;
+    }
+    @media screen and (min-width: 321px) and (max-width: 850px) {
+      margin-left: 70px;
+    }  
+} 
+
+.login-box {
+  background: #fff;
+  border: 1px solid #ddd; 
+  margin: 100px 0;
+  padding: 40px 20px 0 20px;
+}

@@ -4,8 +4,8 @@
 {% get_download_filename node as download_filename %}
 {% get_group_object groupid as group_object %}
 <div class="row">
-  <div class="medium 12 columns">
-      <div class="left small-3 columns">
+  <div class="medium-12 columns">
+      <div class="left medium-3 small-12 columns">
             <h3>{% trans "File name:" %}<a href="{% url 'read_file' group_name_tag node download_filename %}" download="{{ download_filename }}"> {{node.name}} <i class="fa fa-download" aria-hidden="true"></i></a></h3>
             <h5>{% trans "Created By:" %}{{ node.user_details_dict.contributors|join:', ' }} </h5>
             <!--alternate file listing -->
@@ -71,7 +71,7 @@
             {% endif %}
             </div>
       </div>
-      <div class="small-9 columns">
+      <div class="medium-9 small-12 columns" style="margin-top: 20px;">
             <div  {% if 'Page' in node.member_of_names_list %} class="preview_asset_page" {% else %} class="preview_asset" style="text-align:center;"{% endif %} > 
            {% if title == "asset_content_detail" or title == "asset_gallery_detail" or title == "raw_material_detail"%}
 

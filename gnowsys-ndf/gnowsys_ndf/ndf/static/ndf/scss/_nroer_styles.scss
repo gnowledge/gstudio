@@ -15,6 +15,10 @@ $primary-blue : #164A7B;
     @media only screen and (max-width: 320px) {
         background: url("watermark.png") no-repeat 50% 120%;
     }
+/*    @media screen and (min-width: 321px) and (max-width: 850px) {
+        background: url("watermark.png") no-repeat 70% 70%;
+    }*/
+
     min-height: 100%;
     margin-bottom: -130px!important;
     @media only screen and (max-width: 320px) {

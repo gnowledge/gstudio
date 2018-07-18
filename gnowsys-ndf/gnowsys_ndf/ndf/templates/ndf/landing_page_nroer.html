@@ -244,8 +244,8 @@ article.columns{
 
             <div class="medium-3 small-8 small-centered large-uncentered columns">
                 <div class="panel" style="background-color: #ffffb3;">
-                    <div align="center">  
-                        <h4 class="analytics-cards">{% trans "Discussion" %}</h4>
+                    <div align="center" class="analytics-cards">  
+                        <h4>{% trans "Discussion" %}</h4>
                         <h4>{{ discussion_count }}</h4>
                     </div>    
                 </div>
@@ -253,7 +253,7 @@ article.columns{
             <div class="medium-3 small-8 small-centered large-uncentered columns">
                 <div class="panel" style="background-color: #d5ff80;">
                     <div align="center" class="analytics-cards">  
-                        <a href="{% url 'e-library' group_id %}" style="font-size: 16px;">{% trans "eResourses" %}</a>
+                        <a href="{% url 'e-library' group_id %}">{% trans "eResourses" %}</a>
                         <h4>{{ files_count }}</h4>
                     </div>    
                 </div>
