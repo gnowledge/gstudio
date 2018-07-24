@@ -7222,3 +7222,20 @@ def save_edited_card_info(request, group_id):
   node_obj.update({"altnames":unicode(unit_title),"content":unicode(unit_desc)})
   node_obj.save()
   return HttpResponse("success")
+
+def activity_player_content(request,group_id):
+  node_parent_id = request.POST.get('node_parent_id', None)
+  node_id = request.POST.get('node_id', None)
+  print node_id
+  print node_parent_id
+  print group_id
+  activity_node = node_collection.one({'_id':ObjectId(node_id)})
+  print activity_node
+  return render_to_response('ndf/activity_player_content.html',
+          {
+            "group_id":group_id, "activity_id":node_id, "lesson_id":node_parent_id, "activity_node":activity_node
+          },
+          context_instance=RequestContext(request))
+
+
+

@@ -1,7 +1,14 @@
-<div class="course-content">
+<div class="course-content small-3 medium-3 columns">
     <div id="tree1">
     </div>
 </div>
+<div class="activityplayer-course-content small-9 medium-9 columns">
+    <div id="activityplayer-course-content">
+
+    </div>
+</div>
+
+
 <script type="text/javascript">
     iconMapping = {
         'COMPLETED': 'fa-check-circle-o',
@@ -84,7 +91,7 @@
                             isLessonComplete = activity_ids.some(function(val) { return     visited_nodes_ids.indexOf(val) >= 0; });
                             // Partial complete
                             if (isLessonComplete){
-                                    $li.find('.jqtree-title').prepend('<i title="Lesson is In-progress" class="course-status-icon fa '+iconMapping['INPROGRESS']+'"</i> ')
+                                        $li.find('.jqtree-title').prepend('<i title="Lesson is In-progress" class="course-status-icon fa '+iconMapping['INPROGRESS']+'"</i> ')
                             }
                             
                         }
@@ -92,8 +99,10 @@
                 }
 
                 else if (node.type == "activity-group"){
-                    url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
-                    $li.find('.jqtree-title').html('<a href="'+url+'" id='+node.id +' class="redirect_to_unitplayer"><span>' + $li.find('.jqtree-title').html() + ' </a></span>')
+
+
+                    // url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
+                    $li.find('.jqtree-title').html('<a id='+node.id +' class="redirect_to_unitplayer"><span id='+node.parent.id+'>' + $li.find('.jqtree-title').html() + ' </a></span>')
                     if(visited_nodes_ids.indexOf(node.id) != -1){
                         if (visited_nodes[node.id] > 1){
                         title_attr = "You visited this activity "+visited_nodes[node.id]+" times"
@@ -104,6 +113,12 @@
                         }
                         $li.find('.jqtree-title').prepend('<i title="'+title_attr+'" class="course-status-icon fa '+iconMapping['COMPLETED']+'"</i>')
                     }
+
+                    // $.get('/{{group_id}}/course/activity_player/',{id:'node_id'} function(data){
+                    //     $('#activityplayer-course-content').html(data);
+                    //     })
+
+  
                 }
 
             }
@@ -112,5 +127,25 @@
 
     $(document).on('click', '.jqtree-toggler-lesson', function(){
         $(this).find('.jqtree-toggler').click()
+    })
+    $(document).on('click', '.redirect_to_unitplayer', function(){
+        var activity_id= $(this).attr("id");
+        var lesson_id = $(this).find("span").attr("id");
+        var span_value = $(this).find("span").text();
+        $.ajax({
+        url:"{% url 'activity_player_content' group_id %}",
+        type:"POST",
+        datatype: "html",
+        data:{
+          node_parent_id: lesson_id,
+          node_id : activity_id,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success:function(data){
+          // alert(span_value);
+          $('#activityplayer-course-content').empty();
+          $("#activityplayer-course-content").append(data);
+        }
+      }); 
     })
 </script>
