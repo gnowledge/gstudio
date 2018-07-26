@@ -1,10 +1,16 @@
-<div class="course-content small-3 medium-3 columns">
-    <div id="tree1">
-    </div>
-</div>
-<div class="activityplayer-course-content small-9 medium-9 columns">
-    <div id="activityplayer-course-content">
+<div class="small-12 medium-12 small-centered medium-centered columns">
+     <div class="course_editor ">
 
+        <div class="course-content small-12 medium-12 columns">
+            <div id="tree1">
+
+            </div>
+        </div>
+<!--         <div class="activityplayer-course-content small-9 medium-8  columns">
+            <div id="activityplayer-course-content">
+        
+             </div>
+        </div> -->
     </div>
 </div>
 
@@ -102,7 +108,7 @@
 
 
                     // url = '/{{group_id}}/course/activity_player/' + node.parent.id + '/' + node.id
-                    $li.find('.jqtree-title').html('<a id='+node.id +' class="redirect_to_unitplayer"><span id='+node.parent.id+'>' + $li.find('.jqtree-title').html() + ' </a></span>')
+                    $li.find('.jqtree-title').html('<a id='+node.id +' class="redirect_to_unitplayer"><span id='+node.parent.id+'>' + $li.find('.jqtree-title').html() + ' </a></span><div id="activityplayer-course-content" style="height:100%;">')
                     if(visited_nodes_ids.indexOf(node.id) != -1){
                         if (visited_nodes[node.id] > 1){
                         title_attr = "You visited this activity "+visited_nodes[node.id]+" times"
