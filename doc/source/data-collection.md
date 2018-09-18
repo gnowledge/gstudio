@@ -1,4 +1,4 @@
-# Data Collection
+# Data Collection [Complete]
 
 All the CLIx schools are running either of the platforms:
     [1]. gStudio
@@ -17,7 +17,8 @@ Year (YYYY)                                             [ LEVEL 0 ]
                 - db                                    [ LEVEL 4 ]
                 - media                                 [ LEVEL 4 ]
                 - rcs-repo                              [ LEVEL 4 ]
-                - pgdump-all.sql                        [ LEVEL 4 ]
+                - postgres-dump                         [ LEVEL 4 ]
+                    - pg_dump_all.sql                   [ LEVEL 5 ]
                 - system-heartbeat                      [ LEVEL 4 ]
                 - gstudio-exported-users-analytics-csvs [ LEVEL 4 ]
                 - gstudio_tools_logs                    [ LEVEL 4 ]
@@ -64,7 +65,7 @@ we have a provision to collect data from the said platforms and both may reside 
     - `db`: mongoDB data *(gStudio + qbank)*.
     - `media`: Files uploaded on clixserver *(gStudio)*.
     - `rcs-repo`: rcs, versioned json files *(gStudio)*.
-    - `pgdump-all.sql`: Postgres DB dump.
+    - `postgres-dump`: Postgres DB dump folder containing file `pg_dump_all.sql`. This is dump of user data.
     - `system-heartbeat`: Contains log of following:
         - Server Id
         - School Id
@@ -89,7 +90,6 @@ we have a provision to collect data from the said platforms and both may reside 
         - `studentResponseFiles`: User uploaded files in assessments e.g: recorded-audio, images etc. 
     - `nginx-logs`: Contains logs produced by nginx.
 
----
 
 **EXAMPLE STRUCTURE**:
 ```
@@ -102,7 +102,8 @@ Example-data-collection-dir-str/
     │       │   ├── db
     │       │   ├── media
     │       │   ├── rcs-repo
-    │       │   ├── pgdump-all.sql
+    │       │   ├── postgres-dump
+    │       │   |    └── pg_dump_all.sql
     │       |   ├── gstudio-exported-users-analytics-csvs
     │       |   ├── gstudio_tools_logs
     │       |   ├── gstudio-logs
@@ -121,7 +122,8 @@ Example-data-collection-dir-str/
             │   ├── db
             │   ├── media
             │   ├── rcs-repo
-            │   ├── pgdump-all.sql
+            │   ├── postgres-dump
+            │   |    └── pg_dump_all.sql
             │   ├── gstudio-exported-users-analytics-csvs
             │   ├── gstudio_tools_logs
             │   ├── gstudio-logs
@@ -135,3 +137,53 @@ Example-data-collection-dir-str/
             │       └── studentResponseFiles
             └── unplatform
 ```
+
+
+---
+
+## Derived Data
+Derived data is one which we can pull out from above complete data by running scripts on it.
+
+### 1. Activity Timestamp [format: CSV]
+1.1 For **Single User**:
+- Script Name: `activity_timestamp`
+- Prerequisite:
+    - Get in docker (ref. Utility 1)
+    - Reach at required gstudio location within docker (ref. Utility 2)
+- [ RUN ]: `python manage.py activity_timestamp <username>`
+- Example [ RUN ]: `python manage.py activity_timestamp green-apple-sp100`
+
+1.2 For **all user's**:
+- Script Name: `get_all_users_activity_timestamp_csvs.py`
+- Prerequisite:
+    - Get in docker (ref. Utility 1)
+    - Reach at required gstudio location within docker (ref. Utility 2)
+    - Get into project shell (ref. Utility 3)
+- [ RUN ]: `execfile('../doc/deployer/get_all_users_activity_timestamp_csvs.py')`
+
+### 2. Progress CSV's: [format: CSV]
+- Script name: `export_users_analytics`
+- Prerequisite:
+    - Get in docker (ref. Utility 1)
+    - Reach at required gstudio location within docker (ref. Utility 2)
+- [ RUN ]: `python manage.py export_users_analytics`
+
+### 3. Assessments data [format: DB data dumps]
+- Script Name: `single_school_get_MIT_activity_data.py`
+- Prerequisite:
+    - Get in docker (ref. Utility 1)
+    - Reach at required gstudio location within docker (ref. Utility 4)
+- [ RUN ]: `python single_school_get_MIT_activity_data.py`
+
+---
+
+### Utility Commands:
+
+#### 1. Get into docker [ RUN ]:
+- `docker exec -it gstudio bash`
+#### 2. Reach at required `gstudio` location within docker [ RUN ]:
+- `cd /home/docker/code/gstudio/gnowsys-ndf`
+#### 3. Get into project shell [ RUN ]:
+- `python manage.py shell`
+#### 4. Reach at required `qbank-gstudio-scripts` location within docker [ RUN ]:
+- `cd qbank-gstudio-scripts/single_school_get_MIT_activity_data/`

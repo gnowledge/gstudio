@@ -103,6 +103,7 @@ media urls in nested dictionary. Following is schema of if\_file:
 -  "collection\_set": List of resource names to organize resources.
 -  "post\_node": N/A
 -  "prior\_node": List of pre-requisites of concern resource.
+-  "relation\_set": Objects relations in a key value pair form. Value can be single ObjectId or list of ObjectId.
 
 -  curricular: Boolean value either true or false. Specifies resource is
    curricular or not.
@@ -126,25 +127,31 @@ media urls in nested dictionary. Following is schema of if\_file:
 
 --------------
 
-**Example API calls:** Examples can be used live on nroer.gov.in.
+**Example API calls:** Examples can be used on live nroer.gov.in server.
 
-List possible query keys: - http://nroer.gov.in/api/v1
+List possible query keys:
+- http://nroer.gov.in/api/v1
 
-List possible values for query keys - http://nroer.gov.in/api/v1/tags -
-http://nroer.gov.in/api/v1/status
+List possible values for query keys
+- http://nroer.gov.in/api/v1/tags
+- http://nroer.gov.in/api/v1/status
 
-List json objects with various key and value combination: -
-http://nroer.gov.in/api/v1?tags=creative -
-http://nroer.gov.in/api/v1?resource\_type=File&tags=creative -
-http://nroer.gov.in/api/v1?workspace=home&resource\_type=File&tag=creative
--
-http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&created\_by=nroer\_team&educationaluse=Images
--
-http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&educationalsubject=history
--
-http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&source=CIET,%20NCERT
--
-http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&created\_by=nroer\_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
+List json objects with various key and value combination:
+- http://nroer.gov.in/api/v1?tags=creative
+- http://nroer.gov.in/api/v1?resource\_type=File&tags=creative
+- http://nroer.gov.in/api/v1?workspace=home&resource\_type=File&tag=creative
+- http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&created\_by=nroer\_team&educationaluse=Images
+- http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&educationalsubject=history
+- http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&source=CIET,%20NCERT
+- http://nroer.gov.in/api/v1/?workspace=home&resource\_type=File&created\_by=nroer\_team&legal.copyright=CC-BY-SA%204.0%20unported&interactivitytype=expositive&educationaluse=image
+
+Relation support:
+- Check for field `relation_set` in every object. It contains dict of relation-name (key) and ObjectId or [ObjectId] as value.
+- We can derive full object with `//<domain>/api/v1?_id=<ObjectId>` API call.
+- Example: To list out the topic ("Patterns and Symmetry"): https://nroer.gov.in/api/v1?resource_type=Topic&name=Patterns%20and%20Symmetry
+- To get detail about one object of taught_by: https://nroer.gov.in/api/v1?_id=5af1810816b51c01e3736a5c
+- NOTE: Get additional/complete details of object: https://nroer.gov.in/dev/query/5af1810816b51c01e3736a5c/nbh
+
 
 If you need more specific help, contact the developers on the mailing
 list, or file an issue at the git repo.

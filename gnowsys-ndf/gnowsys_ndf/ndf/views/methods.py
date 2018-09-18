@@ -2085,7 +2085,10 @@ def cast_to_data_type(value, data_type):
     # print "\n\t\tin method: ", value, " == ", data_type
 
     if data_type != "list":
-      value = value.strip()
+        try:
+            value = value.strip()
+        except Exception as e:
+            pass
     casted_value = value
     if data_type == "unicode":
         casted_value = unicode(value)
@@ -2126,11 +2129,20 @@ def cast_to_data_type(value, data_type):
             casted_value = [i.strip() for i in value if i]
             # print "casted_value",casted_value
 
-    elif data_type == "datetime.datetime":
-        # "value" should be in following example format
-        # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
-        # Out[10]: datetime(2014, 12, 11, 0, 0)
-        casted_value = datetime.strptime(value, "%d/%m/%Y")
+    elif (data_type == "datetime.datetime") or (str(data_type) == "<type 'datetime.datetime'>"):
+        try:
+            # "value" should be in following example format
+            # In [10]: datetime.strptime( "11/12/2014", "%d/%m/%Y")
+            # Out[10]: datetime(2014, 12, 11, 0, 0)
+            casted_value = datetime.strptime(value, "%d/%m/%Y")
+        except Exception as e:
+            casted_value = datetime.strptime(value, "%d/%m/%Y %H:%M:%S:%f")
+
+    elif (str(data_type) == "<class 'bson.objectid.ObjectId'>") or isinstance(data_type, (ObjectId, bson.objectid.ObjectId)):
+        try:
+            casted_value = ObjectId(value)
+        except Exception as e:
+            pass
 
     return casted_value
 

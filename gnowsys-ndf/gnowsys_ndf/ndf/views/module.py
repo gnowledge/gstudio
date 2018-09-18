@@ -151,24 +151,37 @@ def module_detail(request, group_id, node_id,title=""):
     '''
     primary_lang_tuple = get_language_tuple(GSTUDIO_PRIMARY_COURSE_LANGUAGE)
     if title == "courses":
-        module_detail_query.update({'$or': [
-        {'$and': [
-            {'member_of': {'$in': [gst_announced_unit_id, gst_ce_id]}},
-            {'$or': [
-              {'created_by': request.user.id},
-              {'group_admin': request.user.id},
-              {'author_set': request.user.id},
-              {
-               '$and': [
-                   {'group_type': u'PUBLIC'},
-                   {'language': primary_lang_tuple},
-               ]
-              },
-            ]}
-        ]},
-        #{'member_of': gst_announced_unit_id }
-      ]})
 
+        #   module_detail_query.update({'$or': [
+        #   {'$and': [
+        #       {'member_of': {'$in': [gst_announced_unit_id, gst_ce_id]}},
+        #       {'$or': [
+        #         {'created_by': request.user.id},
+        #         {'group_admin': request.user.id},
+        #         {'author_set': request.user.id},
+        #         {
+        #          '$and': [
+        #              {'group_type': u'PUBLIC'},
+        #              {'language': primary_lang_tuple},
+        #          ]
+        #         },
+        #       ]}
+        #   ]},
+        #   #{'member_of': gst_announced_unit_id }
+        # ]})
+        #
+        # # above can be delete after robust testing of following new query:
+
+        module_detail_query.update({
+            'status': 'PUBLISHED',
+            '$or': [
+                {'group_admin': request.user.id},
+                {'created_by': request.user.id},
+                {'author_set': request.user.id},
+                {'member_of': gst_announced_unit_id},
+                {'language': primary_lang_tuple, 'group_type': u'PUBLIC', 'member_of': gst_ce_id}
+            ]
+        })
     
     if title == "drafts":
         module_detail_query.update({'$or': [

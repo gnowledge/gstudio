@@ -432,7 +432,7 @@ var animalList = [
                 },
                 {
                   id: 58,
-                  name: 'Honeybee',
+                  name: 'honeybee',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
@@ -500,7 +500,7 @@ var animalList = [
                 },
                 {
                   id: 59,
-                  name: 'Lobster',
+                  name: 'lobster',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
@@ -679,7 +679,7 @@ var animalList = [
                 },
                 {
                   id: 60,
-                  name: 'Scorpion',
+                  name: 'scorpion',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
@@ -724,7 +724,7 @@ var animalList = [
                 },
                 {
                   id: 61,
-                  name: 'Sheep',
+                  name: 'sheep',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
@@ -758,7 +758,7 @@ var animalList = [
                 },
                 {
                   id: 62,
-                  name: 'Squid',
+                  name: 'squid',
                   svg: `<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
                       <g transform="translate(-721.42857,-650.93361)">
                         <path
