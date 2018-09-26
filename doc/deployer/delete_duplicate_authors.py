@@ -21,7 +21,7 @@ for i in j:
 
 # delete new instances:
 for each_node_to_del_id in ([ sl for x in (i['new'].values() for i in auth_dec.values()) for sl in x ]):
-    delete_node(each_node_to_del, deletion_type=1)
+    delete_node(each_node_to_del_id, deletion_type=1)
 
 # Pending:
 # - check for grelation `profile_pic` and other to take decision of which object to keep
