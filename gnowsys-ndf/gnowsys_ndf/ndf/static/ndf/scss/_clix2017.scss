@@ -2668,6 +2668,7 @@ ul.jqtree-tree .jqtree-toggler {
         .note-text {
           // //font-size: 19px;
           letter-spacing: 0.7px;
+          word-wrap: break-word;
           p{
             padding: 0px;
           }
