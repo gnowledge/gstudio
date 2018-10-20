@@ -10,29 +10,28 @@
 from gnowsys_ndf.ndf.models import node_collection
 import re
 
-''' To collect all the activities under the English module'''
-GSystemnds = node_collection.find({
+# To collect all the activities under the English module
+english_module_names = ['English Elementary','English Beginner'] 
+english_modules = node_collection.find({'_type':'GSystem','name':{'$in':english_module_names}},{'_id':1,'collection_set':1})
+
+page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
+gsystemnds = node_collection.find({
             '_type':'GSystem',
-            'member_of':[ObjectId('5752ad552e01310a05dca4a1')],
-            'group_set':{'$in':[
-                    ObjectId('5943ff594975ac013d3701fc'),ObjectId('5943fd564975ac013d36fdae'),
-                    ObjectId('59425be44975ac013cccb909'),ObjectId('59b6565c2c47960148218050')]},
+            'member_of':page_gst_id,
+            'group_set':{'$in':[eachid for each in english_modules for eachid in each.collection_set]},
             'collection_set':[]})
 
-'''Pattern to identity the Multiple ID = toggler 
-To find the below string occuring more than once
-<input align="right" id="toggler" type="checkbox"><label class="toggle-me" for="toggler">Transcript</label> '''
+#To find the below string occuring more than once <input align="right" id="toggler" type="checkbox"><label class="toggle-me" for="toggler">Transcript</label> '''
 regx = "(id=\"toggler\"(?!for=\"toggler\").*?for=\"toggler\")"
  
-'''Found only one id :59425bed4975ac013cccb981------59425be44975ac013cccb909'''
- 
-'''For each node if the pattern matched more than twice then we change the first 2 occurances of the string "toggler" with "toggler09" '''
-for each in GSystemnds:
+#For each node if the pattern matched more than twice then we change the first 2 occurances of the string "toggler" with "toggler09"
+for each in gsystemnds:
     matches = re.findall(regx,str(each.content))
     flag = False
     if len(matches) > 1:
         flag = True
         trns_faulty_nd = node_collection.one({'_id':ObjectId(each._id)})
         trns_faulty_nd.content.replace('"toggler"','"toggler09"',2)
-    if flag:    
-    trns_faulty_nd.save()
+    if flag:
+        print "Saving :",each._id
+        trns_faulty_nd.save()

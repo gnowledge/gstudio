@@ -24,21 +24,24 @@ import re
 from gnowsys_ndf.ndf.models import node_collection
 from bs4 import BeautifulSoup  
 
-'''To identify the href starting with digit but not with "/"''';
+#To identify the href starting with digit but not with "/"
 regx1 = '^\d' 
 
-'''Extracting all activities under the Linear Equations module'''
-LEGSystmnds = node_collection.find({
+le_module_name = "Linear Equations"
+le_modules = node_collection.find({'_type':'GSystem','name':{'$in':le_module_name}},{'_id':1,'collection_set':1})
+
+page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
+
+#Extracting all activities under the Linear Equations module
+legsystmnds = node_collection.find({
         '_type':'GSystem', 
-        'member_of':[ObjectId('5752ad552e01310a05dca4a1')],
-        'group_set':{'$in':[
-            ObjectId('59b665592c47962c1d002711'),ObjectId('59b666132c47962c1d002874'),
-            ObjectId('59b662f42c47962c1d002147'),ObjectId('59b663de2c47962c1d002620')]},
+        'member_of':page_gst_id,
+        'group_set':{'$in':[eachid for each in le_modules for eachid in each.collection_set]},
         'collection_set':[]})
    
 
-'''To fetch the faulty hrefs and update them accordingly. This covers the e-Notes as well as Upload'''
-for index, each_nd in enumerate(LEGSystmnds,start =1):
+#To fetch the faulty hrefs and update them accordingly. This covers the e-Notes as well as Upload
+for index, each_nd in enumerate(legsystmnds,start =1):
      soup = BeautifulSoup(each_nd.content)
      findflg = soup.find_all('a')
      if findflg:
@@ -53,7 +56,5 @@ for index, each_nd in enumerate(LEGSystmnds,start =1):
              if flag:
                  print "Changing:", each_nd._id
     		 each_nd.save()
-                 #print each_nd.content.encode("utf-8")
-     #print "="*30
      
 
