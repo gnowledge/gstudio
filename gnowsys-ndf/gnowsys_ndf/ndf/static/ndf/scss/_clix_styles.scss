@@ -661,6 +661,7 @@ body>footer {
         }
         .note-text {
           // //font-size: 19px;
+          word-wrap: break-word;
           letter-spacing: 0.7px;
           p{
             padding: 0px;
