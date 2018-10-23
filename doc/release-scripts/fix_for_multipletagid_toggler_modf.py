@@ -30,8 +30,7 @@ for each in gsystemnds:
     flag = False
     if len(matches) > 1:
         flag = True
-        trns_faulty_nd = node_collection.one({'_id':ObjectId(each._id)})
-        trns_faulty_nd.content.replace('"toggler"','"toggler09"',2)
+        each.content.replace('"toggler"','"toggler09"',2)
     if flag:
         print "Saving :",each._id     # Printing the node id which got changed and is being saved
-        trns_faulty_nd.save()
+        each.save()
