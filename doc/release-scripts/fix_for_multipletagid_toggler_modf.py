@@ -30,7 +30,7 @@ for each in gsystemnds:
     flag = False
     if len(matches) > 1:
         flag = True
-        each.content.replace('"toggler"','"toggler09"',2)
+        each.content = each.content.replace('"toggler"','"toggler09"',2)
     if flag:
         print "Saving :",each._id     # Printing the node id which got changed and is being saved
         each.save()
