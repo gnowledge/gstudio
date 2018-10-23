@@ -22,18 +22,18 @@ activitynds = node_collection.find({'_type': 'GSystem','member_of':page_gst_id,'
      soup = BeautifulSoup(eachnd.content)
      fndflg = soup.find_all('img')
      if fndflg:
-         print index ,"\t",":", eachnd_id
+         #print index ,"\t",":", eachnd_id
          for eachimg in fndflg:
              imgsrc = eachimg["src"]
-             print imgsrc,"\n"
+             #print imgsrc,"\n"
              nodesave = False
              innerflg = imgsrc.startswith("https://clixplatform")
              if innerflg:
                  nodesave = True
-                 print index, "\t", eachnd._id,":\n"
+                 #print index, "\t", eachnd._id,":\n"
                  imgsrc = imgsrc[imgsrc.index('/media') : len(imgsrc)]
          if nodesave:
-             print "Changing :",eachnd._id
+             print "Changing :",eachnd._id       # Printing node which is changed
              eachnd.save()
 
 

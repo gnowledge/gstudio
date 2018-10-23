@@ -33,5 +33,5 @@ for each in gsystemnds:
         trns_faulty_nd = node_collection.one({'_id':ObjectId(each._id)})
         trns_faulty_nd.content.replace('"toggler"','"toggler09"',2)
     if flag:
-        print "Saving :",each._id
+        print "Saving :",each._id     # Printing the node id which got changed and is being saved
         trns_faulty_nd.save()

@@ -42,19 +42,19 @@ legsystmnds = node_collection.find({
 
 #To fetch the faulty hrefs and update them accordingly. This covers the e-Notes as well as Upload
 for index, each_nd in enumerate(legsystmnds,start =1):
-     soup = BeautifulSoup(each_nd.content)
+     soup = BeautifulSoup(each_nd.content)         
      findflg = soup.find_all('a')
+     flag = False
      if findflg:
          for link in findflg:
              linkaddr = link.get("href")
-             flag = False
              if re.match(regx1,linkaddr):
                  flag = True
                  linkaddr = "/"+linkaddr
                  link['href'] = linkaddr
                  each_nd.content = soup
-             if flag:
-                 print "Changing:", each_nd._id
-    		 each_nd.save()
+         if flag:
+              print "Changing:", each_nd._id       # Printing the node which got changed
+              each_nd.save()
      
 
