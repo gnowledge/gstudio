@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 regx1 = '^\d' 
 
 le_module_name = "Linear Equations"
-le_modules = node_collection.find({'_type':'GSystem','name':{'$in':le_module_name}},{'_id':1,'collection_set':1})
+le_modules = node_collection.find({'_type':'GSystem','name':le_module_name},{'_id':1,'collection_set':1})
 
 page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
 
@@ -52,8 +52,9 @@ for index, each_nd in enumerate(legsystmnds,start =1):
                  flag = True
                  linkaddr = "/"+linkaddr
                  link['href'] = linkaddr
-                 each_nd.content = soup
          if flag:
+              each_nd.content = soup
+              each_nd.content = each_nd.content.decode("utf-8")
               print "Changing:", each_nd._id       # Printing the node which got changed
               each_nd.save()
      

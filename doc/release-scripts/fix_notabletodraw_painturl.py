@@ -42,6 +42,7 @@ for index,each_nd in enumerate(grgsystmnds,start =1):
            if flag: 
                   print "Saving :", each_nd._id     # Printing the node which is changed and about to be saved
                   each_nd.content = soup
+                  each_nd.content = each_nd.content.decode("utf-8")
                   each_nd.save()
  
 

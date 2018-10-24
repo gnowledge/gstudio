@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 
 changedflg = False
 
-actnd = node_collection.find({'_type':'GSystem','_id':ObjectId('59425d1c4975ac013cccbba3')})
+actnd = node_collection.one({'_type':'GSystem','_id':ObjectId('59b653d42c47960149a1287f')})
 
 soup = BeautifulSoup(actnd.content)
 
