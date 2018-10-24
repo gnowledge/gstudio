@@ -31689,42 +31689,43 @@ body > footer {
 }
 /* line 662, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text {
+  word-wrap: break-word;
   letter-spacing: 0.7px;
 }
-/* line 665, ../../../scss/_clix_styles.scss */
+/* line 666, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .note-content .note-text p {
   padding: 0px;
 }
-/* line 671, ../../../scss/_clix_styles.scss */
+/* line 672, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections {
   padding: 0em 1em 0em;
 }
-/* line 675, ../../../scss/_clix_styles.scss */
+/* line 676, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header span {
   font-weight: bold;
 }
-/* line 678, ../../../scss/_clix_styles.scss */
+/* line 679, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .comments-header i:not(:first-child) {
   margin-left: 15px;
 }
-/* line 683, ../../../scss/_clix_styles.scss */
+/* line 684, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment {
   border-top: 1px solid grey;
   padding: 15px 10px;
   margin-top: 5px;
 }
-/* line 688, ../../../scss/_clix_styles.scss */
+/* line 689, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-box,
 .notebook .notebook-body .note-page .comment-sections .new-comment .trumbowyg-editor {
   min-height: 200px;
   margin-top: 0px;
 }
-/* line 694, ../../../scss/_clix_styles.scss */
+/* line 695, ../../../scss/_clix_styles.scss */
 .notebook .notebook-body .note-page .comment-sections .new-comment .user-prof-image {
   line-height: 0em;
 }
 
-/* line 704, ../../../scss/_clix_styles.scss */
+/* line 705, ../../../scss/_clix_styles.scss */
 .add-note-btn {
   padding: 0px 5px;
   border-radius: 5px;
@@ -31735,14 +31736,14 @@ body > footer {
   font-size: 18px;
   color: #713557;
 }
-/* line 713, ../../../scss/_clix_styles.scss */
+/* line 714, ../../../scss/_clix_styles.scss */
 .add-note-btn:hover {
   background-color: #713557;
   border-color: #713557;
   color: #fff;
 }
 
-/* line 720, ../../../scss/_clix_styles.scss */
+/* line 721, ../../../scss/_clix_styles.scss */
 .edit-note-btn {
   float: right;
   margin-left: 10px;
@@ -31755,18 +31756,18 @@ body > footer {
   font-size: 18px;
   color: #713557;
 }
-/* line 731, ../../../scss/_clix_styles.scss */
+/* line 732, ../../../scss/_clix_styles.scss */
 .edit-note-btn:hover {
   background-color: #713557;
   border-color: #713557;
   color: #fff;
 }
-/* line 736, ../../../scss/_clix_styles.scss */
+/* line 737, ../../../scss/_clix_styles.scss */
 .edit-note-btn i {
   margin-right: 5px;
 }
 
-/* line 740, ../../../scss/_clix_styles.scss */
+/* line 741, ../../../scss/_clix_styles.scss */
 .delete-note-btn {
   float: right;
   width: 85px;
@@ -31778,18 +31779,18 @@ body > footer {
   font-size: 18px;
   color: #713557;
 }
-/* line 750, ../../../scss/_clix_styles.scss */
+/* line 751, ../../../scss/_clix_styles.scss */
 .delete-note-btn:hover {
   background-color: #713557;
   border-color: #713557;
   color: #fff;
 }
-/* line 755, ../../../scss/_clix_styles.scss */
+/* line 756, ../../../scss/_clix_styles.scss */
 .delete-note-btn i {
   margin-right: 5px;
 }
 
-/* line 761, ../../../scss/_clix_styles.scss */
+/* line 762, ../../../scss/_clix_styles.scss */
 .download-report {
   padding-left: 40px;
   font-size: 20px;
