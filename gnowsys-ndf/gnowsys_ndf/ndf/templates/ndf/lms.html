@@ -189,7 +189,7 @@
 
               {% endif %}
               <li>
-                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% trans "Edit Metadata" %}</a>
+                  <a href="{% url 'unit_edit' groupid group_object.pk %}" class="fi-pencil"> {% if 'Author' in group_object_member_of_names_list %} {% trans "Edit Profile" %} {% else %} {% trans "Edit Metadata" %} {% endif %}</a>
               </li>
               <li> <a data-reveal-id="delete-unit"><i class="fa fa-trash"></i> {% trans "Delete" %}</a> </li>
               <div id="delete-unit" class="reveal-modal tiny text-center" data-reveal>
