@@ -26,8 +26,8 @@ def list_buddy(request, group_id='home'):
     fetching all buddies.
     '''
 
-    buddies_authid_name_dict= request.session.get('buddies_authid_name_dict', {})
-    buddies_authid_list     = request.session.get('buddies_authid_list', [])
+    buddies_authid_name_dict = request.session.get('buddies_authid_name_dict', {})
+    buddies_authid_list = request.session.get('buddies_authid_list', [])
     # to load all user's at page load time (performance penalty, kept for ref):
     #
     # filter_authors = [ObjectId(auth_oid)for auth_oid in buddies_authid_list]
@@ -60,20 +60,21 @@ def list_buddy(request, group_id='home'):
 @get_execution_time
 def update_buddies(request, group_id):
 
+    # list of `User` ids. i.e: [int]
     selected_buddies_list = eval(request.POST.get('selected_buddies_list', '[]'))
-    # print "=== selected_buddies_list : ", selected_buddies_list
+    # Author ids: i.e: [ObjectId]
     selected_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(selected_buddies_list)
+    # ensure unique entries:
     selected_buddies_userids_set = set(selected_buddies_userids_list)
 
     updated_buddies_authid_name_dict = {}
     already_active_userid_name_dict = {}
 
+    # [ObjectId]
     buddies_authid_list = request.session.get('buddies_authid_list', [])
+    # existing buddies
     existing_buddies_userid_list = Author.get_user_id_list_from_author_oid_list(buddies_authid_list)
-    # print "=== buddies_authid_list : ", buddies_authid_list
-    # print "=== existing_buddies_userid_list : ", existing_buddies_userid_list
     intersection_buddy_userids = selected_buddies_userids_set.intersection(set(existing_buddies_userid_list))
-    # print "=======", intersection_buddy_userids
 
     if selected_buddies_list:
 
@@ -88,13 +89,8 @@ def update_buddies(request, group_id):
                         # { b['_id'].__str__(): b['name'] for b in updated_buddies_cur}
             if auth_cur:
                 already_active_userid_name_dict = {a['created_by']: a['name'] for a in auth_cur}
-            # print "==== already_active_userid_name_dict : ", already_active_userid_name_dict
 
         selected_buddies_list = list(selected_buddies_userids_set - sitewide_active_userids_set) + list(intersection_buddy_userids)
-        # print "== sitewide_active_userids_set: ", sitewide_active_userids_set
-        # print "selected_buddies_list : ", selected_buddies_list
-        # print "== selected_buddies_userids_set: ", selected_buddies_userids_set
-
         selected_buddies_list = Author.get_author_oid_list_from_user_id_list(user_ids_list=selected_buddies_list, list_of_str_oids=True)
 
     if selected_buddies_list or buddies_authid_list:
@@ -102,7 +98,6 @@ def update_buddies(request, group_id):
         # update_buddies method signature:
         # def update_buddies(self, loggedin_userid, session_key, buddy_auth_ids_list=[]):
         active_buddy_auth_list = Buddy.update_buddies(request.user.id, request.session.session_key, selected_buddies_list)
-        # print "\n\nactive_buddy_auth_list : ", active_buddy_auth_list
 
         # ab: active buddy
         updated_buddies_cur = node_collection.find({
@@ -121,13 +116,11 @@ def update_buddies(request, group_id):
         request.session['buddies_authid_list']      = active_buddy_auth_list
         request.session['buddies_authid_name_dict'] = json.dumps(updated_buddies_authid_name_dict)
         request.session['buddies_username_id_dict'] = json.dumps(buddies_username_id_dict)
-        # print "\n\nrequest.session['buddies_authid_name_dict'] : ", request.session['buddies_authid_name_dict']
 
     result_dict = {
                 'buddies': updated_buddies_authid_name_dict,
                 'already_active': already_active_userid_name_dict
             }
-    # print "=== result_dict : ", result_dict
 
     return HttpResponse(json.dumps(result_dict))
 
