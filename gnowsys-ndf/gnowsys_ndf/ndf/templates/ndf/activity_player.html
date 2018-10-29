@@ -279,11 +279,10 @@
             }
        }
     }
-
-    setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src} }}, 5000);
-
-  })
-
+    
+   setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].getAttribute('src')===""){break;}else{if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src}} }}, 5000); })
+//setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src} }}, 5000); 
+})
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",
