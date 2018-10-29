@@ -58,4 +58,5 @@ if actnd and changedflg:
      actnd.content = soup
      actnd.content = actnd.content.decode("utf-8")
      actnd.save()
+     changedflg = False
 

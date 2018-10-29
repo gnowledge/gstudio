@@ -21,23 +21,25 @@ Fix :  Authoring Issue, where in the url mentioned under href is not proper whic
 
 
 import re
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection, Node
 from bs4 import BeautifulSoup  
 
 #To identify the href starting with digit but not with "/"
+regx = re.compile('<a href="[\d\w]*\/course\/notebook\/\?create=True"',re.IGNORECASE)
 regx1 = '^\d' 
 
 le_module_name = "Linear Equations"
-le_modules = node_collection.find({'_type':'GSystem','name':le_module_name},{'_id':1,'collection_set':1})
+le_modules = node_collection.find({'_type':'GSystem','name':le_module_name},{'collection_set':1})
 
-page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
+page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
 
 #Extracting all activities under the Linear Equations module
 legsystmnds = node_collection.find({
         '_type':'GSystem', 
         'member_of':page_gst_id,
         'group_set':{'$in':[eachid for each in le_modules for eachid in each.collection_set]},
-        'collection_set':[]})
+        'collection_set':[],
+        'content':regx})
    
 
 #To fetch the faulty hrefs and update them accordingly. This covers the e-Notes as well as Upload

@@ -7,7 +7,7 @@ Fix :  Finding the activities having the image src as the absolute URL and then 
 
 
 import re
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection, Node
 from bs4 import BeautifulSoup  
 
 #To identify the image src having the absolute URL 
@@ -15,7 +15,7 @@ regx = re.compile('"https:\/\/clixplatform.tiss.edu\/media',re.IGNORECASE)
 regx1 = re.compile('"http:\/\/clixplatform.tiss.edu\/media',re.IGNORECASE) 
 
 #Extracting all activity pages containing the above regx pattern in the content
-page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
+page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
 activitynds = node_collection.find({'_type': 'GSystem','member_of':page_gst_id,'content': {'$in':[regx,regx1]},'collection_set': []})   
 
 nodesave = False
@@ -33,11 +33,12 @@ for index,eachnd in enumerate(activitynds,start =1):
                 if innerflg:
                     nodesave = True
                     #print index, "\t", eachnd._id,
-                    eachimg['src'] = imgsrc[imgsrc.index('/media') : len(imgsrc)]
+                    eachimg['src'] = imgsrc[imgsrc.index('/media') : ]
         if nodesave:
             eachnd.content = soup
             eachnd.content = eachnd.content.decode("utf-8")
             print "Changing :",eachnd._id       # Printing node which is changed
             eachnd.save()
+            nodesave = False
     print "*"*30
 

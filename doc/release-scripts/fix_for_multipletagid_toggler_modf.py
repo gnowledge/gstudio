@@ -7,23 +7,24 @@
 
 '''
 
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection, Node
 import re
 
+#To find the below string occuring more than once <input align="right" id="toggler" type="checkbox"><label class="toggle-me" for="toggler">Transcript</label> '''
+regx = re.compile("(id=\"toggler\"(?!for=\"toggler\").*?for=\"toggler\")",re.IGNORECASE)
+ 
 # To collect all the activities under the English module
 english_module_names = ['English Elementary','English Beginner'] 
 english_modules = node_collection.find({'_type':'GSystem','name':{'$in':english_module_names}},{'_id':1,'collection_set':1})
 
-page_gst_id = node_collection.one({'_type': 'GSystemType', 'name': 'Page'})._id
+page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
 gsystemnds = node_collection.find({
             '_type':'GSystem',
             'member_of':page_gst_id,
             'group_set':{'$in':[eachid for each in english_modules for eachid in each.collection_set]},
-            'collection_set':[]})
+            'collection_set':[],
+            'content':regx})
 
-#To find the below string occuring more than once <input align="right" id="toggler" type="checkbox"><label class="toggle-me" for="toggler">Transcript</label> '''
-regx = "(id=\"toggler\"(?!for=\"toggler\").*?for=\"toggler\")"
- 
 #For each node if the pattern matched more than twice then we change the first 2 occurances of the string "toggler" with "toggler09"
 for each in gsystemnds:
     matches = re.findall(regx,str(each.content))
@@ -34,3 +35,5 @@ for each in gsystemnds:
     if flag:
         print "Saving :",each._id     # Printing the node id which got changed and is being saved
         each.save()
+        flag = False
+    

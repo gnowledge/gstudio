@@ -15,12 +15,13 @@ Hence this may not work for every server
 import re
 from gnowsys_ndf.ndf.models import node_collection
 from bs4 import BeautifulSoup  
-
+from bson import ObjectId
 '''To identify the href without "/"'''
 regx1 = '^/sugar/activities/Paint.activity/'
 
+activities_list = list(map(ObjectId,['59425d1c4975ac013cccbba3','59425e4d4975ac013cccbcb4']))
 grgsystmnds = node_collection.find({'_type':'GSystem',
-				    '$or':[{'_id':ObjectId('59425d1c4975ac013cccbba3')},{'_id':ObjectId('59425e4d4975ac013cccbcb4')}]})
+				    '_id':{'$in':activities_list}})
 
    
 '''To fetch the faulty hrefs and update them accordingly.'''
@@ -44,5 +45,6 @@ for index,each_nd in enumerate(grgsystmnds,start =1):
                   each_nd.content = soup
                   each_nd.content = each_nd.content.decode("utf-8")
                   each_nd.save()
+                  flag = False
  
 
