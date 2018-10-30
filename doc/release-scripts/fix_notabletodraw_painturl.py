@@ -13,15 +13,24 @@ Hence this may not work for every server
 
 
 import re
-from gnowsys_ndf.ndf.models import node_collection
+from gnowsys_ndf.ndf.models import node_collection,Node
 from bs4 import BeautifulSoup  
 from bson import ObjectId
 '''To identify the href without "/"'''
 regx1 = '^/sugar/activities/Paint.activity/'
-
+trnslnof_gst_id = Node.get_name_id_from_type('translation_of','RelationType')[1]
 activities_list = list(map(ObjectId,['59425d1c4975ac013cccbba3','59425e4d4975ac013cccbcb4']))
+trnsnds_list = []
+for each in activities_list:
+       trnsnds_list.append(triple_collection.find({'_type':'GRelation','relation_type':trnslnof_gst_id,'subject':each}).distinct('right_subject'))
+
+activities_list.extend(eachid for eachlst in trnsnds_list for eachid in eachlst)
+
 grgsystmnds = node_collection.find({'_type':'GSystem',
 				    '_id':{'$in':activities_list}})
+
+#for each in grgsystemnds:
+#       each.get_relation_right_subject_nodes('translation_of')
 
    
 '''To fetch the faulty hrefs and update them accordingly.'''

@@ -18,9 +18,10 @@ english_module_names = ['English Elementary','English Beginner']
 english_modules = node_collection.find({'_type':'GSystem','name':{'$in':english_module_names}},{'_id':1,'collection_set':1})
 
 page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
+trnsnd_gst_id =Node.get_name_id_from_type('trans_node','GSystemType')[1]
 gsystemnds = node_collection.find({
             '_type':'GSystem',
-            'member_of':page_gst_id,
+            'member_of':{'$in':[trnsnd_gst_id,page_gst_id]},
             'group_set':{'$in':[eachid for each in english_modules for eachid in each.collection_set]},
             'collection_set':[],
             'content':regx})

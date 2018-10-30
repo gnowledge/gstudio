@@ -12,6 +12,7 @@ This script addresses a particular activity node, hence hardcoded the node id ma
 import re
 from gnowsys_ndf.ndf.models import node_collection
 from bs4 import BeautifulSoup  
+from bson import ObjectId
 
 '''Extracting the let's talk activity having the issue'''
 

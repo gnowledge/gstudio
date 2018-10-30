@@ -16,7 +16,8 @@ regx1 = re.compile('"http:\/\/clixplatform.tiss.edu\/media',re.IGNORECASE)
 
 #Extracting all activity pages containing the above regx pattern in the content
 page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
-activitynds = node_collection.find({'_type': 'GSystem','member_of':page_gst_id,'content': {'$in':[regx,regx1]},'collection_set': []})   
+trnsnd_gst_id = Node.get_name_id_from_type('trans_node','GSystemType')[1]
+activitynds = node_collection.find({'_type': 'GSystem','member_of':{'$in':[page_gst_id,trnsnd_gst_id]},'content': {'$in':[regx,regx1]},'collection_set': []})   
 
 nodesave = False
 

@@ -32,11 +32,11 @@ le_module_name = "Linear Equations"
 le_modules = node_collection.find({'_type':'GSystem','name':le_module_name},{'collection_set':1})
 
 page_gst_id = Node.get_name_id_from_type('Page','GSystemType')[1]
-
+trnsnd_gst_id =Node.get_name_id_from_type('trans_node','GSystemType')[1]
 #Extracting all activities under the Linear Equations module
 legsystmnds = node_collection.find({
         '_type':'GSystem', 
-        'member_of':page_gst_id,
+        'member_of':{'$in':[page_gst_id,trnsnd_gst_id]},
         'group_set':{'$in':[eachid for each in le_modules for eachid in each.collection_set]},
         'collection_set':[],
         'content':regx})
