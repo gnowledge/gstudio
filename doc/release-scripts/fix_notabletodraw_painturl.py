@@ -42,7 +42,7 @@ for index,each_nd in enumerate(grgsystmnds,start =1):
        if findflg:
            for link in findflg:
                linkaddr = link.get("href")
-               if re.match(regx1,linkaddr):
+               if linkaddr and re.match(regx1,linkaddr):
                    #print "Before:",linkaddr
                    if linkaddr.endswith('n='):
                        flag = True
