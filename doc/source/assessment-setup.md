@@ -1,4 +1,5 @@
-# Setting `oac`, `oat` on any server:
+# Assessments Setup
+> Setting `oac`, `oat` on any server:
 
 1. **qbank**
 - 1.1. `git clone https://github.com/gnowledge/qbank-lite.git` at `manage.py` level.
