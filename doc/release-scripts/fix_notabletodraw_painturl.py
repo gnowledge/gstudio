@@ -13,7 +13,7 @@ Hence this may not work for every server
 
 
 import re
-from gnowsys_ndf.ndf.models import node_collection,Node
+from gnowsys_ndf.ndf.models import node_collection,triple_collection,Node
 from bs4 import BeautifulSoup  
 from bson import ObjectId
 '''To identify the href without "/"'''
