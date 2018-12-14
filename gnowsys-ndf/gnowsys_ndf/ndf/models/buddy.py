@@ -283,9 +283,7 @@ class Buddy(DjangoDocument):
 
 
             added_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['added'])
-            # print "added_buddies_userids_list : ", added_buddies_userids_list
             removed_buddies_userids_list = Author.get_user_id_list_from_author_oid_list(added_removed_buddies_dict['removed'])
-            # print "removed_buddies_userids_list : ", removed_buddies_userids_list
 
             # DjangoActiveUsersGroup.update_user_set(
             #                                     add=added_buddies_userids_list,

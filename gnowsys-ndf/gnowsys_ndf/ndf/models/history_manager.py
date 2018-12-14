@@ -292,5 +292,5 @@ class HistoryManager():
             print "\nDeleted RCS json version file : ", version_file_path
             os.remove(json_file_path)
             print "\nDeleted RCS json file : ", json_file_path
-        except Exception, e:
+        except Exception as e:
             print "\nException occured while deleting RCS file for node '", node_obj._id.__str__(), "' : ", e

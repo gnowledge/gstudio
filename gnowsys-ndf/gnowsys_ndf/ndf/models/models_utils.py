@@ -6,7 +6,7 @@ class NodeJSONEncoder(json.JSONEncoder):
       return str(o)
 
     if isinstance(o, datetime.datetime):
-      return o.strftime("%d/%m/%Y %H:%M:%S")
+      return o.strftime("%d/%m/%Y %H:%M:%S:%f")
 
     return json.JSONEncoder.default(self, o)
 
@@ -134,7 +134,7 @@ class node_holder(DjangoDocument):
 
 #     try:
 #         active_loggedin_and_buddy_users_group = DjangoGroup.objects.get_or_create(name=django_active_users_group_name)[0]
-#     except Exception, e:
+#     except Exception as e:
 #         print e
 #         pass
 

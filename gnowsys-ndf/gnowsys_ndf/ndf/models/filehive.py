@@ -204,7 +204,7 @@ class Filehive(DjangoDocument):
                 file_blob.seek(0, os.SEEK_END)
                 file_size = file_blob.tell()
                 file_blob.seek(0)
-        except Exception, e:
+        except Exception as e:
             print "Exception in calculating file_size: ", e
             file_size = 0
 
@@ -218,7 +218,7 @@ class Filehive(DjangoDocument):
         else:
             try:
                 image_dimension_tuple = get_image_dimensions(file_blob)
-            except Exception, e:
+            except Exception as e:
                 print "Exception in calculating file dimensions: ", e
                 pass
 
@@ -306,7 +306,7 @@ class Filehive(DjangoDocument):
 
             try:
                 img = Image.open(StringIO(files.read()))
-            except Exception, e:
+            except Exception as e:
                 print "Exception in opening file with PIL.Image.Open(): ", e
                 return None, None
 
@@ -343,7 +343,7 @@ class Filehive(DjangoDocument):
 
             return mid_size_img, img_size
 
-        except Exception, e:
+        except Exception as e:
             print "Exception in converting image to mid size: ", e
             return None
 

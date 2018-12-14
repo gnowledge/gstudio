@@ -20,6 +20,7 @@ Welcome to gstudio's documentation
     implementation/implementing-interactives
     implementation/gstudio-lite
     gStudio-clix-integration
+    assessment-setup
 
 
 .. toctree::

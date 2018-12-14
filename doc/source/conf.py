@@ -68,7 +68,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'gstudio'
-copyright = u'2017, GN, Kedar A, Rachana K'
+copyright = u'2018, GN, Kedar A, Rachana K'
 author = u'GN, Kedar A., Rachana K.'
 
 # The version info for the project you're documenting, acts as replacement for
