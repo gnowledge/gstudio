@@ -226,12 +226,21 @@
     $container.scrollTop(
         $scrollTo.offset().top - $container.offset().top- $container.offset().top + $container.scrollTop()
     );
-
+    //var iframes_css = document.getElementsByTagName('iframe');
+    //document.getElementsByTagName('iframe').style.setProperty("width","100%","important");
     var iframes = document.getElementsByTagName('iframe');
-    var key = 'assessment.Bank';
 
+    //iframes.width = "100%";
+    //iframes.style.setProperty("width","100%","important");
+    var key = 'assessment.Bank';
+    // setwidth(function(){
+    //   for (var i = 0; i != iframes.length; ++i) {
+    //     iframes[i].style.setProperty("width","100%","important");
+    //   }
+    // })
     for (var i = 0; i != iframes.length; ++i) {
        var match = iframes[i].src.search(key);
+       iframes[i].style.setProperty("width","100%","important");
        // console.log(match);
        // iframes[i].replace(/&amp;/g, '&')
        // match_ = match;
@@ -279,10 +288,20 @@
             }
        }
     }
-    
-   setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].getAttribute('src')===""){break;}else{if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src}} }}, 5000); })
-//setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src} }}, 5000); 
-})
+   /*setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src} }}, 50); 
+})*/
+
+setTimeout(function() {
+   	for(i=0; i<iframes.length; i++){
+   		if(iframes[i].getAttribute('src')===""){break;}
+   		else {if(iframes[i].src.search(key)) {
+   			iframes[i].src = iframes[i].src
+   		} }
+   	}}, 50);
+     //iframes[i].style.setProperty("width","100%","important");
+
+    })
+  
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",
