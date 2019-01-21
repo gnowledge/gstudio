@@ -78,22 +78,24 @@
 
     <!-- populating replies -->
 
-    {% for each_reply in all_replies %}
-      {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
-      <div class="content" content-reply-id="{{ each_reply.oid }}" data-reply-level="{{each_reply.level}}" data-userid="{{each_reply.userid}}" >
-        <div style="margin-left:calc(({{each_reply.level}} - 1) * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ each_reply.oid }}" data-priornode-id="{{ each_reply.prior_node }}">
-          <div clas="discussion-title row " >
+    {% for reply in all_replies %}
+     {% comment %} 
+     {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
+     {% endcomment %}
+      <div class="content" content-reply-id="{{ reply.oid }}" data-reply-level="{{reply.level}}" data-userid="{{reply.userid}}" >
+        <div style="margin-left:calc(({{reply.level}} - 1) * 48px); {% if reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ reply.oid }}" data-priornode-id="{{ reply.prior_node }}">
+          <div class="discussion-title row " >
              <div class="discussion-title-username">
-              <a  href="{% url 'dashboard' each_reply.userid %}" style="color:#ADABAB !important" title=" {{ each_reply.username }}">
-                {{ each_reply.username }}
+              <a  href="{% url 'dashboard' reply.userid %}" style="color:#ADABAB !important" title=" {{ reply.username }}">
+                {{ reply.username }}
               </a>
-                <small style="float:right;color:#999999">{{ each_reply.last_update }}</small>
+                <small style="float:right;color:#999999">{{ reply.last_update }}</small>
             </div>
 
             </div>
-          <div class="discussion-content" data-reply-id="{{ each_reply.oid }}">
-            {{each_reply.HTMLcontent|safe }}
-          {% for node in each_reply.collection_set  %}
+          <div class="discussion-content" data-reply-id="{{ reply.oid }}">
+            {{reply.HTMLcontent|safe }}
+          {% for node in reply.collection_set  %}
             <div style="margin: 1em;">
               <br/>
               {% if node.status == "MODERATION" %}
@@ -115,16 +117,16 @@
 
           </div>
           <div class="discussion-footer">
-            <a class="reply-btn reply_res"  data-id='{{ each_reply.oid }}' onclick='openCKEditor($(this),"{{each_reply.oid}}")' data-org-content='{{ each_reply.content }}'>
+            <a class="reply-btn reply_res"  data-id='{{ reply.oid }}' onclick='openCKEditor($(this),"{{reply.oid}}")' data-org-content='{{ reply.content }}'>
               <i class="fa fa-reply"></i>
               {% trans "Reply" %}
             </a>
-            {% if request.user.id == each_reply.userid or is_gstaff %}
-              <a class="reply-btn delete_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick="deleteReply($(this))" style="float:right">
+            {% if request.user.id == reply.userid or is_gstaff %}
+              <a class="reply-btn delete_res" data-id='{{ reply.oid }}' data-userid="{{reply.userid}}" onclick="deleteReply($(this))" style="float:right">
                 <i class="fa fa-trash-o"></i>
                 {% trans "Delete" %}
               </a>
-               <a class="reply-btn edit_res" data-id='{{ each_reply.oid }}' data-userid="{{each_reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important">
+               <a class="reply-btn edit_res" data-id='{{reply.oid }}' data-userid="{{reply.userid}}" onclick='editreply($(this))' style="float:right;margin-right:10px!important">
                 <i class="fa fa-pencil-square-o"></i>
                 {% trans "Edit" %} |
               </a>
@@ -133,7 +135,6 @@
 
         </div>
       </div>
-      {% endif %}
 
     {% endfor %}
 
