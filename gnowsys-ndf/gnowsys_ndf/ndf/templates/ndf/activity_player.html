@@ -288,20 +288,20 @@
             }
        }
     }
-   /*setTimeout(function() {for(i=0; i<iframes.length; i++){if(iframes[i].src.search(key)) {iframes[i].src = iframes[i].src} }}, 50); 
-})*/
+    
+   setTimeout(function(){
+    for(i=0; i<iframes.length; i++){
+      if(iframes[i].getAttribute('src')===""){
+        break;
+      }
+      else{
+        if(iframes[i].src.search(key)){
+          iframes[i].src = iframes[i].src
+        }}
+      }}
+      , 5000);
+  })
 
-setTimeout(function() {
-   	for(i=0; i<iframes.length; i++){
-   		if(iframes[i].getAttribute('src')===""){break;}
-   		else {if(iframes[i].src.search(key)) {
-   			iframes[i].src = iframes[i].src
-   		} }
-   	}}, 50);
-     //iframes[i].style.setProperty("width","100%","important");
-
-    })
-  
   $(".admin-page").click(function(event){
       $.ajax({
               type: "POST",
