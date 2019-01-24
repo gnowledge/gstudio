@@ -2805,7 +2805,15 @@ def course_analytics(request, group_id, user_id, render_template=False, get_resu
                 'notapplicable_quizitems': 0,
                 'incorrect_attempted_quizitems': 0,
                 'attempted_quizitems': 0,
-                'admin_view': False
+                'admin_view': False,
+                #As progress csv are failing for i2C, have added default values to assessment data
+                'correct_attempted_assessments':0,
+                'unattempted_assessments':0,
+                'visited_assessments':0,
+                'notapplicable_assessments':0,
+                'incorrect_attempted_assessments':0,
+                'attempted_assessments':0,
+                'total_assessment_items':0
             })
     data_points_dict = {}
     assessment_and_quiz_data = kwargs.get('assessment_and_quiz_data', False)
