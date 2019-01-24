@@ -232,6 +232,7 @@
 
     for (var i = 0; i != iframes.length; ++i) {
        var match = iframes[i].src.search(key);
+       iframes[i].style.setProperty("width","100%","important");
        // console.log(match);
        // iframes[i].replace(/&amp;/g, '&')
        // match_ = match;
