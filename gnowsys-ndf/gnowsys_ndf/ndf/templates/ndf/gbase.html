@@ -65,7 +65,9 @@
     {% if site.BUDDY_LOGIN and user.is_authenticated and request.author.agency_type == 'Student' %}
         {% include "ndf/buddy.html" %}
     {% endif %}
-
+    {% if site.SITE_NAME == 'clix' %}
+        {% include "ndf/video_sidebar.html" %}
+    {% endif %}
     {% include "ndf/header_clix.html" %}
     {% block extended_header %}{% endblock %}
 
