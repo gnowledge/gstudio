@@ -1,0 +1,196 @@
+<html>
+	<head>
+			<link rel="stylesheet" type="text/css" href="/static/ndf/css/help_videos.css">
+			<!-- <script src="static/ndf/js/video-controls-def.js"></script> -->
+		<!--Forward-->
+	
+			</head>
+			
+			
+		<!--Forward end-->
+	</head>
+	<body>
+
+		
+		<!-- <div class="float-sm">
+			<div class="fl-fl float-help">
+					<a href="#" target="_blank">HELP Videos</a>
+			</div>
+			<div class="fl-fl float-bv">
+				<a href="/media/help_videos/Adding Buddies.mp4" target="_blank">Buddy Video</a>
+			</div>
+    		<div class="fl-fl float-ev">
+				<a href="/media/help_videos/Exploring courses and going to lesson overview.mp4" target="_blank">Explore Video</a>
+			</div>
+    		<div class="fl-fl float-uv">
+				<a href="/media/help_videos/Exploring the Unit Part I.mp4" target="_blank">Unit Video</a>
+			</div>
+    		<div class="fl-fl float-iv">
+				<a href="/media/help_videos/Intro to platfrom, signing in.mp4" target="_blank">Introduction Video</a>
+			</div>
+		</div> -->
+		<!-- <div class="help-menu">
+			<button class="video_btn">Help Videos</button>
+			<div class="content">
+				<a href="/media/help_videos/Adding Buddies.mp4">Buddy Video</a>
+				<a href="/media/help_videos/Exploring courses and going to lesson overview.mp4" >Explore Video</a>
+				<a href="/media/help_videos/Exploring the Unit Part I.mp4">Unit Video</a>
+				<a href="/media/help_videos/Intro to platfrom, signing in.mp4">Introduction Video</a>
+			</div>
+		</div> -->
+		<div class="dropup"> <!-- style="width:10%"-->
+			<div class="dropbtn" ><i class="fa fa-video-camera"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Help Videos	<i class="fa fa-angle-up"></i></div> <!--style="width:inherit !important"-->
+			<div class="dropup-content" >
+				<a href="#" data-reveal-id="intro">Introduction  	<i class="fa fa-angle-right"></i></a>
+				<a href="#" data-reveal-id="addbuddy"> Adding Buddy <i class="fa fa-angle-right"></i></a>
+				<a href="#" data-reveal-id="explorevideo" >Exploring Platform<i class="fa fa-angle-right"></i></a>
+				<a href="#" data-reveal-id="exploreunit">Exploring Units <i class="fa fa-angle-right"></i></a>
+				
+			</div>
+		  </div>
+			
+		  <!-- <a href="#" data-reveal-id="myModal">Click Me For A Modal</a> -->
+			
+			<div id="addbuddy" class="reveal-modal" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal data-reset-on-close="true" aria-labelledby="modalTitle" aria-hidden="true" role="dialog" style="width:100%; background: rgba(0,0,0,.5) !important;">
+  				<h2 id="modalTitle" style="color:azure !important">Adding Buddy</h2><br><br>
+				<center>
+					<video class="vjs-tech" controls width="75%" height="75%" id="video">
+					<source src="/media/help_videos/Adding Buddies.webm" type="video/webm">
+				</video>
+				<!-- <a href="/media/help_videos/Adding Buddies.mp4"><i class="fa fa-play"></i></a> -->
+				<!-- <iframe src="/media/help_videos/Adding Buddies.mp4" type="video/mp4"></iframe> -->
+			</center>
+					<a class="close-reveal-modal" aria-label="Close" onclick="location.reload()">&#215;</a>
+					<!-- <div id="def-controls">
+							<input type="range" value="0" id="vid-prog-bar">
+						</div> -->
+					
+			</div>
+			<div id="explorevideo" class="reveal-modal" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal data-reset-on-close="true" aria-labelledby="modalTitle" aria-hidden="true" role="dialog" style="width:100%; background: rgba(0,0,0,.5) !important;">
+  				<h2 id="modalTitle" style="color:azure !important">Explore Platform</h2><br><br>
+				<center><video class="vjs-tech" controls width="75%" height="75%" id="video">
+					<source src="/media/help_videos/Exploring courses and going to lesson overview.webm" type="video/mp4">
+				</video>
+			</center>
+  				<a class="close-reveal-modal" aria-label="Close" onclick="location.reload()">&#215;</a>
+			</div>
+		
+			<div id="exploreunit" class="reveal-modal" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal data-reset-on-close="true" aria-labelledby="modalTitle" aria-hidden="true" role="dialog" style="width:100%;  background: rgba(0,0,0,.5) !important;">
+  				<h2 id="modalTitle" style="color:azure !important">Unit Information</h2><br><br>
+				<center><video class="vjs-tech" controls width="75%" height="75%" id="video">
+					<source src="/media/help_videos/Exploring the Unit Part I.webm" type="video/mp4">
+				</video>
+			</center>
+  				<a class="close-reveal-modal" aria-label="Close" onclick="location.reload()">&#215;</a>
+			</div>
+			<div id="intro" class="reveal-modal" data-options="close_on_background_click:false;close_on_esc:false;" data-reveal data-reset-on-close="true" aria-labelledby="modalTitle" aria-hidden="true" role="dialog" style="width:100%;  background: rgba(0,0,0,.5) !important;">
+  				<h2 id="modalTitle" style="color:azure !important">Introduction</h2><br><br>
+				<center><video class="vjs-tech" controls width="75%" height="75%" id="video">
+					<source src="/media/help_videos/Intro to platfrom, signing in.webm" type="video/mp4">
+				</video>
+			</center>
+  				<a class="close-reveal-modal" aria-label="Close" onclick="location.reload()">&#215;</a>
+			</div>
+		  <!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+		  <div class="modal fade" id="myModal" role="dialog">
+			<div class="modal-dialog"> -->
+			
+			  <!-- Modal content-->
+			  <!-- <div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">Modal Header</h4>
+				</div>
+				<div class="modal-body">
+				  <p>Some text in the modal.</p>
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			  </div>
+			  
+			</div>
+		  </div> -->
+		  <!--Modal for videos-->
+		  <!-- <div id="addbuddy" class="modal fade" role="dialog">
+			<div class="modal-dialog"> -->
+		  
+			  <!-- Modal content-->
+			  <!-- <div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">Adding Buddies</h4>
+				</div>
+				<div class="modal-body"> -->
+				  <!-- <p>Some text in the modal.</p> -->
+					<!-- <video controls>
+						<source src="/media/help_videos/Adding Buddies.mp4" type="video/mp4">
+					</video>
+				</div>
+			  </div>
+		  
+			</div>
+		  </div> -->
+
+		  <!-- <div id="explorevideo" class="modal fade" role="dialog">
+			<div class="modal-dialog"> -->
+		  
+			  <!-- Modal content-->
+			  <!-- <div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">Adding Buddies</h4>
+				</div>
+				<div class="modal-body"> -->
+				  <!-- <p>Some text in the modal.</p> -->
+					<!-- <video controls>
+						<source src="/media/help_videos/Exploring courses and going to lesson overview.mp4" type="video/mp4">
+					</video>
+				</div>
+			  </div>
+		  
+			</div>
+		  </div> -->
+<!-- 
+		  <div id="exploreunit" class="modal fade" role="dialog">
+			<div class="modal-dialog"> -->
+		  
+			  <!-- Modal content-->
+			  <!-- <div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">Adding Buddies</h4>
+				</div>
+				<div class="modal-body"> -->
+				  <!-- <p>Some text in the modal.</p> -->
+					<!-- <video controls>
+						<source src="/media/help_videos/Exploring the Unit Part I.mp4" type="video/mp4">
+					</video>
+				</div>
+			  </div>
+		  
+			</div>
+		  </div> -->
+
+		  <!-- <div id="intro" class="modal fade" role="dialog">
+			<div class="modal-dialog"> -->
+		  
+			  <!-- Modal content-->
+			  <!-- <div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">Adding Buddies</h4>
+				</div>
+				<div class="modal-body"> -->
+				  <!-- <p>Some text in the modal.</p> -->
+					<!-- <video controls>
+						<source src="/media/help_videos/Intro to platfrom, signing in.mp4" type="video/mp4">
+					</video>
+				</div>
+			  </div>
+		  
+			</div>
+		  </div> -->
+		  <!--Modal end-->
+	</body>
+</html>

@@ -1,0 +1,61 @@
+@import '/static/ndf/bower_components/videojs/dist/video-js.css';
+@import '/static/ndf/bower_components/videojs/dist/video.js';
+@import '/static/ndf/bower_components/videojs/dist/video.min.js';
+@import '/static/ndf/bower_components/videojs/dist/video-js.min.css';
+@import '/static/ndf/css/videojs-skin-color.css';
+@import '/static/ndf/css/opensans-fonts.css';
+@import '/static/ndf/css/sgc-toc.css';
+/*Video sidebar styles*/ /*Black bg, order of displying videos, remove video word*/
+.dropbtn {
+    background-color: #713558;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    /* position: fixed; */
+    z-index: 1;
+    /* bottom: 10px;
+    right:10px; */
+  }
+  .dropbtn:hover{
+    background-color: white !important;
+    color:#713558 !important;
+  }
+  .dropup {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    /* display: inline-block; */
+    z-index: 1;
+  }
+  .dropup:hover{
+    background-color: white !important;
+    color: #713558 !important;
+  }
+  .dropup-content {
+    display: none;
+    position: absolute;
+    background-color: #713558;
+    min-width: 160px;
+    bottom: 50px;
+    z-index: 1;
+    color: white;
+  }
+  
+  .dropup-content a {
+    color: white;
+    padding: 12px 16px;
+    display: block;
+  }
+  
+  .dropup-content a:hover {
+    background-color: white !important;
+    color: #713558 !important;
+  }
+  
+  
+  .dropup:hover .dropup-content {
+    display: block;
+  }
+  
+  /*Video sidebar end*/
