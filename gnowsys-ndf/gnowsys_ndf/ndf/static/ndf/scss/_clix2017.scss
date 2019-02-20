@@ -63,8 +63,26 @@ h5{
     margin-left: 5px;
 }
 
+.li-size {
 
 
+    @media only screen and  (max-device-width : 1024px) {
+    // /* Styles */
+            font-size: small !important;
+
+    }
+
+}
+.on-hover-effect{
+    @media only screen and  (max-device-width : 1024px) {
+        // /* Styles */
+                font-size: small !important;
+    
+        }
+}
+.on-hover-effect:hover{
+    border-bottom: 2px solid $primary-theme-color !important;
+   }
 
 .overlay-head{
     background-color: $complimentary-color;
@@ -586,7 +604,7 @@ h5{
     .top-bar-section {
         ul {
             &.left li {
-                border-right: 2px solid $primary-theme-color;
+                border-right: 2px;
             }
             li {
                 background: $primary-theme-color;
@@ -600,7 +618,7 @@ h5{
                     display: block;
                     padding: 12px 0 12px 0;
                     font-family: "OpenSans-Regular";
-                    font-size: 16px;
+                    //font-size: 16px;
 
                 }
                 &:hover {
@@ -709,7 +727,7 @@ h5{
                         line-height: 49px;
                         border-left-width: 0px;
                         font-family: OpenSans-Regular;
-                        border-top: 2px solid $primary-theme-color;
+                        border-top: 2px;
 
                     }
                     &.active {
@@ -3851,8 +3869,9 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
         @media only screen and (max-device-width : 1024px) {
         // /* Styles */
                  text-overflow:ellipsis;
-                width:calc(100% - 753px);
-                font-size:16px;
+                //width:calc(100% - 753px);
+                //font-size:16px;
+                font-size:small;
                 overflow: hidden;
 
         }
@@ -3970,7 +3989,7 @@ $ah_2_background_color_hover: rgba(244, 244, 244, 0.3);
 
         @media screen and (max-width: 1024px) {
             background-color: $ah_2_background_color;
-            margin-left:210px;
+           // margin-left:210px;
 
         }
 
@@ -4337,6 +4356,7 @@ $primary-button-background-color: #00a9ee;
 $nav_menu_1_color: #713558;
 $nav_menu_1_bg_color: $complimentary-color;
 $nav_menu_1_tab_border: #713558;
+
 ul.nav_menu_1 {
     margin-bottom: 0px;
     background-color: $nav_menu_1_bg_color;

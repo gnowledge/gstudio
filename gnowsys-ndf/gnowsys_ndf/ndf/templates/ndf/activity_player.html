@@ -28,53 +28,57 @@
     <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
 {% else %}
   <div class="activity_player_secondary_header activity_player_header sticky">
-    <nav class="activity_player_secondary_header activity_player_header" data-topbar role="navigation" data-options="sticky_on: large">
+    <nav class="top-bar" data-topbar role="navigation" data-options="sticky_on: large" style="background-color: white !important">
 {% endif %}
-      <div class="small-1 columns end header_text_sm_block">
-        <a title="Go back to Overview" href="{% url 'course_content' group_name  %}">
-        <div class="header_icon_block prev_button">
-          <span>
-            <i class="fa fa-angle-left header_icon"></i> Back</span>
-        </div>
-        </a>
-      </div>
-      <div class="header_title" title ="{% firstof group_object.altnames group_object.name %}">
+
+<section class="top-bar-section">
+      <ul class="left show-for-medium-up top-left-menu">
+         <!--List item 1--><li class="on-hover-effect">
+   <a style="background-color: white !important;color:#713558;" title="Go back to Overview" href="{% url 'course_content' group_name  %}">
+      <span>
+        <i class="fa fa-angle-left header_icon"></i> Back</span>
+    </a>
+  </li>
+        <!--List item 2--><li class="li-size"><a href="#" title ="{% firstof group_object.altnames group_object.name %}" style="background-color: white !important;color:#713558;">
         {% firstof group_object.altnames group_object.name  %}
         {% if is_gstaff and "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
           <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
         {% endif %}
-      </div>
-
-      <div class="lesson-nav">
-        <div class="new_note header_text_block header_text_md_block">
-            <a title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_name %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
-               {% trans "e-Notes" %} 
+        </a>
+</li>
+      </ul>
+     <ul class="right show-for-medium-up top-right-menu">
+      <!--List item 1--><li class="on-hover-effect"><div class="new_note header_text_block header_text_md_block" style="background-color: white !important;">
+            <a  style="color: #713558;" title="Click here to write a Note" {% if user_access_priv == "allow" %} target="_blank" href="{% url 'course_notebook' group_name %}?create=True" {% else %} class="user_not_enrolled" {% endif %}><i class="fa fa-edit header_icon"></i>&nbsp;
+              {% trans "e-Notes" %} 
+           </a>
+       </div></li>
+       <!--List item 2--><li class="on-hover-effect"> <div  style="background-color: white !important;">
+            <a  style="color: #713558"  {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_name prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
+              {% trans "Previous Lesson" %}  
+           </a>
+       </div></li>
+       <!--List item 3--><li class="on-hover-effect"><div  style="background-color: white !important;">
+              <a  style="color: #713558" {% if resource_prev_id %} href="{% url 'activity_player_detail' group_name lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
+                <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
             </a>
-        </div>
-        <div class="new_note header_text_block  header_text_lg_block">
-            <a {% if prev_lesson_id and lesson_act_prev_id and not resource_prev_id%} href="{% url 'activity_player_detail' group_name prev_lesson_id lesson_act_prev_id %}" title="Go to previous lesson"   {% else %} class = "disabled hide" title="You are on the first lesson"   {% endif %} ><i class="fa fa-angle-double-left header_icon"></i>&nbsp;
-               {% trans "Previous Lesson" %}  
-            </a>
-        </div>
-        <div class="pagination prev_button header_text_block header_text_md_block">
-              <a {% if resource_prev_id %} href="{% url 'activity_player_detail' group_name lesson_node.pk resource_prev_id %}" title="Go to previous activity"  {% else %} class = "disabled hide" title="You are on the first activity" {% endif %}> 
-                  <i class="fa fa-angle-left header_icon"></i> {% trans "PREV" %}
-              </a>
-        </div>
-        <div class="pagination page_count " ><a title="You are on Activity {{resource_index|add:'1'}}  in this Lesson">
+      </div></li>
+      <!--List item 4--><li class="li-size"><div style="background-color: white !important;" ><a  style="color: #713558" title="You are on Activity {{resource_index|add:'1'}}  in this Lesson">
             {{resource_index|add:'1'}} {% trans "OF" %} {{lesson_node.collection_set|length}}</a>
-        </div>
-        <div class="pagination page_count header_text_block header_text_md_block">
-              <a {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_name lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
-                  {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
-              </a>
-        </div>
-        <div class="new_note header_text_block header_text_lg_block">
-            <a {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_name next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
-               {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
+          </div></li>
+          <!--List item 5--><li class="on-hover-effect"> <div  style="background-color: white !important;">
+              <a  style="color: #713558" {% if resource_next_id %} title="Go to next activity"  href="{% url 'activity_player_detail' group_name lesson_node.pk resource_next_id %}" {% else %} class = "disabled hide" title="You are on the last activity" {% endif %}>
+                {% trans "NEXT" %} <i class="fa fa-angle-right header_icon"></i>
             </a>
-        </div>
-      </div>
+      </div</li>
+      <!--List item 6--><li class="on-hover-effect"><div  style="background-color: white !important;">
+            <a  style="color: #713558" {% if next_lesson_id  and lesson_next_act_id and not resource_next_id %} title="Go to next lesson"  href="{% url 'activity_player_detail' group_name next_lesson_id lesson_next_act_id %}" {% else %} class = "disabled hide"   title="You are on the last Lesson" {% endif %} >
+              {% trans "Next Lesson" %} <i class="fa fa-angle-double-right header_icon"></i>    
+           </a>
+       </div></li>
+     </ul>
+    </section>
+    
 </nav>
 </div>
 
@@ -232,7 +236,7 @@
 
     for (var i = 0; i != iframes.length; ++i) {
        var match = iframes[i].src.search(key);
-       iframes[i].style.setProperty("width","100%","important");
+       //iframes[i].style.setProperty("width","100%","important");
        // console.log(match);
        // iframes[i].replace(/&amp;/g, '&')
        // match_ = match;
