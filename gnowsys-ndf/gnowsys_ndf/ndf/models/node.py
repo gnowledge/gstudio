@@ -430,7 +430,9 @@ class Node(DjangoDocument):
 
         contributor_names = []
         for each_pk in self.contributors:
+            #print "user:",User.objects.get(pk=each_pk).username
             contributor_names.append(User.objects.get(pk=each_pk).username)
+        #print "contributor:",contributor_names
         user_details['contributors'] = contributor_names
 
         if self.modified_by:

@@ -1119,7 +1119,7 @@ def thread_reply_count( oid ):
 
 	if thr_rep and (thr_rep.count() > 0):
 		for each in thr_rep:
-
+                        #print "\n\n",each
 			global_thread_rep_counter += 1
 
 			if not global_thread_latest_reply["content_org"]:
