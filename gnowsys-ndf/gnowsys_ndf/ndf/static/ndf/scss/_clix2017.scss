@@ -566,6 +566,7 @@ h5{
         }
     }
 }
+//Responsive for Tab verison 
 
 
 
@@ -608,6 +609,8 @@ h5{
             }
             li {
                 background: $primary-theme-color;
+             
+
 
 
                 &>a {
@@ -618,7 +621,7 @@ h5{
                     display: block;
                     padding: 12px 0 12px 0;
                     font-family: "OpenSans-Regular";
-                    //font-size: 16px;
+                    font-size: 16px !important;
 
                 }
                 &:hover {
@@ -693,7 +696,32 @@ h5{
         }
     }
 }
+.top-bar.expanded .title-area  {
+    background: #713558;
+}
+// responsive changes for navbar 
+@media screen and (max-width: 560px ){
+    .top-bar .top-bar-section ul li > a {
+        border-bottom: 1px;
+        margin-left: 10px;
+    }
+}
+// @media screen and (max-width: 660px ){
 
+//    #sample_buddy_panel .buddy_panel {
+//         top: 69px !important;
+//     }
+// }
+@media  (min-width: 560px ) and (max-width: 790px ) {
+    .top-bar .top-bar-section ul.left li>a{
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+    .top-bar .top-bar-section ul li>a{
+        letter-spacing: 0px;
+        font-size: 12px !important;
+    }
+ }
 @media screen and (min-width: 40.063em) {
     .top-bar {
         .title-area {
@@ -704,7 +732,7 @@ h5{
         }
         .top-bar-section {
             ul.left li>a {
-                padding: 0px 20px;
+                // padding: 0px 20px;
                     &.active{
                     color:$complimentary-color;
                     font-size: 17px;
@@ -4100,6 +4128,14 @@ Buddy Vertical Bar Css
 */
 
 $bp_background_color: #101d29;
+
+@media screen and (max-width: 660px ){
+
+     .buddy_panel {
+         position: relative;
+         top: 69px !important;
+     }
+ }
 
 .buddy_panel {
     position: fixed;

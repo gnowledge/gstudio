@@ -53,54 +53,54 @@
 
 <nav class="top-bar" data-topbar role="navigation" id="menu_bar_gstudio">
         <ul class="title-area">
-            <li class="name show-for-medium-up" style="height:47px;">
-                <a  title="About: Connected Learning Initiative (CLIx)" class="loggedin-user" href="{% url 'landing_page'  %}?True" style="margin-top:1px;">
+            <li class="name  " style="width: 45px; height: 45px;">
+                <a  class="img-logo" style="float:left" title="About: Connected Learning Initiative (CLIx)"  href="{% url 'landing_page'  %}?True" style="margin-top:1px;">
                 
                 <img src="{{site.SECONDARY_LOGO}}">
                 </a>
             </li>
-            <li class="name hide-for-medium-up">
+            <!-- <li class="name hide-for-medium-up">
                 <i class="fi-list side-bar-button"></i>
                 <i class="fi-x close-menu-dropdown hide"></i>
                 <a style="font-size: 16px" class="loggedin-user" href="#">
                     <div></div>
                 </a>
-            </li>
+            </li> -->
             <!-- Remove the class "menu-icon" to 
             get rid of menu icon. Take out "Menu" to just have icon alone -->
-            <li class="toggle-topbar"><a href="#"><i class="icons-large fi-torso"></i>&nbsp;<span class="badge badge-blue">1</span></a></li>
+            <li class="toggle-topbar menu-icon " style="margin-top:-20px;">  <a href="#"><span class="badge badge-blue">1</span></a></li>
         </ul>
 
         <section class="top-bar-section">
             <!-- Left Nav Section -->
-            <ul class="left show-for-medium-up">
+            <ul class="left   ">
                 {% if request.user.is_authenticated %}
                     <li> 
-                        <a style="font-size: 16px" title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
+                        <a style="font-size:16px;" title="Click here to view your enrolled Courses" href="{% url 'my_desk' request.user.id %}" {% if title == "my desk" or title == "my performance" %} class="active" {% endif %}> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a>
                     </li>
                 {% endif %}
             
                 <li>
-                    <a style="font-size: 16px" title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} ><i class="fa fa-binoculars" aria-hidden="true"></i> Explore</a>
+                    <a style="font-size:16px;" title="Click here to view all Courses" href="{% url explore_url %}" {% if title == 'base courses' or title == "courses" or title == "drafts" %} class="active" {% endif %} ><i class="fa fa-binoculars" aria-hidden="true"></i> Explore</a>
                 </li>
 
                 <li>
-                    <a  style="font-size: 16px" title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:16px;"></i> Apps</a>
+                    <a  style="font-size:16px;" title="Click here to play, learn and have Fun!" target="_blank" href="{% url 'tools_temp' %}" {% if title == 'tools' %} class="active" {% endif %}> <i class="fi-die-three" aria-hidden="true" style="font-size:16px;"></i> Apps</a>
                 </li>
                 
             </ul>
-            <ul class="right show-for-medium-up top-right-menu">
+            <ul class="right ">
                 {% comment %}
                 {% if groupid %}
-                <li class=""><a style="font-size: 16px" title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
+                <li class=""><a style="" title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' groupid %}"> <i class="fa fa-bell-o"></i></a></li>
                 {% elif group_id %}
-                    <li class=""><a style="font-size: 16px" title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' group_id %}"> <i class="fa fa-bell-o"></i></a></li>
+                    <li class=""><a style="" title="Click here to view Notifications" target="_blank" href="{% url 'notification_details' group_id %}"> <i class="fa fa-bell-o"></i></a></li>
                 {% endif %}
                 {% endcomment %}
                 {% if help_oid %}
-                    <li class=""><a style="font-size: 16px" title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
+                    <li class=""><a style="font-size: 16px;" title="Click here to view FAQ Help" {% if title == 'Help Page'  %} class="active" {% endif %} target="_blank" href="{% url 'course_content' help_oid %}"> <i class="fa fa-info-circle"></i> Help </a></li>
                 {% endif %}
-                <li class="has-dropdown not-click" title="Choose Language">
+                <li class="has-dropdown " title="Choose Language">
                     <a style="font-size: 16px" href="#"> <i class="fa fa-globe" aria-hidden="true"></i>
                     {{request.LANGUAGE_CODE|get_header_lang}}
                     </a>
@@ -119,7 +119,7 @@
                 </li>
           
             {% if request.user.is_authenticated %}
-                <li class="has-dropdown buddy_margin white-text" style="margin-right: auto;"  title="{{ user.username }}">
+                <li class="has-dropdown buddy_margin white-text show-for-medium-up" style="margin-right: 30px;"  title="{{ user.username }}">
                     {% get_profile_pic request.user.pk as prof_pic %}
                     <!-- <a href="{% url 'dashboard' request.user.pk %}"> -->
                     
@@ -145,20 +145,20 @@
                 </li>
             {% else %}
                 <li>
-                    <a style="font-size: 16px" title="Click here to login" class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
+                    <a style="font-size: 16px;" title="Click here to login" class="" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l">
                     <i class="fi-key"></i>&nbsp; {% trans "Login" %}
                   </a>
                 </li>
             {% endif %}
             </ul>
-            <ul class="right hide-for-medium-up dropdown-menu hide">
+            <!-- <ul class="right hide-for-medium-up dropdown-menu hide">
                 <li class=""><a href="#"> <i class="fa fa-briefcase" aria-hidden="true"></i> My Desk</a></li>
                 <li><a  class="{%if title == 'courses'%}active{%endif%}" href="{% url explore_url %}"> <i class="fa fa-binoculars" aria-hidden="true"></i> Explore </a></li>
                 <li class=""><a href="#"> Blog</a></li>
                 <li class=""><a href="#"><i class="fi-info"></i> Help Topics</a></li>
-            </ul>
+            </ul> -->
             {% if user.is_authenticated %}
-            <ul class="right hide-for-medium-up side-bar-menu hide">
+            <ul class="right  show-for-small-only">
                 <li class="">
                     {% comment %}
                     <!--<a href="{% url 'dashboard' request.user.pk %}">-->
@@ -174,7 +174,7 @@
                         <img src="{{MEDIA_URL}}{{prof_pic.if_file.original.relurl}}" class="user-profile-pic-small"/>
                         {{ user.username }}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="dropdown show-for-s">
                         <li>
                             <a href="{% url 'auth_password_change' %}">{% trans "Change Password" %}
                             </a>
