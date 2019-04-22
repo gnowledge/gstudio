@@ -633,7 +633,7 @@
   padding: 0 0 10px !important;
   border-bottom: 2px solid #ddd;
   opacity: 0;
-  overflow-y: scroll;
+  overflow-y: hidden;
   transition: all 1s ease-in-out;
 }
 
