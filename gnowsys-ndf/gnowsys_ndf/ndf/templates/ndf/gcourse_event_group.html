@@ -337,6 +337,10 @@
             {% elif title == 'course_quiz_data' %}
               {% include "ndf/course_quiz_data.html" %}
 
+            {% elif title == 'course_assessment_data' %}
+              {% include "ndf/course_assessment_data.html" %}
+
+
             {% elif title == 'course_analytics' %}
               {% if is_gstaff %}
                 {% include "ndf/admin_course_analytics.html" %}

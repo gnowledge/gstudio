@@ -41,8 +41,15 @@
   </li>
         <!--List item 2--><li class="li-size"><a href="#" title ="{% firstof group_object.altnames group_object.name %}" style="background-color: white !important;color:#713558;">
         {% firstof group_object.altnames group_object.name  %}
-        {% if is_gstaff and "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
+        {% if is_gstaff %}
+          {% if "QuizItemEvent" in node.member_of_names_list or "QuizItem" in node.member_of_names_list%}
           <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
+          {% endif %}
+        {% endif %}
+        {% if is_gstaff %}
+          {% if node.name == "Post Assessment"  or node.name == "Pre-Assessment"%}
+          <a href="{% url 'course_assessment_data' group_id node.pk %}" class="header_text_block right">Assessment_Results</a>
+          {% endif %}
         {% endif %}
         </a>
 </li>
