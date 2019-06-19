@@ -3901,14 +3901,15 @@ def get_submission_times(question):
 def get_attempts(question, MC):
     """ from the list of items, get the actual choice text
         for each attempt """
+    #print "Question Received:",question
     item = get_item(question['itemId'], MC)
-    # print "Item Id's: for each assessment taken",item['_id']
+    #print "Item Id's: for each assessment taken",item['_id']
     if item:
 
      if (question['responses'] and
              'missingResponse' not in question['responses'][0]):
          response = question['responses'][0]
-         # print "Each Item/Question Response",response
+         #print "Each Item/Question Response",response
          if 'choiceIds' in response:
              # Need to account for multiple choice, MW sentence, etc.
              #   So may have more than one `choiceId`.
@@ -4011,6 +4012,12 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     # print "Assessment results:",results
     # print type(results)
 
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    #print "Group Object:",group_obj
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    gstaff_access = check_is_gstaff(group_id, request.user)
+    allow_to_join = get_group_join_status(group_obj)
     result_row=[]
     final_row_list=[]
 
@@ -4050,20 +4057,9 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
                 for ind in na_index:
                     partly_max_list_ele[ind] = min_list_ele[ind]
             return partly_max_list + exception_list
-        group_obj   = Group.get_group_name_id(group_id, get_obj=True)
-        #print group_obj
-        group_id    = group_obj._id
-        group_name  = group_obj.name
-        gstaff_access = check_is_gstaff(group_id, request.user)
         if not gstaff_access:
             return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
-        allow_to_join = get_group_join_status(group_obj)
-        template = 'ndf/gcourse_event_group.html'
-        context_variables = {
-                'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
-                'group_obj': group_obj, 'title': 'course_assessment_data', 'allow_to_join': allow_to_join
-            }
         
         # print "results_dict:",results_dict
         
@@ -4086,9 +4082,14 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
         for each in eachlist:
             final_row_list.append(each)
 
-    # print "final:",final_row_list
+    #print "final:",final_row_list
 
     
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_obj': group_obj, 'title': 'course_assessment_data', 'allow_to_join': allow_to_join
+        }
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj, 'data': json.dumps(final_row_list)})

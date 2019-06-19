@@ -4272,3 +4272,14 @@ def get_name_by_node_id(node_id):
 @register.assignment_tag
 def get_institute_name():
 	return GSTUDIO_INSTITUTE_NAME
+
+@get_execution_time
+@register.assignment_tag
+def check_if_pre_or_post_assessment(node_name):
+
+	# eachname = get_name_by_node_id(node_id)
+	print "eachname:",node_name
+	if (node_name.lower().__contains__('assessment') or node_name.lower().__contains__('test')) and (node_name.lower().__contains__('pre') or node_name.lower().__contains__('post')):
+		return True
+
+	return False

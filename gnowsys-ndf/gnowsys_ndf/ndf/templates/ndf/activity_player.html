@@ -7,6 +7,7 @@
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
+{% check_if_pre_or_post_assessment node.name as show_assessmentresults%}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}
@@ -14,7 +15,6 @@
 {% get_thread_node node.pk as thread_node_obj %}
 {% get_attribute_value thread_node_obj.pk 'thread_interaction_type' as thr_int_type %}
 {% get_default_discussion_lbl as disc_label %}
-
 <style type="text/css">
   .disabled , .disabled i {
     color:gray !important;
@@ -46,10 +46,9 @@
           <a href="{% url 'course_quiz_data' group_id %}" class="header_text_block right">RESULTS</a>
           {% endif %}
         {% endif %}
-        {% if is_gstaff %}
-          {% if node.name == "Post Assessment"  or node.name == "Pre-Assessment"%}
+        {% if is_gstaff and show_assessmentresults%}
           <a href="{% url 'course_assessment_data' group_id node.pk %}" class="header_text_block right">Assessment_Results</a>
-          {% endif %}
+
         {% endif %}
         </a>
 </li>
