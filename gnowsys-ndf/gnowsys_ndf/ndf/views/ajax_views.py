@@ -7071,20 +7071,37 @@ def save_metadata(request, group_id):
     return HttpResponseRedirect(reverse('asset_detail', kwargs={'group_id':ObjectId(group_id),'asset_id': ObjectId(node._id)}))
   # return HttpResponse('success')
 
-def export_to_epub(request, group_id, node_id):
+def export_to_epub(request, group_id, export_type, node_id):
     from gnowsys_ndf.ndf.views.export_to_epub import *
     response_dict = {'success': False}
-    try:
-        node_obj = node_collection.one({'_id': ObjectId(node_id)})
-        epub_loc = create_epub(node_obj)
-        zip_file = open(epub_loc, 'rb')
-        response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
-        response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'
-        return response
-    except Exception as export_fail:
-        print "\n export_fail: ", export_fail
-        pass
-    return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+    #if export type is lesson
+    if export_type =='lesson':
+      try:
+          node_obj = node_collection.one({'_id': ObjectId(node_id)})
+          epub_loc = create_epub(node_obj)
+          #print(epub_loc)
+          zip_file = open(epub_loc, 'rb')
+          #print(zip_file)
+          response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+          response['Content-Disposition'] = 'attachment; filename="'+ slugify(node_obj.name) + '.epub"'
+          return response
+      except Exception as export_fail:
+          print "\n export_fail: ", export_fail
+          pass
+      return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
+    #if export type is unit
+    else:
+      try:
+          group_obj = node_collection.one({'_id': ObjectId(group_id)})
+          epub_loc = create_unit_epub(group_obj)
+          zip_file = open(epub_loc, 'rb')
+          response = HttpResponse(zip_file.read(), content_type="application/epub+zip")
+          response['Content-Disposition'] = 'attachment; filename="' + slugify(group_obj.name) + '.epub"'
+          return response
+      except Exception as export_fail:
+          print "\n export_fail: ", export_fail
+          pass
+      return HttpResponseRedirect(reverse('unit_detail', kwargs={'group_id': group_id}))
 
 def remove_related_doc(request, group_id):
     node = request.POST.get('node', None)

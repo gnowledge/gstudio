@@ -1,20 +1,41 @@
 {% load i18n %}
+<!--EPub Export Widget-->
+<div id="exportModule" class="reveal-modal medium radius" data-reveal data-alert>
+<div id="exportUnit" class="reveal-modal medium radius" data-reveal data-alert> 
+ <div id="exportLesson" class="reveal-modal medium radius" data-reveal data-alert>
+ <!--Module level Epub export 
+  <p id="exportModuleLabel">Module Level Epub export: </p>
+  <div class="row">    
+     <a href="{% url 'export_to_epub' group_id 'module' group_object.pk %}" class="orange-button exp_node" target="_blank" title="{{group_object.name}}">{{group_object.name|truncatechars:15}}</a>
+    </div>
+<hr style="height:1px;border:none;color:#333;background-color:#333;" /> -->
 
-<div id="exportLesson" class="reveal-modal medium radius" data-reveal data-alert>
-  <p id="exportLessonLabel">Click to Export into ePub: </p>
-  <div style="display: inline-block;" class="right">
-    <a href="#" id="expLessonbtnCancel" class="orange-button">Cancel</a>
+<!--Unit Level EPub Export-->  
+  <p id="exportUnitLabel">Unit Level Epub Export: </p>  
+    <div class="row">    
+     <a href="{% url 'export_to_epub' group_id 'unit' group_object.pk %}" class="orange-button exp_node" target="_blank" title="{{group_object.name}}">{{group_object.name|truncatechars:15}}</a>
+    </div> 
+
+ <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+  <!-- Lesson Level Epub Export-->
+ 
+  <p id="exportLessonLabel">Lesson Level Epub Export </p>
+    <div style="display: inline-block;" class="right">
+     <a href="#" id="expLessonbtnCancel" class="orange-button">Cancel</a>
+    </div> 
+    <div class="row">
+      {% for each_node in lessons_list  %}
+      <a href="{% url 'export_to_epub' group_id 'lesson' each_node.pk %}" class="orange-button exp_node" target="_blank" title="{{each_node.name}}">{{each_node.name|truncatechars:15}}</a>
+      {% if forloop.counter|divisibleby:5 %}<br/><br/>{% endif %}
+      {% endfor %}
+    </div>
+
   </div>
-  <div class="row">
-    {% for each_node in lessons_list  %}
-    <a href="{% url 'export_to_epub' group_id each_node.pk %}" class="orange-button exp_node" target="_blank" title="{{each_node.name}}">{{each_node.name|truncatechars:15}}</a>
-    {% if forloop.counter|divisibleby:5 %}<br/><br/>{% endif %}
-    {% endfor %}
-  </div>
+</div>
 </div>
 
 <script type="text/javascript">
   $(document).on('click', '#expLessonbtnCancel' ,function(e){
     $('#exportLesson').foundation('reveal', 'close');
   })
-</script>
+</script> 
