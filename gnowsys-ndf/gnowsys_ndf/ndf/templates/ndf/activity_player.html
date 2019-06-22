@@ -7,7 +7,7 @@
 
 {% block body_content %}
 {% check_is_gstaff group_id request.user as is_gstaff %}
-{% check_if_pre_or_post_assessment node.name as show_assessmentresults%}
+{% check_if_pre_or_post_assessment node.pk as show_assessmentresults%}
 {% user_access_policy groupid request.user as user_access_priv %}
 {% get_group_object groupid as group_object %}
 {% get_attribute_value node.pk 'discussion_enable' as node_discussion %}

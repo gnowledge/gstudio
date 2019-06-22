@@ -3838,14 +3838,17 @@ def get_assessment_results(offered_id, MC):
     """ get the sections / results for a given assessment offered """
     SECTIONS = MC['assessment']['AssessmentSection']
     TAKENS = MC['assessment']['AssessmentTaken']
+    print "Offred Id:",offered_id
     taken_id = TAKENS.find({"assessmentOfferedId": offered_id})
+    #print taken_id
     print "Assessment Takens count:",taken_id.count()
     asmnt_takens=[]
     for each in taken_id:
         Assmnt_sections = []
         # print "individual Taken Ids:",each
         tagent_id = each['takingAgentId']
-        if tagent_id == "osid.agent.Agent%3A0%40MIT-ODL":
+        # print tagent_id
+        if tagent_id == "osid.agent.Agent%3A0%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A%40MIT-ODL":
             print "Anonymous User responses not stored"
         else:
             # print each['sections']
@@ -3854,13 +3857,10 @@ def get_assessment_results(offered_id, MC):
             for section in SECTIONS.find({"_id": {"$in": section_id}}):
                 Assmnt_sections.append(section)
 
-            # print Assmnt_sections        
-            # for assectn in Assmnt_sections:
-            #     print "individual Assessment Section:",assectn
+            
             each['sections']=Assmnt_sections
             asmnt_takens.append(each)
-            # print "each user along with sections:",each
-    # print "Assessment Takens:",asmnt_takens
+            
     return asmnt_takens
     
 def get_datetime(dt_obj):
@@ -3869,15 +3869,6 @@ def get_datetime(dt_obj):
         return 'None'
     else:
         return dt_obj.strftime('%Y%m%d %H:%M:%S')
-
-'''def get_module_info(question, MC):
-
-    AssessmentAuthoring = MC['assessment_authoring']['AssessmentPart']
-    assessment_partid = AssessmentAuthoring.find_one({"_id": ObjectId(identifier(question['assessmentPartId']))})
-    if assessment_partid:
-        return assessment_partid['displayName']['text']
-    else:
-        return 'Couldnt find matching id in assessment_authoring' '''
 
 def identifier(id_str):
     """ Return the identifier of an OSID ID string """
@@ -4002,9 +3993,9 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     node_obj = Node.get_node_by_id(node_id)
     soup = BeautifulSoup(node_obj.content)
     tag = soup.find_all('iframe')[0]['src']
-    srctag = tag.split("&",2)[2]
-    srctag = srctag.split("=",1)[1]
-    offered_id= srctag.split("&",1)[0]
+    srctag = tag.split("&assessment_offered_id=",1)[1]
+    strindx=srctag.index('EDU')
+    offered_id =srctag[:strindx+3]
     print "AssessmentOffered Id :",offered_id
     print "\n"
     MC=MongoClient("localhost",27017)
@@ -4063,7 +4054,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
         
         # print "results_dict:",results_dict
         
-        for key,value in results_dict.items():
+        for key,value in results_dict.items(): 
             for v in value:
                 if key == "student_id":
                     # To prevent in error in case where 
@@ -4082,7 +4073,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
         for each in eachlist:
             final_row_list.append(each)
 
-    #print "final:",final_row_list
+    print "final:",final_row_list
 
     
     template = 'ndf/gcourse_event_group.html'
