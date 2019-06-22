@@ -3889,6 +3889,30 @@ def get_submission_times(question):
                 additional_attempt['submissionTime'])))
     return ','.join(times)
 
+def format_file_name(file_dict):
+    """ Return a formatted file name by guessing at the extension from the
+    file label. For example, for:
+
+    'fileIds': {
+        u 'My Project (1)_tb': {
+            u 'assetId': u 'repository.Asset%3A5a27dea1eb5c87013410532a%40ODL.MIT.EDU',
+            u 'assetContentTypeId': u 'asset-content-genus-type%3Atb%40ODL.MIT.EDU',
+            u 'assetContentId': u 'repository.AssetContent%3A5a27dea1eb5c87013410532c%40ODL.MIT.EDU'
+        }
+    }
+
+    This method would return `5a27dea1eb5c87013410532c.tb`.
+
+    NOTE: we'll assume only a single file here, since this should only be used
+    with responses, which take one file right now.
+    """
+    label = file_dict.keys()[0]
+    guessed_extension = label.split('_')[-1]
+    file_data = file_dict[label]
+    filename = get_identifier(file_data['assetContentId'])
+    return '{0}.{1}'.format(filename, guessed_extension)
+
+
 def get_attempts(question, MC):
     """ from the list of items, get the actual choice text
         for each attempt """
