@@ -3848,7 +3848,7 @@ def get_assessment_results(offered_id, MC):
         # print "individual Taken Ids:",each
         tagent_id = each['takingAgentId']
         # print tagent_id
-        if tagent_id == "osid.agent.Agent%3A0%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A%40MIT-ODL":
+        if tagent_id == "osid.agent.Agent%3A0%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A220505%40MIT-ODL":
             print "Anonymous User responses not stored"
         else:
             # print each['sections']
