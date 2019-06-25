@@ -3918,13 +3918,13 @@ def get_attempts(question, MC):
         for each attempt """
     #print "Question Received:",question
     item = get_item(question['itemId'], MC)
-    #print "Item Id's: for each assessment taken",item['_id']
+    # print "Item Id's: for each assessment taken",item['_id']
     if item:
-
+     # print "Item Id:",item['_id']
      if (question['responses'] and
              'missingResponse' not in question['responses'][0]):
          response = question['responses'][0]
-         #print "Each Item/Question Response",response
+         # print "Each Item/Question Response",response
          
          if 'choiceIds' in response : 
              # Need to account for multiple choice, MW sentence, etc.
@@ -3932,12 +3932,13 @@ def get_attempts(question, MC):
              attempts = [' '.join(
                  [get_choice_text(choice_id, item)
                   for choice_id in response['choiceIds']])]
-
+             
          #Need to account for Drag and Drop Activity    
-         elif 'choiceIds' in response['inlineRegions']['RESPONSE_1']:
-             # print "Each Response for drag drop Assessment:",response['inlineRegions']['RESPONSE_1']['choiceIds']
-             attempts =[' '.join([get_c_text(choice_id,item) for choice_id in response['inlineRegions']['RESPONSE_1']['choiceIds']])]
-             # print "Each single Attempt Response for drag drop Assessment:",attempts    
+         elif response.get('inlineRegions'):
+             if 'choiceIds' in response['inlineRegions']['RESPONSE_1']:
+                 # print "Each Response for drag drop Assessment:",response['inlineRegions']['RESPONSE_1']['choiceIds']
+                 attempts =[' '.join([get_c_text(choice_id,item) for choice_id in response['inlineRegions']['RESPONSE_1']['choiceIds']])]
+                 # print "Each single Attempt Response for drag drop Assessment:",attempts    
          elif 'text' in response:
              attempts = [response['text']['text']]
          elif 'fileIds' in response and response['fileIds'] != {}:
@@ -3967,10 +3968,11 @@ def get_attempts(question, MC):
                       for choice_id in additional_attempt['choiceIds']]))
                  
              #Need to account for Drag and Drop Activity
-             elif 'choiceIds' in additional_attempt['inlineRegions']['RESPONSE_1']:
-                 attempts.append(' '.join([get_c_text(choice_id,item) for choice_id in additional_attempt['inlineRegions']['RESPONSE_1']['choiceIds']]))
-                 # print "Each additional Attempt Response for drag drop Assessment:",attempts
-                 #print "Each Response for drag drop Assessment:",additional_attempt['inlineRegions']['RESPONSE_1']['choiceIds']
+             elif additional_attempt.get('inlineRegions'):
+                 if 'choiceIds' in additional_attempt['inlineRegions']['RESPONSE_1']:
+                    attempts.append(' '.join([get_c_text(choice_id,item) for choice_id in additional_attempt['inlineRegions']['RESPONSE_1']['choiceIds']]))
+                    # print "Each additional Attempt Response for drag drop Assessment:",attempts
+                    #print "Each Response for drag drop Assessment:",additional_attempt['inlineRegions']['RESPONSE_1']['choiceIds']
              elif 'text' in additional_attempt:
                  attempts.append(additional_attempt['text']['text'])
              elif ('fileIds' in additional_attempt and
@@ -4045,7 +4047,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     print "\n"
     MC=MongoClient("localhost",27017)
     results = get_assessment_results(offered_id, MC)
-    #print "Assessment results:",results
+    # print "Assessment results:",results
     # print type(results)
 
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
