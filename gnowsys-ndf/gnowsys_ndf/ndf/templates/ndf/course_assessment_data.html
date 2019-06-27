@@ -113,7 +113,6 @@
  -->
 {% endblock %}
 {% get_group_name group_id as group_name %}
-
   <div class="small-12 columns table-container">
   </div>
 
@@ -186,7 +185,7 @@
                 {
                     extend: 'csvHtml5',
                     title: function(){
-                      return "{{group_name|slugify}}" 
+                      return "{{group_name|slugify}}" +" -- "+ "{{node_name}}" 
                     } 
                 },
                 {
@@ -223,7 +222,7 @@
                         }
                     },
                     title: function(){
-                      return "{{group_name|slugify}}" 
+                      return "{{group_name|slugify}}" +" -- "+ "{{node_name}}"
                     } 
 
                 }

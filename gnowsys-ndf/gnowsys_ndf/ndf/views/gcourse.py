@@ -32,7 +32,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value,get_name_by_node_id
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
@@ -2214,6 +2214,7 @@ def course_content(request, group_id):
             'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
             'visited_nodes': json.dumps(visited_nodes)
             })
+    print ""
     return render_to_response(template, context_variables)
 
 @get_execution_time
@@ -3938,7 +3939,7 @@ def get_attempts(question, MC):
              # non-empty file submission
              attempts = [format_file_name(response['fileIds'])]
          elif 'fileIds' in response and response['fileIds'] == {}:
-             attempts = ['empty file response']
+             attempts = ['Response recorded']
          elif 'fileId' in response and response['fileId'] != {}:
              # non-empty file submission pre-March 2018
              attempts = [format_file_name_for_single_file_upload(
@@ -3969,7 +3970,7 @@ def get_attempts(question, MC):
                      format_file_name(additional_attempt['fileIds']))
              elif ('fileIds' in additional_attempt and
                    additional_attempt['fileIds'] == {}):
-                 attempts.append('empty file response')
+                 attempts.append('Response recorded')
              elif ('fileId' in additional_attempt and
                    additional_attempt['fileId'] != {}):
                  # non-empty file submission pre-March 2018
@@ -4017,6 +4018,8 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     
     # print "node id",node_id
     node_obj = Node.get_node_by_id(node_id)
+    node_name=get_name_by_node_id(node_id)
+    # print "Node name:",node_name
     soup = BeautifulSoup(node_obj.content)
     tag = soup.find_all('iframe')[0]['src']
     srctag = tag.split("&assessment_offered_id=",1)[1]
@@ -4028,7 +4031,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     results = get_assessment_results(offered_id, MC)
     # print "Assessment results:",results
     # print type(results)
-
+    
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
     #print "Group Object:",group_obj
     group_id    = group_obj._id
@@ -4104,7 +4107,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     
     template = 'ndf/gcourse_event_group.html'
     context_variables = {
-            'group_id': group_id, 'groupid': group_id, 'group_name':group_name,
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name, 'node_name':node_name,
             'group_obj': group_obj, 'title': 'course_assessment_data', 'allow_to_join': allow_to_join
         }
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
