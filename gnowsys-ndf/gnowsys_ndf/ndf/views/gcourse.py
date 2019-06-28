@@ -2214,7 +2214,7 @@ def course_content(request, group_id):
             'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
             'visited_nodes': json.dumps(visited_nodes)
             })
-    print ""
+    
     return render_to_response(template, context_variables)
 
 @get_execution_time
@@ -3839,9 +3839,7 @@ def get_assessment_results(offered_id, MC):
     """ get the sections / results for a given assessment offered """
     SECTIONS = MC['assessment']['AssessmentSection']
     TAKENS = MC['assessment']['AssessmentTaken']
-    print "Offred Id:",offered_id
     taken_id = TAKENS.find({"assessmentOfferedId": offered_id})
-    #print taken_id
     print "Assessment Takens count:",taken_id.count()
     asmnt_takens=[]
     for each in taken_id:
@@ -3919,13 +3917,10 @@ def get_attempts(question, MC):
         for each attempt """
     #print "Question Received:",question
     item = get_item(question['itemId'], MC)
-    # print "Item Id's: for each assessment taken",item['_id']
     if item:
-     # print "Item Id:",item['_id']
      if (question['responses'] and
              'missingResponse' not in question['responses'][0]):
          response = question['responses'][0]
-         # print "Each Item/Question Response",response
          
          if 'choiceIds' in response : 
              # Need to account for multiple choice, MW sentence, etc.
@@ -4016,10 +4011,8 @@ def format_file_name_for_single_file_upload(file_dict, MC):
 @get_execution_time 
 def course_assessment_data(request,group_id,node_id,all_data=False):
     
-    # print "node id",node_id
     node_obj = Node.get_node_by_id(node_id)
     node_name=get_name_by_node_id(node_id)
-    # print "Node name:",node_name
     soup = BeautifulSoup(node_obj.content)
     tag = soup.find_all('iframe')[0]['src']
     srctag = tag.split("&assessment_offered_id=",1)[1]
@@ -4030,10 +4023,8 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     MC=MongoClient("localhost",27017)
     results = get_assessment_results(offered_id, MC)
     # print "Assessment results:",results
-    # print type(results)
     
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
-    #print "Group Object:",group_obj
     group_id    = group_obj._id
     group_name  = group_obj.name
     gstaff_access = check_is_gstaff(group_id, request.user)
@@ -4081,7 +4072,6 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
             return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
 
         
-        # print "results_dict:",results_dict
         
         for key,value in results_dict.items(): 
             for v in value:
@@ -4094,9 +4084,8 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
                     else:
                         username = v                    
 
-        # print "student user id:",username
         result_row.append(create_result_row(username,r, MC))
-        # print "Post making result row",result_row
+        
 
     for eachlist in result_row:
         for each in eachlist:
@@ -4173,7 +4162,7 @@ def create_result_row(username,result,MC):
                     get_submission_times(question),
                     ]
             row.append(r)
-            # print "\n"
+            
 
     except Exception as e:
         print('No questions for this student_id - {0}'.format(row[0]))
