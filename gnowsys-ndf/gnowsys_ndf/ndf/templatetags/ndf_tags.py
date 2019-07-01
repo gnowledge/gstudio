@@ -59,6 +59,7 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 from django_mailbox.models import Mailbox
 import itertools
+from bs4 import BeautifulSoup
 
 register = Library()
 at_apps_list = node_collection.one({
@@ -4272,3 +4273,24 @@ def get_name_by_node_id(node_id):
 @register.assignment_tag
 def get_institute_name():
 	return GSTUDIO_INSTITUTE_NAME
+
+@get_execution_time
+@register.assignment_tag
+def check_if_pre_or_post_assessment(node_id):
+
+	eachnode = get_node(node_id)
+	print "Node Id:",eachnode._id #,"\nNode Content",eachnode.content
+	soup = BeautifulSoup(eachnode.content)
+	all_iframes=soup.find_all('iframe',src=True)
+	# print all_iframes
+	for eachiframe in all_iframes:
+		# print eachiframe
+		iframe_src_attr=eachiframe['src']
+		# print iframe_src_attr
+		if iframe_src_attr:
+			if "assessment.AssessmentOffered" in iframe_src_attr:
+				return True
+			else:
+				return False
+	
+	
