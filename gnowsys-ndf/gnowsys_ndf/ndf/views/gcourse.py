@@ -4003,10 +4003,14 @@ def get_choice_text(choice_id, item,dispnm):
                     if c['id'] == choice_id ][0]
     # print "choice_texts:",choice_texts
     
-    # each_ltxt=[each for each in choice_texts
-    #             if each['languageTypeId']==dispnm]
+
+    each_ltxt=[each for each in choice_texts
+                 if each['languageTypeId']==dispnm]
     # print "each:",each_ltxt
-    return get_text_from_texts(choice_texts)
+    if each_ltxt:
+        return get_text_from_texts(each_ltxt)
+    else:
+        return get_text_from_texts(choice_texts)
             
 
 
