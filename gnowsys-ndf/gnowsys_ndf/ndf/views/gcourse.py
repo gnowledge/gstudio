@@ -4057,7 +4057,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
 
     print "OfferedId List:",node_assessments
     node_name=get_altname(node_id)
-    print node_name
+    # print node_name
     results = []
 
     for each_assessment in node_assessments:
@@ -4141,7 +4141,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
         for each in eachlist:
             final_row_list.append(each)
 
-    print "final:",final_row_list
+    # print "final:",final_row_list
 
     
     template = 'ndf/gcourse_event_group.html'
