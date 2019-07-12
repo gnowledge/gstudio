@@ -32,7 +32,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value,get_name_by_node_id
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value,get_name_by_node_id,get_altname
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
@@ -3859,7 +3859,7 @@ def get_assessment_results(offered_id, MC):
             
             each['sections']=Assmnt_sections
             asmnt_takens.append(each)
-            
+    # print "AssessmentTakens:----------------------",asmnt_takens   
     return asmnt_takens
     
 def get_datetime(dt_obj):
@@ -3915,19 +3915,24 @@ def format_file_name(file_dict):
 def get_attempts(question, MC):
     """ from the list of items, get the actual choice text
         for each attempt """
-    #print "Question Received:",question
+    # print "Question Received:",question
     item = get_item(question['itemId'], MC)
     if item:
      if (question['responses'] and
              'missingResponse' not in question['responses'][0]):
          response = question['responses'][0]
-         
-         if 'choiceIds' in response : 
+         # print "Response submitted :",response,"\n"
+         # print "DisplayName of Response:",response['displayName']['languageTypeId']
+         if 'choiceIds' in response and 'displayName' in response: 
              # Need to account for multiple choice, MW sentence, etc.
              #   So may have more than one `choiceId`.
+             # print "languageTypeId:",response['displayName']['languageTypeId']
+             dispnm = response['displayName']['languageTypeId']
+             
              attempts = [' '.join(
-                 [get_choice_text(choice_id, item)
-                  for choice_id in response['choiceIds']])]    
+                 [get_choice_text(choice_id, item,dispnm)
+                  for choice_id in response['choiceIds']])]
+             # print "Single Attempt response submitted:",attempts    
          elif 'text' in response:
              attempts = [response['text']['text']]
          elif 'fileIds' in response and response['fileIds'] != {}:
@@ -3951,10 +3956,13 @@ def get_attempts(question, MC):
          attempts = ['None']
      if len(question['responses']) > 1:
          for additional_attempt in question['responses'][1::]:
-             if 'choiceIds' in additional_attempt: 
+             if 'choiceIds' in additional_attempt and 'displayName' in additional_attempt:
+                 # print "LanguageTypeId additional attempt:",additional_attempt['displayName']['languageTypeId']
+                 dispnm = additional_attempt['displayName']['languageTypeId'] 
                  attempts.append(' '.join(
-                     [get_choice_text(choice_id, item)
+                     [get_choice_text(choice_id, item,dispnm)
                       for choice_id in additional_attempt['choiceIds']]))
+                 # print "Additional_attempt Response submitted:",attempts
     
              elif 'text' in additional_attempt:
                  attempts.append(additional_attempt['text']['text'])
@@ -3981,14 +3989,30 @@ def get_attempts(question, MC):
                  #raise TypeError('need to account for new response type,', additional_attempt)
     else:
      attempts = ['None']
+    
+    # print "final Attempts",attempts
     return ','.join(attempts)
 
-def get_choice_text(choice_id, item):
+def get_choice_text(choice_id, item,dispnm):
     """ grab the choice text """
+    
+    # print "******************DisplayName:******************",dispnm   
+
     choice_texts = [c['texts']
                     for c in item['question']['choices']
-                    if c['id'] == choice_id][0]
-    return get_text_from_texts(choice_texts)
+                    if c['id'] == choice_id ][0]
+    # print "choice_texts:",choice_texts
+    
+
+    each_ltxt=[each for each in choice_texts
+                 if each['languageTypeId']==dispnm]
+    # print "each:",each_ltxt
+    if each_ltxt:
+        return get_text_from_texts(each_ltxt)
+    else:
+        return get_text_from_texts(choice_texts)
+            
+
 
 def format_file_name_for_single_file_upload(file_dict, MC):
     guessed_extension = get_identifier(file_dict['assetContentTypeId'])
@@ -4007,21 +4031,44 @@ def format_file_name_for_single_file_upload(file_dict, MC):
     filename = str(ac[0]['_id'])
     return '{0}.{1}'.format(filename, guessed_extension)
 
-
-@get_execution_time 
-def course_assessment_data(request,group_id,node_id,all_data=False):
-    
-    node_obj = Node.get_node_by_id(node_id)
-    node_name=get_name_by_node_id(node_id)
-    soup = BeautifulSoup(node_obj.content)
+@get_execution_time
+def get_offered_id(node_id):
+    # print "Node Id: ",node_id
+    soup = BeautifulSoup(node_id.content)
     tag = soup.find_all('iframe')[0]['src']
     srctag = tag.split("&assessment_offered_id=",1)[1]
     strindx=srctag.index('EDU')
     offered_id =srctag[:strindx+3]
     print "AssessmentOffered Id :",offered_id
-    print "\n"
-    MC=MongoClient("localhost",27017)
-    results = get_assessment_results(offered_id, MC)
+    return offered_id
+
+@get_execution_time 
+def course_assessment_data(request,group_id,node_id,all_data=False):
+    # print "lang",request.LANGUAGE_CODE
+    node_assessments = []
+    node_assessments.append(get_offered_id(Node.get_node_by_id(node_id)))
+    hi_nd = get_lang_node(node_id,'hi')
+    te_nd = get_lang_node(node_id,'te')
+    if  hi_nd!= None or  te_nd!= None:
+        if get_offered_id(hi_nd) not in node_assessments: 
+            node_assessments.append(get_offered_id(hi_nd))
+        if get_offered_id(te_nd) not in node_assessments:
+            node_assessments.append(get_offered_id(te_nd))    
+
+    print "OfferedId List:",node_assessments
+    node_name=get_altname(node_id)
+    # print node_name
+    results = []
+
+    for each_assessment in node_assessments:
+        print each_assessment
+        print "\n"
+        MC=MongoClient("localhost",27017)
+        nd = get_assessment_results(each_assessment, MC)
+        print "count:",len(nd)
+        if len(nd) > 0:
+            results.extend(nd)
+        
     # print "Assessment results:",results
     
     group_obj   = Group.get_group_name_id(group_id, get_obj=True)
@@ -4033,6 +4080,9 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
     final_row_list=[]
 
     results_dict = defaultdict(list)
+
+
+
     for r in results:
         if r:
             if not r['sections']:
@@ -4047,7 +4097,7 @@ def course_assessment_data(request,group_id,node_id,all_data=False):
                     results_dict['student_id'].append(get_identifier(r['takingAgentId']))
                     results_dict['assessment_start_time'].append(get_datetime(r['actualStartTime']))
                     try:
-                        results_dict['question_text'].append(get_question_text(each_question, MC))
+                        results_dict['question_text'].append(get_question_text(each_question,MC))
                         results_dict['question_submission_timestamps'].append(get_submission_times(each_question))
                         results_dict['question_attempts'].append(get_attempts(each_question, MC))
                     except Exception as e:
@@ -4114,7 +4164,7 @@ def get_item(item_id, MC):
     item = ITEMS.find_one({"_id": ObjectId(identifier(item_id))})
     return item
 
-def get_question_text(question, MC):
+def get_question_text(question,MC):
     """ get the item's question text from the list of items """
     item = get_item(question['itemId'], MC)
     if item:
@@ -4128,14 +4178,32 @@ def get_question_text(question, MC):
 
 def get_text_from_texts(texts):
     
+    text_markup = ''
     english_language_type_id = '639-2%3AENG%40ISO'
     eng = [t['text'] for t in texts
            if t['languageTypeId'] == english_language_type_id]
-    text_markup = ''
+    
+
+    telgu_language_type_id = '639-2%3ATEL%40ISO'
+    telu=[t['text'] for t in texts 
+            if t['languageTypeId'] == telgu_language_type_id]
+    
+
+    hindi_language_type_id = '639-2%3AHIN%40ISO'
+    hindi=[t['text'] for t in texts
+            if t['languageTypeId'] == hindi_language_type_id]
+    
+
     if eng:
         text_markup = eng[0]
+        
+    elif telu:
+        text_markup=telu[0]
+        
     else:
-        text_markup = texts[0]['text']
+        text_markup=hindi[0]
+        
+
     soup = BeautifulSoup(text_markup, 'lxml')
     q_content = ['audio', 'video', 'img']
     if any(obj_tag in text_markup for obj_tag in ['audio', 'video', 'img']):
@@ -4151,13 +4219,14 @@ def get_text_from_texts(texts):
 
 def create_result_row(username,result,MC):
     """return one row representing one result"""
+
     row =[]
     try:
         for question in result['sections'][0]['questions']:
             r =[username,
                     # get_identifier(result['takingAgentId']),
                     get_datetime(result['actualStartTime']),
-                    get_question_text(question, MC),  
+                    get_question_text(question,MC),  
                     get_attempts(question, MC),
                     get_submission_times(question),
                     ]
@@ -4169,6 +4238,7 @@ def create_result_row(username,result,MC):
         logging.info('No questions for this student_id - {0}'.format(row[0]))
         row += ['None', 'None', 'None']
     
+    # print "resultrow",row
     return row
     
 

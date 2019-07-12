@@ -4271,6 +4271,17 @@ def get_name_by_node_id(node_id):
 
 @get_execution_time
 @register.assignment_tag
+def get_altname(node_id):
+	if isinstance(node_id, list) and len(node_id):
+		node_id = node_id[-1]
+	node = Node.get_node_by_id(node_id)
+	if node:
+	    return node.altnames
+	else:
+	    return None	
+
+@get_execution_time
+@register.assignment_tag
 def get_institute_name():
 	return GSTUDIO_INSTITUTE_NAME
 
