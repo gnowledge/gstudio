@@ -20,7 +20,9 @@ oebps_files = ["Fonts", "Audios", "Images", "Videos", "Text", "Styles", "Misc"]
 oebps_path = None
 tool_mapping = {}
 
-with open("/static/ndf/epub/tool_mapping.json", "r") as tool_paths:
+BASE = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(BASE, "../static/ndf/epub/tool_mapping.json")) as tool_paths:
     global tool_mapping
     tool_mapping = json.loads(tool_paths.read())
 
@@ -402,8 +404,58 @@ def create_epub(node_obj):
     zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
     epub_dump(epub_root, zipf)
     zipf.close()
+    shutil.rmtree(epub_root)
     print "Successfully created epub: ", epub_name
     return str(epub_root + '.epub')
+
+def create_unit_epub(group_obj):
+
+    epub_disp_name = None
+    epub_name = group_obj.name
+    if group_obj.altnames:
+        epub_disp_name = group_obj.altnames
+    else:
+        epub_disp_name = group_obj.name
+
+    if not os.path.exists(GSTUDIO_EPUBS_LOC_PATH):
+        os.makedirs(GSTUDIO_EPUBS_LOC_PATH)
+
+    datetimestamp = datetime.now().isoformat()
+    epub_name = slugify(epub_name + "_" + str(datetimestamp))
+    epub_root = os.path.join(GSTUDIO_EPUBS_LOC_PATH, epub_name)
+
+    os.makedirs(epub_root)
+    os.makedirs(os.path.join(epub_root, "META-INF"))
+
+    global oebps_path
+    oebps_path = os.path.join(epub_root, "OEBPS")
+    os.makedirs(oebps_path)
+
+    create_mimetype(epub_root)
+    create_container_file(os.path.join(epub_root, "META-INF"))
+
+    create_subfolders(os.path.join(epub_root, "OEBPS"), oebps_files)
+
+    lesson_nodes = node_collection.find({'_id': {'$in': group_obj.collection_set}})
+
+    for lesson in lesson_nodes:
+        content_list = lesson.collection_dict
+        build_html(os.path.join(epub_root, "OEBPS", "Text"), content_list, epub_name)
+        update_content_metadata(str(lesson._id), datetimestamp, epub_disp_name)
+
+    # create_content_file(os.path.join(epub_name,"OEBPS"),content_list)
+    # create_ncx_file(os.path.join(epub_name,"OEBPS"),content_list)
+        fill_from_static()
+
+
+    print "Successfully created epub extraction: ", epub_name
+    zipf = zipfile.ZipFile(epub_root + '.epub', 'w', zipfile.ZIP_DEFLATED)
+    epub_dump(epub_root, zipf)
+    zipf.close()
+    shutil.rmtree(epub_root)
+    print "Successfully created epub: ", epub_name
+    return str(epub_root + '.epub')
+
 
 def check_ip_validity():
     import re
