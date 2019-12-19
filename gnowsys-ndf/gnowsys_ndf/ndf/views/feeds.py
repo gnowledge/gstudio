@@ -19,7 +19,8 @@ from pymongo import Connection
 
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
 	from bson import ObjectId
@@ -31,7 +32,6 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id
 benchmark_collection = db[Benchmark.collection_name]
 analytics_collection = db[Analytics.collection_name]
 ins_objectid = ObjectId()
-
 
 class activity_feed(Feed):
 
@@ -82,4 +82,3 @@ class activity_feed(Feed):
 
 	def item_guid(self, item) :
 		return item['_id']
-

@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
@@ -25,6 +28,7 @@ except ImportError:  # old pymongo
 @get_execution_time
 @login_required
 @auto_enroll
+@cache_control(must_revalidate=True, max_age=6)
 def ratings(request, group_id, node_id):
 
 	rating_given = request.POST.get('rating', '')

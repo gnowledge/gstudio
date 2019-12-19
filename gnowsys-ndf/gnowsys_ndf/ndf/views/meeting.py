@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 # from django.template import Context
 # from django.template.defaultfilters import slugify
 # from django.template.loader import get_template
@@ -48,6 +50,7 @@ app = node_collection.one({'_type': 'GSystemType', 'name': u'Meeting'})
 ##################
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def output(request, group_id, meetingid):
 	newmeetingid = meetingid
 	ins_objectid  = ObjectId()
@@ -69,6 +72,7 @@ def output(request, group_id, meetingid):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def dashb(request, group_id):                                                                           #ramkarnani
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
@@ -101,6 +105,7 @@ def dashb(request, group_id):                                                   
 
 #### Ajax would be called here to get refreshed list of online members
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_online_users(request, group_id):                                                                        #ramkarnani
 	"""Json of online users, useful f.ex. for refreshing a online users list via an ajax call or something"""
 	online_users = cache.get(CACHE_USERS)
@@ -110,6 +115,7 @@ def get_online_users(request, group_id):                                        
 	#print type(a)
 	return HttpResponse(simplejson.dumps(online_users, default=encode_json))
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def invite_meeting(request, group_id, meetingid):                                                                  #ramkarnani
 	try:
             # print "here in view"

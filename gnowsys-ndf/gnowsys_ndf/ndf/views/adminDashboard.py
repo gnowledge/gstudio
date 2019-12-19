@@ -11,9 +11,12 @@ from gnowsys_ndf.ndf.views.methods import *
 
 import json
 
+from django.views.decorators.cache import cache_control
+
 GAPP = node_collection.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDashboard(request):
     '''
     methods for class view
@@ -33,6 +36,7 @@ def adminDashboard(request):
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDashboardClass(request, class_name="GSystem"):
     '''
     fetching class's objects
@@ -122,6 +126,7 @@ def adminDashboardClass(request, class_name="GSystem"):
 
 
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDashboardEdit(request):
     '''
     edit class's objects
@@ -174,6 +179,7 @@ def adminDashboardEdit(request):
           return StreamingHttpResponse(e)
 
 @user_passes_test(lambda u: u.is_superuser)
+@cache_control(must_revalidate=True, max_age=6)
 def adminDashboardDelete(request):
     '''
     delete class's objects

@@ -2,7 +2,8 @@
 import json
 import bson
 from bson.json_util import dumps
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 ''' -- imports from installed packages -- '''
 try:
     from bson import ObjectId
@@ -38,6 +39,7 @@ api_name_model_name_dict = {v: k for v, k in field_verbose_configs.iteritems()}
 
 # TODO: write decorator for making JSON result OPEN API or JSON api compliance
 @csrf_exempt
+@cache_control(must_revalidate=True, max_age=6)
 def db_schema(request, collection_name='', field_name='', field_value=''):
     '''
     GET /api/v2/schema
@@ -48,7 +50,7 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
 
     # following URL will list all possible md5:
     GET /api/v2/schema/Filehive/md5/
-    
+
     # following url will return matching document:
     GET /api/v2/schema/Filehive/md5/2bb048c86ae0aa3d0c496e00d128638bc3576f9dfe4f5aa15dc0a68088bea1c4
     '''
@@ -83,6 +85,7 @@ def db_schema(request, collection_name='', field_name='', field_value=''):
 
 
 @csrf_exempt
+@cache_control(must_revalidate=True, max_age=6)
 def api_create_gs(request, gst_name="Page"):
     # curl -i -X POST -H "Content-Type: multipart/form-data" -F "filehive=@CIET-Mix.csv" -F "content=hey, this is sample content" -F "name=Test the FAB" -F "tags=check, 1, 2, aa" -F 'user_name=administrator'  -F 'workspace=warehouse' http://172.17.0.2:8000/api/v2/create/File
 
@@ -90,11 +93,11 @@ def api_create_gs(request, gst_name="Page"):
     # print "===================:: ", request.POST
     # print "===================:: ", request.POST.dict()
     # print "===================:: ", request.FILES
-    
+
     write_files(request, group_id=request.POST.get('workspace'), unique_gs_per_file=False, kwargs=request.POST.dict())
     return HttpResponse(1)
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def api_get_gs_nodes(request):
 
     get_parameters_dict = request.GET.dict()
@@ -161,7 +164,7 @@ def api_get_gs_nodes(request):
         gst_name, gst_id = GSystemType.get_gst_name_id(get_resource_type)
         oid_name_dict[gst_id] = gst_name
         get_parameters_dict['member_of'] = [gst_id]
-        attributes = sample_gs.get_possible_attributes([gst_id]) 
+        attributes = sample_gs.get_possible_attributes([gst_id])
 
     get_workspace = request.GET.get('workspace', None)
     if get_workspace:
@@ -251,7 +254,7 @@ def gst_attributes(gst_name_or_id):
     return [at.name for at in node_collection.find({'_type': 'AttributeType', 'subject_type': gst_id})]
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def api_get_field_values(request, field_name):
     '''
     GET /api/v2/tags

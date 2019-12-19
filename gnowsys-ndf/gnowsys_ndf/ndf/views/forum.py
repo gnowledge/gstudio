@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.auth.decorators import login_required
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 ''' -- imports from django_mongokit -- '''
 
 ''' -- imports from gstudio -- '''
@@ -50,6 +52,7 @@ app = forum_gst
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def forum(request, group_id, node_id=None):
     '''
     Method to list all the available forums and to return forum-search-query result.
@@ -120,6 +123,7 @@ def forum(request, group_id, node_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_forum(request, group_id):
     '''
     Method to create forum and Retrieve all the forums
@@ -240,6 +244,7 @@ def create_forum(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def edit_forum(request,group_id,forum_id):
     '''
     Method to create forum and Retrieve all the forums
@@ -360,6 +365,7 @@ def edit_forum(request,group_id,forum_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def display_forum(request,group_id,forum_id):
     hide_create_thread_btn = True
     other_forums_list = None
@@ -411,6 +417,7 @@ def display_forum(request,group_id,forum_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def display_thread(request,group_id, thread_id, forum_id=None):
     '''
     Method to display thread and it's content
@@ -483,6 +490,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_thread(request, group_id, forum_id):
     '''
     Method to create thread
@@ -590,6 +598,7 @@ def create_thread(request, group_id, forum_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_node(request, group_id):
 
     # ins_objectid  = ObjectId()
@@ -774,6 +783,7 @@ def get_profile_pic(username):
 @login_required
 @check_delete
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_forum(request,group_id,node_id,relns=None):
     """ Changing status of forum to HIDDEN
     """
@@ -821,6 +831,7 @@ def delete_forum(request,group_id,node_id,relns=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_thread(request,group_id,forum_id,node_id):
     """ Changing status of thread to HIDDEN
     """
@@ -883,6 +894,7 @@ def delete_thread(request,group_id,forum_id,node_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def edit_thread(request,group_id,forum_id,thread_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -962,6 +974,7 @@ def edit_thread(request,group_id,forum_id,thread_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_reply(request,group_id,forum_id,thread_id,node_id):
 
     # ins_objectid  = ObjectId()

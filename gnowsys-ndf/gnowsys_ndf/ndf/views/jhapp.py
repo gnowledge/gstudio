@@ -1,7 +1,9 @@
 import json
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-''' -- imports from installed packages -- ''' 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.methods import *
@@ -20,6 +22,7 @@ GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 GST_POLICESQUAD = node_collection.one({"_type":"GSystemType","name":"PoliceSquad"})
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def jhapp(request, group_id):
   try:
       group_id = ObjectId(group_id)
@@ -37,6 +40,7 @@ def jhapp(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def uploadjhapp(request, group_id):
 
   try:
@@ -47,6 +51,7 @@ def uploadjhapp(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def savejhapp(request,group_id):
   from gnowsys_ndf.ndf.views.file import save_file
   try:
@@ -60,18 +65,18 @@ def savejhapp(request,group_id):
   usrid = request.user.id
   # jsmol_gst  = node_collection.one({"_type":"GSystemType","name":"Jsmol" })
   sel_jhapp_gst  = node_collection.one({"_type":"GSystemType","name":unicode(jhapp_type_trim) })
-  
+
   import zipfile
   from gnowsys_ndf.ndf.views.filehive import write_files
   is_user_gstaff = check_is_gstaff(group_obj._id, request.user)
-  
+
   fileobj_list = write_files(request, group_id)
   fileobj_id = fileobj_list[0]['_id']
   file_node = node_collection.one({'_id': ObjectId(fileobj_id) })
-  
+
   if sel_jhapp_gst._id:
     file_node.member_of = [ObjectId(sel_jhapp_gst._id)]
-  
+
   uploaded_files = request.FILES.getlist('filehive', [])
   zip_path = file_node.if_file.original['relurl']
   zip_split_path = zip_path.split('.')
@@ -81,7 +86,7 @@ def savejhapp(request,group_id):
 
   with zipfile.ZipFile("/data/media/"+ file_node.if_file.original['relurl'], "r") as z:
     z.extractall(un_zip_split_path)
-  
+
   relurl_path = str("/" + un_zip_path[0] + "/" + un_zip_path[1] + "/" +un_zip_path[2] + "/" + file_name[0] + "/" + "index" + ".html" )
   # print "_______________________________",relurl_path
   discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})

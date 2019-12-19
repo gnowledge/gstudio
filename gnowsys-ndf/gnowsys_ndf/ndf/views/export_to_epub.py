@@ -10,6 +10,9 @@ import urlparse
 from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GSTUDIO_EPUBS_LOC_PATH
 from gnowsys_ndf.ndf.models import node_collection
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -27,7 +30,6 @@ with open("/static/ndf/epub/tool_mapping.json", "r") as tool_paths:
 # tool_mapping = {'policequad': 'modules/Tools/Police Quad/index.html',
 #                 'turtleblocksjs': 'modules/Tools/Turtle Blocks/index.html',
 #                 'biomechanic': 'modules/Tools/Bio- Mechanic/index.html'}
-
 def create_subfolders(root,subfolder_names_list):
     for subfolder in subfolder_names_list:
         os.makedirs(os.path.join(root, subfolder))
@@ -71,7 +73,7 @@ def create_update_ncx(file_display_name, file_slugified_name):
     with open(ncx_file_path, "w+") as ncx_file:
         navMap_ele = soup.find("navMap")
         navpoint_ctr_val = len(soup.find_all("navPoint")) + 1
-        navPoint_ele = soup.new_tag("navPoint", 
+        navPoint_ele = soup.new_tag("navPoint",
             id="navPoint"+(navpoint_ctr_val).__str__(),
             # playorder=(navpoint_ctr_val).__str__()
             )
@@ -116,7 +118,7 @@ def create_update_content_file(file_name_wo_ext, file_loc, media_type,  epub_nam
     file_loc : Text|Styles|Misc
     media-type: text/css|text/javascript
     """
-    
+
     file_name_w_ext = file_name_wo_ext
     file_path = os.path.join(file_loc,file_name_wo_ext)
     if not is_non_html:
@@ -216,7 +218,7 @@ def parse_content(path, content_soup, epub_name):
         each_script.extract()
 
 
-    # ==== updating media elements ==== 
+    # ==== updating media elements ====
     #Transcipt file
     all_transcript_data = content_soup.find_all(attrs={'class':'transcript'})
     for each_transcript in all_transcript_data:
@@ -251,13 +253,13 @@ def parse_content(path, content_soup, epub_name):
         new_iframe_src = iframe_src_attr
         if iframe_src_attr:
             if "assessment.AssessmentOffered" in iframe_src_attr:
-                # ==== updating assessment iframes ==== 
+                # ==== updating assessment iframes ====
                 new_iframe_src = iframe_src_attr
                 parsed = urlparse.urlparse(iframe_src_attr)
                 new_iframe_src = parsed._replace(netloc="localhost:8888", path="/oea/")
                 each_iframe["src"] = new_iframe_src.geturl()
             else:
-                # ==== updating App iframes ==== 
+                # ==== updating App iframes ====
                 for each_tool_key,each_tool_val in tool_mapping.items():
                     if each_tool_key in iframe_src_attr:
                         new_iframe_src = each_tool_val
@@ -297,7 +299,7 @@ def build_html(path,obj, epub_name):
         1. Clone base-skeleton html file
         2. Build <body> by adding content object
         3. parse_content
-    
+
     """
 
     soup = None
@@ -407,8 +409,7 @@ def create_epub(node_obj):
 
 def check_ip_validity():
     import re
-    if re.match(r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$', ip):  
-        print "Valid IP"  
+    if re.match(r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$', ip):
+        print "Valid IP"
     else:
         print "Invalid IP"
-

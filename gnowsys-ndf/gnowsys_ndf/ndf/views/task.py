@@ -11,6 +11,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 # from django.utils import simplejson
 # from online_status.utils import encode_json
 
@@ -40,6 +42,7 @@ else :
 	sitename = ""
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def task(request, group_name, task_id=None):
     """Renders a list of all 'task' available within the database.
 
@@ -68,6 +71,7 @@ def task(request, group_name, task_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def task_details(request, group_name, task_id):
   """Renders given task's details.
 
@@ -172,7 +176,9 @@ def task_details(request, group_name, task_id):
   variables = RequestContext(request, var)
   template = "ndf/task_details.html"
   return render_to_response(template, variables)
+
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None, slug=None):
     if request.method == "POST" :
         #here group_name contains the object id of the group insted of name sent from
@@ -213,6 +219,7 @@ def save_image(request, group_name, app_id=None, app_name=None, app_set_id=None,
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_task(request, group_name, task_id=None, task=None, count=0):
   """Creates/Modifies details about the given Task.
 
@@ -359,7 +366,6 @@ def create_edit_task(request, group_name, task_id=None, task=None, count=0):
           context_variables,
           context_instance=RequestContext(request)
         )
-
 
 def update(request,rt_list,at_list,task_node,group_id,group_name):
       file_id=(request.POST.get("files"))
@@ -527,7 +533,6 @@ def update(request,rt_list,at_list,task_node,group_id,group_name):
 
         # End Patch
 
-
 def create_task(request,task_id,group_id):
     if task_id:
         task_node = node_collection.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
@@ -580,7 +585,6 @@ def create_task(request,task_id,group_id):
     task_node.save(groupid=group_id)
 
     return task_node
-
 
 def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_id):
   file_id=(request.POST.get("files"))
@@ -667,6 +671,7 @@ def create_task_at_rt(request,rt_list,at_list,task_node,assign,group_name,group_
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def task_collection(request,group_name,task_id=None,each_page=1):
     ins_objectid  = ObjectId()
     choice=0
@@ -714,6 +719,7 @@ def task_collection(request,group_name,task_id=None,each_page=1):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -766,6 +772,7 @@ def delete_task(request, group_name, _id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def check_filter(request,group_name,choice=1,status='New',each_page=1):
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}

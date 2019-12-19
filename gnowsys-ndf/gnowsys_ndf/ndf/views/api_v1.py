@@ -2,6 +2,8 @@
 import json
 import bson
 from bson.json_util import dumps
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 ''' -- imports from installed packages -- '''
 try:
@@ -25,7 +27,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id, cast_to_data_type
 
 
 gst_api_fields_dict = { "_id": 1, "name": 1, "altnames": 1, "language": 1, "content": 1, "if_file": 1, "tags": 1, "location": 1, "created_by": 1, "modified_by": 1, "contributors": 1, "legal": 1, "rating": 1, "created_at": 1, "last_update": 1, "collection_set": 1, "post_node": 1, "prior_node": 1, "access_policy": 1, "status": 1, "group_set": 1, "member_of": 1, "type_of": 1,
-    "relation_set": 1 #,"attribute_set": 1, 
+    "relation_set": 1 #,"attribute_set": 1,
 }
 
 api_name_model_name_dict = {
@@ -33,7 +35,7 @@ api_name_model_name_dict = {
     'resource_type': 'member_of'
 }
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def api_get_gs_nodes(request):
     get_parameters_dict = request.GET.dict()
     if not get_parameters_dict:
@@ -100,7 +102,7 @@ def api_get_gs_nodes(request):
         if gst_id:
             oid_name_dict[gst_id] = gst_name
             get_parameters_dict['member_of'] = gst_id
-            attributes = sample_gs.get_possible_attributes([gst_id]) 
+            attributes = sample_gs.get_possible_attributes([gst_id])
 
     get_workspace = request.GET.get('workspace', None)
     if get_workspace:
@@ -191,7 +193,7 @@ def gst_attributes(gst_name_or_id):
     return [at.name for at in node_collection.find({'_type': 'AttributeType', 'subject_type': gst_id})]
 
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def api_get_field_values(request, field_name):
 
     field_name = api_name_model_name_dict.get(field_name, field_name)

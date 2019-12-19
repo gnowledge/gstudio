@@ -9,6 +9,8 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response  # , render
 from django.template import RequestContext
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 # from mongokit import paginator
 
@@ -32,6 +34,7 @@ topic_GST = node_collection.one({'_type': 'GSystemType', 'name': 'Topic'})
 if term_GST:	
 	title = term_GST.altnames
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def term(request, group_id, node_id=None):
 
 	# ins_objectid  = ObjectId()
@@ -83,6 +86,7 @@ def term(request, group_id, node_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_term(request, group_id, node_id=None):
 
     # ins_objectid = ObjectId()
@@ -149,6 +153,7 @@ def create_edit_term(request, group_id, node_id=None):
 
 @login_required   
 @get_execution_time 
+@cache_control(must_revalidate=True, max_age=6)
 def delete_term(request, group_id, node_id):
     """Change the status to Hidden.
     

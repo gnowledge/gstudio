@@ -428,7 +428,23 @@ TEMPLATE_LOADERS = (
     #  'django.template.loaders.eggs.Loader',
 )
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '',                                                               #configure the path where you want to cache on filesystem
+        'TIMEOUT': 2,                                                                 #tolerance level for cache-staling
+        'OPTIONS': {
+            'MAX_ENTRIES':100000
+        }
+    }
+}
+
+CACHE_MIDDLEWARE_ALIAS='default'
+CACHE_MIDDLEWARE_SECONDS= 2
+CACHE_MIDDLEWARE_KEY_PREFIX= ''
+
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware', #added for caching
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -440,17 +456,15 @@ MIDDLEWARE_CLASSES = (
     'pagination.middleware.PaginationMiddleware',
     # 'django.middleware.cache.UpdateCacheMiddleware',
     # 'django.middleware.cache.FetchFromCacheMiddleware',
-
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     # gstudio custom middleware(s):
     'gnowsys_ndf.ndf.middleware.SetData.UserDetails',
     'gnowsys_ndf.ndf.middleware.SetData.Author',
     'gnowsys_ndf.ndf.middleware.SetData.AdditionalDetails',
     # 'gnowsys_ndf.ndf.middleware.Buddy.BuddySession',
     'gnowsys_ndf.ndf.middleware.UserRestrictMiddleware.UserRestrictionMiddleware',
-
+    'django.middleware.cache.FetchFromCacheMiddleware', #added for caching
     # for profiling methods:
     # 'gnowsys_ndf.ndf.middleware.ProfileMiddleware.ProfileMiddleware',
 )

@@ -9,7 +9,8 @@ from django.template import RequestContext
 from django.views.generic import RedirectView
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.ndf.views.analytics import *
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -25,8 +26,9 @@ from gnowsys_ndf.ndf.models import node_collection
 ###################################################
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def homepage(request, group_id):
-    
+
     if request.user.is_authenticated():
         # auth_gst = node_collection.one({'_type': u'GSystemType', 'name': u'Author'})
         # if auth_obj:
@@ -39,7 +41,7 @@ def homepage(request, group_id):
         group on first-time login.
         This functionality is implemented by using django-registration
         signal 'user_activated'. (See 'def create_auth_grp' in signals.py)
-        
+
         if auth is None:
             auth = node_collection.collection.Author()
             auth.name = unicode(request.user)
@@ -55,7 +57,7 @@ def homepage(request, group_id):
             auth.modified_by = user_id
             if user_id not in auth.contributors:
                 auth.contributors.append(user_id)
-            # Get group_type and group_affiliation stored in node_holder for this author 
+            # Get group_type and group_affiliation stored in node_holder for this author
             try:
                 temp_details = node_collection.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
                 if temp_details:
@@ -89,6 +91,7 @@ def homepage(request, group_id):
             return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": group_id}) )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def landing_page(request):
     '''
     Method to render landing page after checking variables in local_settings/settings file.
@@ -115,9 +118,9 @@ def landing_page(request):
                                         context_instance=RequestContext(request)
                                     )
             elif request.user.id:
-                return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )        
+                return HttpResponseRedirect( reverse('my_desk', kwargs={"group_id": request.user.id}) )
             else:
-        
+
                 return render_to_response(
                                         GSTUDIO_SITE_LANDING_TEMPLATE,
                                         {
@@ -130,7 +133,7 @@ def landing_page(request):
         return HttpResponseRedirect( reverse('groupchange', kwargs={"group_id": "home"}) )
 
 
-# This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin   
+# This class overrides the django's default RedirectView class and allows us to redirect it into user group after user logsin
 # class HomeRedirectView(RedirectView):
 #     pattern_name = 'home'
 
@@ -158,7 +161,7 @@ def landing_page(request):
 #                 auth.modified_by = user_id
 #                 if user_id not in auth.contributors:
 #                     auth.contributors.append(user_id)
-#                 # Get group_type and group_affiliation stored in node_holder for this author 
+#                 # Get group_type and group_affiliation stored in node_holder for this author
 #                 try:
 #                     temp_details = node_collection.one({'_type': 'node_holder', 'details_to_hold.node_type': 'Author', 'details_to_hold.userid': user_id})
 #                     if temp_details:
@@ -167,24 +170,25 @@ def landing_page(request):
 #                 except e as Exception:
 #                     print "error in getting node_holder details for an author"+str(e)
 #                 auth.save()
-                
+
 #             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
 #             #return "/{0}/".format(auth.pk)
 #             if GSTUDIO_SITE_LANDING_PAGE == 'home':
 #                 #return "/home/dashboard/group"
 #                 return "/home/"
-#             else:    
-#                 return "/{0}/dashboard".format(self.request.user.id)     
+#             else:
+#                 return "/{0}/dashboard".format(self.request.user.id)
 #         else:
 #             # If user is not loggedin it will redirect to home as our base group.
 #             #return "/home/dashboard/group"
 #             return "/home/"
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def help_page_view(request,page_name):
     # page_obj = Node.get_node_by_id(page_id)
     help_grp = node_collection.one({'$and':[{'_type': u'Group'}, {'name': u'help'}]})
-    
+
     page_obj = node_collection.one({"name":unicode(page_name),"group_set":ObjectId(help_grp._id)})
     return render_to_response(
                                         "ndf/help_page.html",

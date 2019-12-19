@@ -21,6 +21,8 @@ from mongokit import paginator
 from gnowsys_ndf.ndf.models import *
 from pymongo import Connection
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
 	from bson import ObjectId
@@ -39,7 +41,7 @@ ins_objectid = ObjectId()
 '''
 FUNCTION TO REGISTER CUSTOM ACTIVITIES USING AJAX
 '''
-
+@cache_control(must_revalidate=True, max_age=6)
 @get_execution_time
 def custom_events(request):
 	transaction = { 'status' : None, 'message' : None}
@@ -74,13 +76,14 @@ def custom_events(request):
 '''
 USER ANALYTICS VIEWS
 '''
-
 @get_execution_time
 def default_user(request,group_id):
 	return redirect("/")
 
+
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_list_activities(request,group_id):
 
 	'''
@@ -115,6 +118,7 @@ def user_list_activities(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_app_activities(request,group_id,part):
 
 	'''
@@ -182,6 +186,7 @@ def get_user_sessions(user) :
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_summary(request,group_id):
 
 	'''
@@ -219,6 +224,7 @@ def user_summary(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def user_graphs(request) :
 	return render_to_response("ndf/analytics_user_graphs.html", {})
 
@@ -228,12 +234,14 @@ GROUP ANALYTICS VIEWS
 '''
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def default_group(request,group_id):
 	return redirect('/'+group_id+'/analytics/group/summary')
 
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_summary(request,group_id):
 	'''
 	Renders the summary of all the activities done by the members of the Group
@@ -284,6 +292,7 @@ def group_summary(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_list_activities(request,group_id):
 	'''
 	Renders the list of activities of all the members of the group
@@ -316,6 +325,7 @@ def group_list_activities(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_members(request, group_id) :
 
 	'''
@@ -383,6 +393,7 @@ def group_members(request, group_id) :
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_member_info_details(request, group_id, user) :
 
 	group_name, group_id = get_group_name_id(group_id)
@@ -1068,19 +1079,14 @@ def default_activity(group_id,url,doc):
 	return 1
 
 
-
 def event_activity(group_id,url,doc):
 	return 0
-
 def group_activity(group_id,url,doc):
 	return 0
-
 def image_activity(group_id,url,doc):
 	return 0
-
 def video_activity(group_id,url,doc):
 	return 0
-
 
 
 
@@ -1101,10 +1107,3 @@ def Gid(group):
 		pass
 
 	return group_id
-
-
-
-
-
-
-

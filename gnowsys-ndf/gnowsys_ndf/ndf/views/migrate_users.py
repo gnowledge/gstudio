@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 from gnowsys_ndf.notification import models as notification
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 def migrate():
    """ test """
    fp=open("cube_users","r")

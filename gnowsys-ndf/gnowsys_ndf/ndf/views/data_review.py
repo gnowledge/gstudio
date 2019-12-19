@@ -7,6 +7,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response  # , render  #uncomment when to use
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from mongokit import paginator
 
@@ -53,6 +55,7 @@ group_gst_id = node_collection.find_one({'_type': "GSystemType", "name": "Group"
 # data review in File app
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def data_review(request, group_id, page_no=1, **kwargs):
     '''
     To get all the information related to every resource object in the group.
@@ -138,6 +141,7 @@ def data_review(request, group_id, page_no=1, **kwargs):
 # ---END of data review in File app
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 
     try:
@@ -198,6 +202,7 @@ def get_dr_search_result_dict(request, group_id, search_text=None, page_no=1):
 # saving resource object of data review
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def data_review_save(request, group_id):
     '''
     Method to save each and every data-row edit of data review app

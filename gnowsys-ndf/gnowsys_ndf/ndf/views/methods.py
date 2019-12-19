@@ -323,24 +323,18 @@ def capture_data(file_object=None, file_data=None, content_type=None,time=None):
 def get_group_name_id(group_name_or_id, get_obj=False):
     '''
       - This method takes possible group name/id as an argument and returns (group-name and id) or group object.
-
       - If no second argument is passed, as method name suggests, returned result is "group_name" first and "group_id" second.
-
       - When we need the entire group object, just pass second argument as (boolian) True. In the case group object will be returned.
-
       Example 1: res_group_name, res_group_id = get_group_name_id(group_name_or_id)
       - "res_group_name" will contain name of the group.
       - "res_group_id" will contain _id/ObjectId of the group.
-
       Example 2: res_group_obj = get_group_name_id(group_name_or_id, get_obj=True)
       - "res_group_obj" will contain entire object.
-
       Optimization Tip: before calling this method, try to cast group_id to ObjectId as follows (or copy paste following snippet at start of function or wherever there is a need):
       try:
           group_id = ObjectId(group_id)
       except:
           group_name, group_id = get_group_name_id(group_id)
-
     '''
     # if cached result exists return it
     if not get_obj:
@@ -668,7 +662,6 @@ def get_all_resources_for_group(group_id):
 @get_execution_time
 def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
     """Returns list of GApps.
-
     Arguments:
     default_gapp_listing -- (Optional argument)
         - This is to decide which list should be considered for listing GAPPs;
@@ -677,13 +670,11 @@ def get_gapps(default_gapp_listing=False, already_selected_gapps=[]):
             - At present used in listing GAPPS whenever a new group is created
         - False: GSTUDIO_WORKING_GAPPS (selection-menu)
             - At present used in listing GAPPS for setting-up GAPPS for a group
-
     already_selected_gapps -- (Optional argument)
         - List of GApps already set for a given group in form of
         dictionary variable
         - If specified, then these listed GApps are excluded from
         the list of GApps returned by this function
-
     Returns:
         - List of GApps where each GApp is in form of node/dictionary
     """
@@ -1327,12 +1318,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     '''
     if node.content_org != content_org:
         node.content_org = unicode(content_org)
-
         # Required to link temporary files with the current user who is
         # modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + slugify(usrname) + "-" + ObjectId().__str__()
-
         node_page_type_list = []
         if node.get("_id",None):
             get_node = node_collection.one({'_id': ObjectId(node._id)})
@@ -1341,7 +1330,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
               for each_node_type_of in node_type_of:
                 node_type_of_name = node_collection.one({'_id': each_node_type_of})
                 node_page_type_list.append(node_type_of_name.name)
-
         # org editor for wiki page and ckeditor for blog and info pages
         if node_page_type_list:
           if "Wiki page" in node_page_type_list:
@@ -2154,7 +2142,6 @@ def get_node_metadata(request, node, **kwargs):
     Pass is_changed=True as last/third argument while calling this/get_node_metadata method.
     Example:
       updated_ga_nodes = get_node_metadata(request, node_obj, GST_FILE_OBJ, is_changed=True)
-
     '''
     attribute_type_list = ["age_range", "audience", "timerequired",
                            "interactivitytype", "basedonurl", "educationaluse",
@@ -2411,11 +2398,9 @@ def get_property_order_with_value(node):
 def parse_template_data(field_data_type, field_value, **kwargs):
     """
     Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
-
     Arguments:
     field_data_type -- data-type of the field
     field_value -- value of the field retrieved from GET/POST object
-
     Returns:
     Parsed value based on the data-type of the field
     """
@@ -2656,7 +2641,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
         object_scope : unicode,
         subject_scope : unicode
       }
-
     '''
 
     if ga_node is None:
@@ -2845,18 +2829,15 @@ def create_gattribute(subject_id, attribute_type_node, object_value=None, **kwar
 def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
     """Creates single or multiple GRelation documents (instances) based on given
     RelationType's cardinality (one-to-one / one-to-many).
-
     Arguments:
     subject_id -- ObjectId of the subject-node
     relation_type_node -- Document of the RelationType node (Embedded document)
     right_subject_id_or_list --
       - When one to one relationship: Single ObjectId of the right_subject node
       - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
-
     Returns:
     - When one to one relationship: Created/Updated/Existed document.
     - When one to many relationship: Created/Updated/Existed list of documents.
-
     kwargs -- can hold the scope value
     """
     gr_node = None
@@ -2871,7 +2852,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         object_scope : unicode,
         subject_scope : unicode
       }
-
     In next phase, validate the scope values by adding:
         GSTUDIO_FORMAT_SCOPE_VALUES
         GSTUDIO_SIZE_SCOPE_VALUES
@@ -3599,11 +3579,9 @@ def get_file_node(file_name=""):
 @get_execution_time
 def create_task(task_dict, task_type_creation="single"):
     """Creates task with required attribute(s) and relation(s).
-
     task_dict
     - Required keys: _id[optional], name, group_set, created_by, modified_by, contributors, content_org,
         created_by_name, Status, Priority, start_time, end_time, Assignee, has_type
-
     task_type_creation
     - Valid input values: "single", "multiple", "group"
     """
@@ -3743,20 +3721,17 @@ def create_task(task_dict, task_type_creation="single"):
 @get_execution_time
 def get_student_enrollment_code(college_id, node_id_to_ignore, registration_date, college_group_id=None):
     """Returns new student's enrollment code
-
     Enrollment Code is combination of following values:
     Code: (MH/SNG/15/xxxx)
     - 2-letters state code
     - 3-letters college code
     - 2-digits year of registration
     - 4-digits Auto-generated No.
-
     Arguments:
     college_id: ObjectId of college's node
     node_id_to_ignore: ObjectId of the student node for which this function generates enrollment_code
     registration_date: Date of registration of student node for which this function generates enrollment_code
     college_group_id [Optional]: ObjectId of college's group node
-
     Returns:
     Newly created enrollment code for student node
     """
@@ -3932,12 +3907,9 @@ def create_college_group_and_setup_data(college_node):
     """
     Creates private group for given college; establishes relationship
     between them via "has_group" RelationType.
-
     Also populating data into it needed for registrations.
-
     Arguments:
     college_node -- College node (or document)
-
     Returns:
     College group node
     GRelation node
@@ -4156,7 +4128,6 @@ def parse_data(doc):
 
 def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
     """This function deletes GAttribute node(s) of Triples collection.
-
     Keyword arguments:
     subject_id -- (Optional argument)
         - Specify this argument if you need to delete/purge GAttribute(s)
@@ -4164,7 +4135,6 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         - ObjectId of the node whose GAttribute node(s) need(s) to be deleted,
         accepted in either format String or ObjectId
         - Default value is set to None
-
     kwargs["node_id"] -- (Optional argument)
         - Specify this argument if you need to delete/purge only a given
         GAttribute node
@@ -4173,7 +4143,6 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         - If this argument is specified, subject_id will work as an optional
         argument and even query variable would be overridden by node_id's
         query variable
-
     deletion_type -- (Optional argument)
         - Specify this to signify which type of deletion you need to perform
         - Accepts only either of the following values:
@@ -4183,21 +4152,17 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
         (b) 1 (one, i.e. Purge)
             - Process in which node is deleted from the database
         - Default value is set to 0 (zero)
-
     Returns:
     A tuple with following values:
         First-element: Boolean value
         Second-element: Message
-
     If deletion is successful, then (True, "Success message.")
     Otherwise, (False, "Error message !")
-
     Examples:
     del_status, del_status_msg = delete_attribute(
         subject_id=ObjectId("...")
         [, deletion_type=0[/1]]
     )
-
     del_status, del_status_msg = delete_attribute(
         node_id=ObjectId("...")
         [, deletion_type=0[/1]]
@@ -4392,7 +4357,6 @@ def delete_gattribute(subject_id=None, deletion_type=0, **kwargs):
 
 def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
     """This function deletes GRelation node(s) of Triples collection.
-
     Keyword arguments:
     subject_id -- (Optional argument)
         - Specify this argument if you need to delete/purge GRelation(s)
@@ -4400,7 +4364,6 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         - ObjectId of the node whose GRelation node(s) need(s) to be deleted,
         accepted in either format String or ObjectId
         - Default value is set to None
-
     kwargs["node_id"] -- (Optional argument)
         - Specify this argument if you need to delete/purge only a given
         GRelation node
@@ -4409,7 +4372,6 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         - If this argument is specified, subject_id will work as an optional
         argument and even query variable would be overridden by node_id's
         query variable
-
     deletion_type -- (Optional argument)
         - Specify this to signify which type of deletion you need to perform
         - Accepts only either of the following values:
@@ -4419,21 +4381,17 @@ def delete_grelation(subject_id=None, deletion_type=0, **kwargs):
         (b) 1 (one, i.e. Purge)
             - Process in which node is deleted from the database
         - Default value is set to 0 (zero)
-
     Returns:
     A tuple with following values:
         First-element: Boolean value
         Second-element: Message
-
     If deletion is successful, then (True, "Success message.")
     Otherwise, (False, "Error message !")
-
     Examples:
     del_status, del_status_msg = delete_grelation(
         subject_id=ObjectId("...")
         [, deletion_type=0[/1]]
     )
-
     del_status, del_status_msg = delete_grelation(
         node_id=ObjectId("...")
         [, deletion_type=0[/1]]
@@ -4675,7 +4633,6 @@ def delete_node(
         deletion_type=0, **kwargs):
     """This function deletes node belonging to either Nodes collection or
     Triples collection.
-
     Keyword Arguments:
     node_id -- (Optional argument)
         - Specify this argument if you need to delete/purge only a given
@@ -4687,7 +4644,6 @@ def delete_node(
         - If this argument is ignored, then you must specify subject_id as a
         parameter (mandatory in case of deleting node from Triples collection).
         - Default value is set to None
-
     collection_name -- (Optional argument)
         - Specify this to signify from which collection you need to delete node
         i.e. helpful in setting-up the collection-variable
@@ -4696,7 +4652,6 @@ def delete_node(
         (a) node_collection.collection_name/"Nodes"
         (b) triple_collection.collection_name/"Triples"
         - Default set to node_collection.collection_name (i.e. "Nodes")
-
     deletion_type -- (Optional argument)
         - Specify this to signify which type of deletion you need to perform
         - Accepts only either of the following values:
@@ -4706,29 +4661,24 @@ def delete_node(
         (b) 1 (one, i.e. Purge)
             - Process in which node is deleted from the database
         - Default value is set to 0 (zero)
-
     kwargs["subject_id"] -- (Optional argument)
         - Specify this argument if you need to delete/purge GRelation(s) and/or
         GAttribute(s) related to given node belonging to Nodes collection
         - ObjectId of the node whose GAttribute(s) and/or GRelation node(s)
         need(s) to be deleted, accepted in either format String or ObjectId
         - Default value is set to None
-
     kwargs["_type"] -- (Optional argument)
         - Specify this argument if you need to delete/purge specifically either
         only GAttribute node(s) or GRelation node(s)
         - If ignored, then by default node(s) belonging to both types
         (GAttribute and GRelation) will be considered for deleting/purging
         - Can also be specified in case of delete/purge Nodes collection node
-
     Returns:
     A tuple with following values:
         First-element: Boolean value
         Second-element: Message
-
     If deletion is successful, then (True, "Success message.")
     Otherwise, (False, "Error message !")
-
     If you need to delete node of Nodes collection, then you only need to
     specify node_id, collection_name, and deletion_type as parameters.
         Examples:
@@ -4737,7 +4687,6 @@ def delete_node(
             [, collection_name=node_collection.collection_name]
             [, deletion_type=0[/1]]
         )
-
     If you need to delete node(s) of Triples collection, then you need to
     specify node_id/subject_id [depending on whether you need to delete single
     node or multiple nodes which are related to given node of Nodes collection]
@@ -5172,13 +5121,11 @@ def create_thread_for_node(request, group_id, node):
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
-
       Actions:
        * Finds the thread_node associated with passed node.
        * Creates ATs release_response and thread_interaction_type for thread_node
        * If dates set for thread, created ATs start_time and end_time for thread_node
        * Creates RT has_thread between node and thread_node
-
       Returns:
         * Success - True/False
     """
@@ -5198,11 +5145,9 @@ def node_thread_access(group_id, node):
       Accepts:
        * ObjectId of group.
        * node - Page/File GSystem
-
       Actions:
        * Finds the thread_node associated with passed node.
        * Validation for discussion based on start_time and end_time, if exists
-
       Returns:
        * thread_node - used in discussion.html
        * success (i.e True/False)
@@ -5249,10 +5194,8 @@ def node_thread_access(group_id, node):
 
 def get_prior_node_hierarchy(oid):
     """pass the node's ObjectId and get list of objects in hierarchy
-
     Args:
         oid (TYPE): mongo ObjectId
-
     Returns:
         list: List of objects starts from passed node till top node
     """
@@ -5279,10 +5222,8 @@ def get_language_tuple(lang):
     """
     from input argument of language code of language name
     get the std matching tuple from settings.
-
     Returns:
         tuple: (<language code>, <language name>)
-
     Args:
         lang (str or unicode): it is the one of item from tuple.
         It may either language-code or language-name.
@@ -5313,14 +5254,10 @@ def get_filter_querydict(filters):
     After getting the filters from request,
     this method converts it into mongo query-able.
     suitable form. Which can be passed to '$and'.
-
     Args:
         filter (JSON): It's a nested list of '$or' dicts.
         e.g:
         [{"$or":[{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Upper Primary","selFieldPrimaryType":"list"},{"selFieldValue":"educationallevel","selFieldValueAltnames":"Level","selFieldGstudioType":"attribute","selFieldText":"Primary","selFieldPrimaryType":"list"}]},{"$or":[{"selFieldValue":"interactivitytype","selFieldValueAltnames":"interactivitytype","selFieldGstudioType":"attribute","selFieldText":"Expositive","selFieldPrimaryType":"basestring"}]}]
-
-
-
     Returns:
         JSON: JSON format which can be directly feed to query.
         e.g:
@@ -5499,13 +5436,10 @@ def dig_nodes_field(parent_node, field_name="collection_set",
   This function fetches list of ObjectIds by
   digging into the node's field_name and
   the result's field_name recursively.
-
   'field_name' can be collection_set/prior_node/post_node etc.
   'member_of' is a list of GST names e.g ['Page', 'File']
-
   If 'only_leaf_nodes' is True, the leaf nodes will be fetched,
   i.e the nodes not having any value in their said field_name
-
   To invoke this function:
     result = dig_nodes_field(node_obj)/
     result = dig_nodes_field(node_obj,'collection_set')/
@@ -5627,14 +5561,12 @@ def get_course_completetion_status(group_obj, user_id,ids_list=False):
                     partially_exists = any(each_id in completed_ids for each_id in cu_node.collection_set)
                     if partially_exists:
                       incompleted_ids.append(cu_node._id)
-
               if all(each_item in completed_ids for each_item in css_node.collection_set):
                 completed_ids.append(css_node._id)
               else:
                 partially_exists = any(each_id in completed_ids for each_id in css_node.collection_set)
                 if partially_exists or all(each_item in incompleted_ids for each_item in css_node.collection_set):
                   incompleted_ids.append(css_node._id)
-
           if all(each_item in completed_ids for each_item in cs_node.collection_set):
             completed_ids.append(cs_node._id)
           else:

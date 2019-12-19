@@ -12,6 +12,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
@@ -30,6 +32,7 @@ at_items_sort_list = node_collection.one({'_type': "AttributeType", 'name': "ite
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def list_modules(request, group_id):
     '''
     listing of modules
@@ -51,6 +54,7 @@ def list_modules(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def module_create_edit(request, group_id, module_id=None, cancel_url='list_modules'):
     if request.method == "GET":
 
@@ -101,6 +105,7 @@ def module_create_edit(request, group_id, module_id=None, cancel_url='list_modul
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def module_detail(request, group_id, node_id,title=""):
     '''
     detail of of selected module
@@ -222,6 +227,7 @@ def module_detail(request, group_id, node_id,title=""):
         context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def unit_order_list(request, group_id, node_id):
     response_dict = {"success": False}
     unit_id_list = request.POST.get('unit_list', [])

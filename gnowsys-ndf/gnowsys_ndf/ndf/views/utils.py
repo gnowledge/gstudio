@@ -4,12 +4,13 @@ Possibly avoid (direct) queries.
 '''
 import bson
 import datetime
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
-
 
 def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
     req_dict = {}
@@ -18,7 +19,6 @@ def get_dict_from_list_of_dicts(list_of_dicts,convert_objid_to_str=False):
         str_val_dict = {key: map(str,val) for key, val in req_dict.items()}
         return str_val_dict
     return req_dict
-
 
 def get_query_dict(**kwargs):
     '''
@@ -54,7 +54,6 @@ def add_to_list(list_to_update, value_to_append):
     if value_to_append not in list_to_update:
         list_to_update.append(value_to_append)
     return list_to_update
-
 
 def cast_to_data_type(value, data_type):
     '''
@@ -115,7 +114,6 @@ def cast_to_data_type(value, data_type):
 
     return casted_value
 
-
 def replace_in_list(list_to_update, old_val, new_val, append_if_not=False):
     '''
     Replace <old_value> with <new_value> in list_to_update, if exists.
@@ -151,7 +149,6 @@ def merge_lists_and_maintain_unique_ele(list_a, list_b, advanced_merge=False):
     else:
         merged_list = list(set(list_a) | set(list_b))
     return merged_list
-
 
 def reverse_dict_having_listvalues(dict_listvalues):
     '''

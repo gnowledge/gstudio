@@ -9,6 +9,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from gnowsys_ndf.ndf.models import Node, GSystem, GSystemType, RelationType, Group
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
@@ -21,7 +23,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import  get_relation_value
 rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType', get_obj=True)
 supported_languages = ['Hindi', 'Telugu']
 trans_node_gst_name, trans_node_gst_id = GSystemType.get_gst_name_id("trans_node")
-
+@cache_control(must_revalidate=True, max_age=6)
 def all_translations(request, group_id, node_id):
     '''
     returns all translated nodes of provided node.
@@ -45,7 +47,7 @@ def all_translations(request, group_id, node_id):
                                 'supported_languages': supported_languages                               },
                               context_instance=RequestContext(request))
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def show_translation(request, group_id, node_id, lang):
     '''
     for VIEW/READ: show translated provided node to provided LANG CODE
@@ -91,6 +93,7 @@ def show_translation(request, group_id, node_id, lang):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def translate(request, group_id, node_id, lang, translated_node_id=None, **kwargs):
     '''
     for EDIT: translate provided node to provided LANG CODE
@@ -176,14 +179,12 @@ def translate(request, group_id, node_id, lang, translated_node_id=None, **kwarg
     return HttpResponseRedirect(reverse('show_translation', kwargs={'group_id': group_id, 'node_id': node_id, 'lang': lang }))
     # return translated_node, translate_grel
 
-
 def get_lang_node(node_id,lang):
     rel_value = get_relation_value(ObjectId(node_id),"translation_of")
     for each in rel_value['grel_node']:
         if each.language[0] ==  get_language_tuple(lang)[0]:
             trans_node = each
             return trans_node
-
 def get_trans_node_list(node_list,lang):
     trans_node_list = []
     for each in node_list:
@@ -197,7 +198,6 @@ def get_trans_node_list(node_list,lang):
             # trans_node_list.append({ObjectId(node._id): {"name": node.name, "basenodeid":ObjectId(node._id)}})
     if trans_node_list:
         return trans_node_list
-
 def get_course_content_hierarchy(unit_group_obj,lang="en"):
     '''
     ARGS: unit_group_obj
@@ -263,7 +263,6 @@ def get_course_content_hierarchy(unit_group_obj,lang="en"):
                         lesson_dict['children'].append(activity_dict)
             unit_structure.append(lesson_dict)
     return unit_structure
-
 
 
 def get_unit_hierarchy(unit_group_obj,lang="en"):

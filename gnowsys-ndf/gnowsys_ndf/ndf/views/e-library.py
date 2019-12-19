@@ -6,6 +6,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mongokit import paginator
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
 	from bson import ObjectId
@@ -36,6 +38,7 @@ GST_JSMOL = node_collection.one({"_type":"GSystemType","name":"Jsmol"})
 ##############################################################################
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def resource_list(request, group_id, app_id=None, page_no=1):
 	"""
 	* Renders a list of all 'Resources' available within the database (except eBooks).
@@ -166,7 +169,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 			elif len(set(eu_list)) == 1:
 				educationaluse_stats = { eu_list[0]: eu_list.count(eu_list[0])}
 			educationaluse_stats["all"] = files.count()
-		
+
 
 		# print educationaluse_stats
 		result_paginated_cur = files
@@ -224,6 +227,7 @@ def resource_list(request, group_id, app_id=None, page_no=1):
 								context_instance = RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def elib_paged_file_objs(request, group_id, filetype, page_no):
 	'''
 	Method to implement pagination in File and E-Library app.
@@ -324,7 +328,7 @@ def elib_paged_file_objs(request, group_id, filetype, page_no):
 
 		# print "query_dict : ", query_dict
 
-		
+
 		files = node_collection.find({
 										'member_of': {'$in': [GST_FILE._id,GST_JSMOL._id]},
 										# 'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},

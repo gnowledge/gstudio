@@ -2,7 +2,8 @@
 import json
 from jsonrpc import jsonrpc_method
 from django.contrib.auth.models import User
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 from mongokit import paginator
 
 try:
@@ -18,7 +19,6 @@ from gnowsys_ndf.ndf.models import node_collection
 
 
 #######################################################################################################################################
-
 
 @jsonrpc_method('resources', safe=True) 
 def resources_list(request):
@@ -87,7 +87,6 @@ def resources_list(request):
 
 	# print "\n",json.dumps(ebooks_dict),"\n"
 	return json.dumps(ebooks_dict)
-
 @get_execution_time
 def get_metadata(efile):
 	'''

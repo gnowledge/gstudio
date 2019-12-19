@@ -15,6 +15,8 @@ import threading
 
 from PIL import Image, ImageDraw
 from StringIO import StringIO
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -64,6 +66,7 @@ lock = threading.Lock()
 count = 0
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def file(request, group_id, file_id=None, page_no=1):
     """
     Renders a list of all 'Files' available within the database.
@@ -524,6 +527,7 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
     return result_dict
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def paged_file_objs(request, group_id, filetype, page_no):
     '''
     Method to implement pagination in File and E-Library app.
@@ -752,6 +756,7 @@ def paged_file_objs(request, group_id, filetype, page_no):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def uploadDoc(request, group_id):
 
     try:
@@ -783,6 +788,7 @@ def uploadDoc(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
@@ -1393,6 +1399,7 @@ def GetDoc(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def file_search(request, group_id):
     # ins_objectid  = ObjectId()
     # if ins_objectid.is_valid(group_id) is False :
@@ -1421,6 +1428,7 @@ def file_search(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_file(request, group_id, _id):
   """Delete file and its data
   """
@@ -1458,6 +1466,7 @@ def delete_file(request, group_id, _id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
@@ -1568,7 +1577,7 @@ def file_detail(request, group_id, _id):
                               context_instance = RequestContext(request)
                              )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def file_content(request, group_id):
 
     node_id = request.GET.get('id', None)
@@ -1583,6 +1592,7 @@ def file_content(request, group_id):
                                 }, context_instance = RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
@@ -1667,6 +1677,7 @@ def getFileThumbnail(request, group_id, _id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def readDoc(request, _id, group_id, file_name=""):
     '''Return Files
     '''
@@ -1717,6 +1728,7 @@ def readDoc(request, _id, group_id, file_name=""):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def read_attachment(request, group_id, file_path):
   file_path = '/' + file_path
   with open(file_path,'r') as download_file:
@@ -1725,7 +1737,7 @@ def read_attachment(request, group_id, file_path):
     response['Content-Disposition'] = 'attachment; filename=' + file_path.split("/")[-1]
     return response
 
-
+@cache_control(must_revalidate=True, max_age=6)
 @get_execution_time
 def file_edit(request,group_id,_id):
     # ins_objectid  = ObjectId()
@@ -1836,7 +1848,7 @@ def file_edit(request,group_id,_id):
                                   context_instance=RequestContext(request)
                               )
 
-
+@cache_control(must_revalidate=True, max_age=6)
 def get_gridfs_resource(request, gridfs_id):
 
     # print gridfs_id

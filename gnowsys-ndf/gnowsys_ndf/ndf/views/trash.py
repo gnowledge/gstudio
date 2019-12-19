@@ -9,10 +9,13 @@ from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.methods import *
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_SITE_NAME
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 trash_group = node_collection.one({'_type': 'Group', "name": u"Trash"});
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def trash_resource(request,group_id,node_id):
 	'''
 	Delete Action.
@@ -75,6 +78,7 @@ def trash_resource(request,group_id,node_id):
 		# return(eval('group_dashboard')(request, group_id))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 # @staff_required
 def delete_group(request, group_id, url_name='groupchange'):
     response_dict = {'success': False}
@@ -99,6 +103,7 @@ def delete_group(request, group_id, url_name='groupchange'):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_resource(request,group_id):
 	# NOTE: purge of themes need to be handled differently.
 	# all the collection hierarchy needs to be purged in this case.
@@ -114,6 +119,7 @@ def delete_resource(request,group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def restore_resource(request, group_id):
 	group_name, group_id = get_group_name_id(group_id)
 	response_dict = {'success': False}
@@ -134,6 +140,7 @@ def restore_resource(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_multiple_resources(request,group_id):
 	files_list = request.POST.getlist("collection[]", '')
 	auth = node_collection.one({'_type': 'Author', 'name': unicode(request.user.username) })

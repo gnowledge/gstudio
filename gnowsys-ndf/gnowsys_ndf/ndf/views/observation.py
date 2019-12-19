@@ -12,7 +12,8 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -31,6 +32,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def all_observations(request, group_id, app_id=None):
 
 	ins_objectid  = ObjectId()
@@ -115,6 +117,7 @@ def all_observations(request, group_id, app_id=None):
 							 	context_instance=RequestContext(request)
 							 )
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	ins_objectid  = ObjectId()
@@ -209,6 +212,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 	user_type = request.POST["user"]
 	user_session_id = request.POST["user_session_id"]
@@ -294,6 +298,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	user_type = request.POST["user"]
@@ -342,6 +347,7 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 	return StreamingHttpResponse(response_data)
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
     if request.method == "POST" :

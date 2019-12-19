@@ -12,6 +12,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem  #, Triple
@@ -30,6 +32,7 @@ rt_translation_of = Node.get_name_id_from_type('translation_of', 'RelationType',
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def unit_create_edit(request, group_id, unit_group_id=None):
     '''
     creation as well as eit of units
@@ -164,6 +167,7 @@ def unit_create_edit(request, group_id, unit_group_id=None):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def unit_detail(request, group_id):
     '''
     detail of of selected units
@@ -191,6 +195,7 @@ def unit_detail(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def list_units(request, group_id):
     '''
     listing of units
@@ -223,6 +228,7 @@ def list_units(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def lesson_create_edit(request, group_id, unit_group_id=None):
     '''
     creation as well as edit of lessons
@@ -371,6 +377,7 @@ def lesson_create_edit(request, group_id, unit_group_id=None):
 
 # @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def activity_create_edit(request, group_id, lesson_id=None):
     '''
     creation as well as edit of activities
@@ -426,7 +433,6 @@ def activity_create_edit(request, group_id, lesson_id=None):
             # return HttpResponse(json.dumps(unit_structure))
 
     return HttpResponse(json.dumps(result_dict))
-
 
 
 def _get_unit_hierarchy(unit_group_obj,lang="en"):

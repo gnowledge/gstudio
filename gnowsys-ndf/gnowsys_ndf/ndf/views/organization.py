@@ -10,6 +10,8 @@ from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
   from bson import ObjectId
@@ -30,6 +32,7 @@ from gnowsys_ndf.ndf.views.methods import get_group_name_id
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -235,6 +238,7 @@ def organization_detail(request, group_id, app_id=None, app_set_id=None, app_set
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def organization_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   Creates/Modifies document of given organization-type.

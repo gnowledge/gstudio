@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import login_required
 # from django.contrib.sites.models import Site
 # from mongokit import IS
 from mongokit import paginator
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -44,6 +46,7 @@ gst_base_unit_name, gst_base_unit_id = GSystemType.get_gst_name_id('base_unit')
 at_items_sort_list = node_collection.one({'_type': "AttributeType", 'name': "items_sort_list"})
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def explore(request):
     return HttpResponseRedirect(reverse('explore_courses', kwargs={}))
 
@@ -60,6 +63,7 @@ def explore(request):
 Depricated as on 15 Apr 2017 - katkamrachana
 For new explore UI to list Modules and announced-units
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def explore_courses(request,page_no=1):
     # this will be announced tab
     title = 'courses'
@@ -104,6 +108,7 @@ def explore_courses(request,page_no=1):
 '''
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def explore_groups(request,page_no=1):
     title = 'workspaces'
     gstaff_access = check_is_gstaff(group_id,request.user)
@@ -140,6 +145,7 @@ def explore_groups(request,page_no=1):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def explore_basecourses(request,page_no=1):
 
     title = 'courses'
@@ -228,7 +234,7 @@ def explore_courses(request):
     # this will be announced tab
     title = 'courses'
     context_variable = {
-                        'title': title, 
+                        'title': title,
                         'group_id': group_id, 'groupid': group_id,
                         'modules_is_cur': True,
                     }
@@ -321,12 +327,13 @@ def explore_courses(request):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def explore_drafts(request):
     title = 'drafts'
     modules_sort_list = None
     modules_sort_list = get_attribute_value(group_id, 'items_sort_list')
     context_variable = {
-                        'title': title, 
+                        'title': title,
                         'group_id': group_id, 'groupid': group_id,
                         'modules_is_cur': True
                     }
@@ -389,11 +396,12 @@ def explore_drafts(request):
         context_instance=RequestContext(request))
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def module_order_list(request):
     response_dict = {"success": False}
     module_id_list = request.POST.get('module_list', [])
     try:
-        items_sort_list_gattr_node = triple_collection.one({'_type': 'GAttribute', 'subject': group_id, 
+        items_sort_list_gattr_node = triple_collection.one({'_type': 'GAttribute', 'subject': group_id,
             'attribute_type': at_items_sort_list._id, 'status': u'PUBLISHED'})
         if items_sort_list_gattr_node:
             ga_node = delete_gattribute(node_id=items_sort_list_gattr_node._id, deletion_type=0)

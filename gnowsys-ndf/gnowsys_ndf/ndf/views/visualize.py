@@ -13,6 +13,8 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -36,6 +38,7 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 db = get_database()
 collection = db[Node.collection_name]
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def graphs(request,group_id):
 		# HttpResponseRedirect("ndf/visualize.html",
 		# 					 	{

@@ -13,7 +13,6 @@ def hit_qbank_request(url):
         pass
     return result_set
 
-
 def get_assessment_id(domain,bankId,assessmentsoffered_id):
     # print "\nassessmentsoffered_id: ", assessmentsoffered_id
     url = str(domain) + ":8080/api/v1/assessment/banks/"+str(bankId)+\
@@ -26,7 +25,7 @@ def get_assessment_id(domain,bankId,assessmentsoffered_id):
         print "\nError Occurred in get_assessment_id()", get_assessment_id
         pass
     return assessmentId
-    
+
 def get_assessment_items_count(domain, bankId, assessmentId):
     url = str(domain) + ":8080/api/v1/assessment/banks/"+str(bankId)+\
     "/assessments/"+str(assessmentId) + "/items"

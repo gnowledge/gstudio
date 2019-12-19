@@ -14,6 +14,8 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.settings import GSTUDIO_BUDDY_LOGIN, GSTUDIO_NOTE_CREATE_POINTS
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import GSystemType, Group, Node, GSystem, Buddy, Counter  #, Triple
@@ -27,6 +29,7 @@ from gnowsys_ndf.ndf.views.methods import get_language_tuple, create_gattribute,
 @login_required
 @auto_enroll
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def node_create_edit(request,
                     group_id=None,
                     member_of=None,

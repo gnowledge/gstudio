@@ -5,7 +5,8 @@ from django.http import HttpResponseRedirect,HttpResponse,StreamingHttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 try:
   from bson import ObjectId
 except ImportError:  # old pymongo
@@ -18,6 +19,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def type_created(request,group_id):
     try:
         group_id = ObjectId(group_id)
@@ -36,6 +38,7 @@ def type_created(request,group_id):
     return render_to_response(template,variable)
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def default_template(request,group_id,node=None,edit_node=None):
     
     try:

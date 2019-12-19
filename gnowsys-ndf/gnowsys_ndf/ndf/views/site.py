@@ -9,6 +9,8 @@ from django.template import RequestContext
 from django.views.generic import RedirectView
 from gnowsys_ndf.ndf.views.methods import get_execution_time
 from gnowsys_ndf.ndf.views.analytics import *
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -16,6 +18,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def site_about(request):
     # page_obj = Node.get_node_by_id(page_id)
     return render_to_response(
@@ -26,6 +29,7 @@ def site_about(request):
                                         context_instance=RequestContext(request)
                                     )
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def site_credits(request):
     # page_obj = Node.get_node_by_id(page_id)
     return render_to_response(
@@ -37,6 +41,7 @@ def site_credits(request):
                                     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def site_contact(request):
     # page_obj = Node.get_node_by_id(page_id)
     return render_to_response(
@@ -48,6 +53,7 @@ def site_contact(request):
                                     )
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def site_termsofuse(request):
     # page_obj = Node.get_node_by_id(page_id)
     return render_to_response(
@@ -58,6 +64,7 @@ def site_termsofuse(request):
                                         context_instance=RequestContext(request)
                                     )
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def site_privacypolicy(request):
     # page_obj = Node.get_node_by_id(page_id)
     return render_to_response(

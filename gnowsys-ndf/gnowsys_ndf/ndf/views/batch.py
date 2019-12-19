@@ -4,6 +4,9 @@ from django.shortcuts import render_to_response  # render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 import json
 
 from mongokit import IS
@@ -23,6 +26,7 @@ app = GST_BATCH
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def batch(request, group_id):
     """
    * Renders a list of all 'batches' available within the database.
@@ -82,6 +86,7 @@ def batch(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def new_create_and_edit(request, group_id, _id=None):
     # node = ""
     # count = ""
@@ -139,7 +144,7 @@ def new_create_and_edit(request, group_id, _id=None):
     variable = RequestContext(request, {
         'group_id': group_id, 'groupid': group_id,
         'appId': app._id, 'title': GST_BATCH.name, 'ATs': req_ATs,
-        'count': batch_count, 'batch_count': xrange(batch_count), 'st_batch_id': GST_BATCH._id, 
+        'count': batch_count, 'batch_count': xrange(batch_count), 'st_batch_id': GST_BATCH._id,
         'ac_node': ac,
         'student_count': student_coll.count(),
         'nussd_course_name': nussd_course_name,
@@ -151,6 +156,7 @@ def new_create_and_edit(request, group_id, _id=None):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_students_for_batches(request, group_id):
     '''
     This save method creates new  and update existing the batches
@@ -169,6 +175,7 @@ def save_students_for_batches(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def save_batch(request, group_id):
 # def save_batch(batch_name, user_list, group_id, request, ac_id):
 
@@ -222,6 +229,7 @@ def save_batch(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def detail(request, group_id, _id):
     student_coll = []
     node = node_collection.one({'_id':ObjectId(_id)})
@@ -237,6 +245,7 @@ def detail(request, group_id, _id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def remove_stud_from_batch(request, group_id):
     group_name, group_id = get_group_name_id(group_id)
     if request.is_ajax() and request.method == "POST":
@@ -282,6 +291,7 @@ def remove_stud_from_batch(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def batch_detail(request, group_id):
     group_name, group_id = get_group_name_id(group_id)
     new_batch_node = None
@@ -302,6 +312,7 @@ def batch_detail(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def delete_batch(request, group_id, _id):
 
     group_name, group_id = get_group_name_id(group_id)
@@ -344,6 +355,7 @@ def delete_batch(request, group_id, _id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def get_possible_batches(request, group_id):
     '''
     Returns:

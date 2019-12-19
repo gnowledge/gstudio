@@ -1,10 +1,12 @@
 import json
 
-''' -- imports from installed packages -- ''' 
+''' -- imports from installed packages -- '''
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 # from django.core.urlresolvers import reverse
 from mongokit import paginator
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 
 try:
@@ -26,13 +28,14 @@ GST_FILE = node_collection.one({'_type':'GSystemType', 'name': u"File"})
 GST_PAGE = node_collection.one({'_type':'GSystemType', 'name': u'Page'})
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def ebook_listing(request, group_id, page_no=1):
 	from gnowsys_ndf.settings import GSTUDIO_NO_OF_OBJS_PP
 	import urllib
 
 	try:
-		group_id = ObjectId(group_id) 
-	except: 
+		group_id = ObjectId(group_id)
+	except:
 		group_name, group_id = get_group_name_id(group_id)
 
 	selfilters = urllib.unquote(request.GET.get('selfilters', ''))
@@ -43,7 +46,7 @@ def ebook_listing(request, group_id, page_no=1):
 		query_dict = get_filter_querydict(selfilters)
 	# else:
 	# 	query_dict.append({'collection_set': {'$exists': "true", '$not': {'$size': 0} }})
-        
+
 	# print "\n----\n", query_dict
 	# all_ebooks = node_collection.find({
 	# 		# "_type": "File",
@@ -52,17 +55,17 @@ def ebook_listing(request, group_id, page_no=1):
 	# 		'collection_set': {'$exists': "true", '$not': {'$size': 0} }
 	# 	})
 
-	all_ebooks = node_collection.find({												
+	all_ebooks = node_collection.find({
 								'member_of': {'$in': [GST_FILE._id, GST_PAGE._id]},
 								# '_type': 'File',
-								# 'fs_file_ids': {'$ne': []}, 
+								# 'fs_file_ids': {'$ne': []},
 								'group_set': {'$in': [ObjectId(group_id)]},
 								'attribute_set.educationaluse': 'eBooks',
 								'$and': query_dict,
 								'$or': [
 										{ 'access_policy': u"PUBLIC" },
 										{ '$and': [
-													{'access_policy': u"PRIVATE"}, 
+													{'access_policy': u"PRIVATE"},
 													{'created_by': request.user.id}
 												]
 										}

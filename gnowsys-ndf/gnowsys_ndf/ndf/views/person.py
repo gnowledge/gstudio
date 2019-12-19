@@ -11,6 +11,8 @@ from django.template import RequestContext
 from django.template import TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 from mongokit import IS
 
@@ -32,6 +34,7 @@ from gnowsys_ndf.ndf.views.methods import get_student_enrollment_code
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   custom view for custom GAPPS
@@ -350,6 +353,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   Creates/Modifies document of given person-type.

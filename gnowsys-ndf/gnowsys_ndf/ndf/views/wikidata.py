@@ -4,8 +4,11 @@ from django.template import RequestContext
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_execution_time
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def index(request, group_id):
 	# ins_objectid  = ObjectId()
  #    	if ins_objectid.is_valid(group_id) is False :
@@ -47,6 +50,7 @@ def index(request, group_id):
       	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'tag_count': tag_count, 'tag_coll': tag_coll, 'selected_topic': selected_topic, 'attribute_set' : attribute_set, 'groupid':group_id, 'group_id':group_id,'topic_count':topic_count})
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def details(request, group_id, topic_id):
 	# ins_objectid  = ObjectId()
 	# group_ins = None
@@ -94,6 +98,7 @@ def details(request, group_id, topic_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def tag_view_list(request, group_id, topic_id, tag):
 	# ins_objectid  = ObjectId()
 	# group_ins = None

@@ -17,6 +17,8 @@ from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.views.generic import View
 from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
 
 try:
     from bson import ObjectId
@@ -1381,7 +1383,7 @@ class CreateCourseEventGroup(CreateEventGroup):
                     if any(base_gs_mem in ["lesson"] for base_gs_mem in each_res_node_mem_list):
                         gst_node_id = self.lesson_gst._id
 
-                    new_res = replicate_resource(request, each_res_node, 
+                    new_res = replicate_resource(request, each_res_node,
                         group_obj._id, mem_of_node_id=gst_node_id)
                     # new_res = self.replicate_resource(request, each_res_node, group_obj)
                     prior_node_obj.collection_set.append(new_res._id)
@@ -1428,6 +1430,7 @@ class GroupCreateEditHandler(View):
     @method_decorator(login_required)
     @method_decorator(staff_required)
     @method_decorator(get_execution_time)
+    @method_decorator(cache_control(must_revalidate=True, max_age=6))
     def get(self, request, group_id, action):
         """
         Catering GET request of group's create/edit.
@@ -1514,6 +1517,7 @@ class GroupCreateEditHandler(View):
     @method_decorator(login_required)
     @method_decorator(staff_required)
     @method_decorator(get_execution_time)
+    @method_decorator(cache_control(must_revalidate=True, max_age=6))
     def post(self, request, group_id, action):
         '''
         To handle post request of group form.
@@ -1611,6 +1615,7 @@ class EventGroupCreateEditHandler(View):
     @method_decorator(login_required)
     @method_decorator(staff_required)
     @method_decorator(get_execution_time)
+    @method_decorator(cache_control(must_revalidate=True, max_age=6))
     def get(self, request, group_id, action, sg_type):
         """
         Catering GET request of group's create/edit.
@@ -1682,6 +1687,7 @@ class EventGroupCreateEditHandler(View):
     @method_decorator(login_required)
     @method_decorator(staff_required)
     @method_decorator(get_execution_time)
+    @method_decorator(cache_control(must_revalidate=True, max_age=6))
     def post(self, request, group_id, action, sg_type):
         '''
         To handle post request of group form.
@@ -1720,7 +1726,7 @@ class EventGroupCreateEditHandler(View):
 
             date_result = mod_group.set_event_and_enrollment_dates(request, group_obj._id, parent_group_obj)
             if sg_type == "CourseEventGroup":
-                if ("base_unit" in parent_group_obj.member_of_names_list or 
+                if ("base_unit" in parent_group_obj.member_of_names_list or
                     "announced_unit" in parent_group_obj.member_of_names_list):
                     group_obj.member_of = [ObjectId(announced_unit_gst._id)]
                 else:
@@ -1814,6 +1820,7 @@ class EventGroupCreateEditHandler(View):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group(request, group_id, app_id=None, agency_type=None):
   """Renders a list of all 'Group-type-GSystems' available within the database.
   """
@@ -2056,6 +2063,7 @@ def populate_list_of_group_members(group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def group_dashboard(request, group_id=None):
 
   try:
@@ -2086,7 +2094,7 @@ def group_dashboard(request, group_id=None):
 
     if ("base_unit" in group_obj.member_of_names_list or
         "CourseEventGroup" in group_obj.member_of_names_list or
-        "BaseCourseGroup" in group_obj.member_of_names_list or 
+        "BaseCourseGroup" in group_obj.member_of_names_list or
         "announced_unit" in group_obj.member_of_names_list):
         return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': group_id}))
 
@@ -2380,6 +2388,7 @@ def group_dashboard(request, group_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def app_selection(request, group_id):
     from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
@@ -2448,6 +2457,7 @@ def app_selection(request, group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def switch_group(request,group_id,node_id):
   from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
@@ -2590,6 +2600,7 @@ def switch_group(request,group_id,node_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def cross_publish(request, group_id):
     try:
         group_id = ObjectId(group_id)
@@ -2669,6 +2680,7 @@ def cross_publish(request, group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def publish_group(request,group_id,node):
 
     group_obj = get_group_name_id(group_id, get_obj=True)
@@ -2705,6 +2717,7 @@ def publish_group(request,group_id,node):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_sub_group(request,group_id):
   try:
       ins_objectid  = ObjectId()
@@ -2812,6 +2825,7 @@ def create_sub_group(request,group_id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def upload_using_save_file(request,group_id):
     from gnowsys_ndf.ndf.views.file import save_file
     try:
@@ -2822,7 +2836,7 @@ def upload_using_save_file(request,group_id):
     group_obj = node_collection.one({'_id': ObjectId(group_id)})
     title = request.POST.get('context_name','')
     sel_topic = request.POST.get('topic_list','')
-    
+
     usrid = request.user.id
     name  = request.POST.get('name')
     # print "\n\n\nusrid",usrid
@@ -3008,6 +3022,7 @@ def upload_using_save_file(request,group_id):
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def notification_details(request,group_id):
     from gnowsys_ndf.ndf.views.utils import get_dict_from_list_of_dicts
     group_name, group_id = get_group_name_id(group_id)
@@ -3022,8 +3037,8 @@ def notification_details(request,group_id):
           if each.if_file.mime_type:
             activity =  'created in asset'
           else:
-            activity =  'created ' + each.name 
-              
+            activity =  'created ' + each.name
+
         else:
           rel_set_dict = get_dict_from_list_of_dicts(each.relation_set)
           if each.if_file.mime_type and 'assetcontent_of' in rel_set_dict:
@@ -3045,10 +3060,10 @@ def notification_details(request,group_id):
         user_activity_append_temp(each)
       each.update({'activity':activity})
       files_list_append_temp(each)
-    
+
 
     return render_to_response('ndf/notification_detail.html',
-                                { 
+                                {
                                   'group_id': group_id,
                                   'groupid':group_id,
                                   'activity_list' : files_list

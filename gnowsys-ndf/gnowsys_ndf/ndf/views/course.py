@@ -15,6 +15,9 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+
 from mongokit import IS
 try:
     from bson import ObjectId
@@ -43,6 +46,7 @@ app = GST_COURSE
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course(request, group_id, course_id=None):
     """
     * Renders a list of all 'courses' available within the database.
@@ -80,7 +84,7 @@ def course(request, group_id, course_id=None):
     # title = GST_COURSE.name
     # if GST_COURSE.name == "Course":
     title = "eCourses"
-    
+
     query = {'member_of': ce_gst._id,'_id':{'$in': group_obj_post_node_list}}
     gstaff_access = False
     if request.user.id:
@@ -117,6 +121,7 @@ def course(request, group_id, course_id=None):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
@@ -166,8 +171,8 @@ def create_edit(request, group_id, node_id=None):
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE),groupid=group_id)
         create_gattribute(course_node._id, at_course_type, u"General")
-        
-        # adding thumbnail 
+
+        # adding thumbnail
         f = request.FILES.get("doc", "")
         # print "\nf is ",f
 
@@ -222,6 +227,7 @@ def create_edit(request, group_id, node_id=None):
 
 # @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_detail(request, group_id, _id):
     # ins_objectid = ObjectId()
     # if ins_objectid.is_valid(group_id) is False:
@@ -306,6 +312,7 @@ def course_detail(request, group_id, _id):
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     Creates/Modifies document of given sub-types of Course(s).
@@ -818,6 +825,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
   Detail view of NUSSD Course/ Announced Course
@@ -1020,7 +1028,7 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
 
 
   context_variables = { 'groupid': group_id, 'group_id': group_id,
-                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
+                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set,
                         'app_set_id': app_set_id,
                         'course_gst_name': course_gst.name,
                         'title': title,
@@ -1036,26 +1044,27 @@ def mis_course_detail(request, group_id, app_id=None, app_set_id=None, app_set_i
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
+    # return render_to_response([template, default_template],
     return render_to_response(template,
                               context_variables,
                               context_instance = RequestContext(request)
                             )
-  
+
   except TemplateDoesNotExist as tde:
     error_message = "\n CourseDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
-  
+
   except Exception as e:
     error_message = "\n CourseDetailListViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
 
 
-# Ajax views for setting up Course Structure 
+# Ajax views for setting up Course Structure
 
 @login_required
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def create_course_struct(request, group_id, node_id):
     """
     This view is to create the structure of the Course.
@@ -1147,6 +1156,7 @@ def create_course_struct(request, group_id, node_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_course_section(request, group_id):
     '''
     Accepts:
@@ -1193,6 +1203,7 @@ def save_course_section(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_course_sub_section(request, group_id):
     '''
     Accepts:
@@ -1244,6 +1255,7 @@ def save_course_sub_section(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def change_node_name(request, group_id):
     '''
     Accepts:
@@ -1266,6 +1278,7 @@ def change_node_name(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def change_order(request, group_id):
     '''
     Accepts:
@@ -1291,13 +1304,14 @@ def change_order(request, group_id):
         a, b = collection_set_list.index(ObjectId(node_id_up)), collection_set_list.index(ObjectId(node_id_down))
         collection_set_list[b], collection_set_list[a] = collection_set_list[a], collection_set_list[b]
         node_collection.collection.update({'_id': parent_node._id}, {'$set': {'collection_set': collection_set_list }}, upsert=False, multi=False)
-	
+
         parent_node.reload()
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def course_sub_section_prop(request, group_id):
     '''
     Accepts:
@@ -1365,6 +1379,7 @@ def course_sub_section_prop(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def add_units(request, group_id):
     '''
     Accepts:
@@ -1408,6 +1423,7 @@ def add_units(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def get_resources(request, group_id):
     '''
     Accepts:
@@ -1489,6 +1505,7 @@ def get_resources(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def save_resources(request, group_id):
     '''
     Accepts:
@@ -1564,6 +1581,7 @@ def save_resources(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def create_edit_unit(request, group_id):
     '''
     Accepts:
@@ -1618,6 +1636,7 @@ def create_edit_unit(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def delete_course(request, group_id, node_id):
     del_stat = delete_item(node_id, "CourseUnit")
     if del_stat:
@@ -1625,6 +1644,7 @@ def delete_course(request, group_id, node_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def delete_from_course_structure(request, group_id):
     '''
     Accepts:
@@ -1658,7 +1678,6 @@ def delete_from_course_structure(request, group_id):
 
         return HttpResponse(json.dumps(response_dict))
 
-
 def delete_item(item, ce_flag):
     node_item = node_collection.one({'_id': ObjectId(item)})
     if ce_flag:
@@ -1679,6 +1698,7 @@ def delete_item(item, ce_flag):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def enroll_generic(request, group_id):
     response_dict = {"success": False}
     if request.is_ajax() and request.method == "POST":
@@ -1711,6 +1731,7 @@ def enroll_generic(request, group_id):
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def remove_resource_from_unit(request, group_id):
     '''
     Accepts:
@@ -1732,13 +1753,14 @@ def remove_resource_from_unit(request, group_id):
 
         if unit_node.collection_set and res_id:
               node_collection.collection.update({'_id': unit_node._id}, {'$pull': {'collection_set': ObjectId(res_id)}}, upsert=False, multi=False)
-	    
+
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
 
 
 @get_execution_time
+@cache_control(must_revalidate=True, max_age=6)
 def add_course_file(request, group_id):
     # this is context node getting from the url get request
     context_node_id = request.GET.get('context_node', '')
@@ -1774,11 +1796,12 @@ def add_course_file(request, group_id):
             context_node.collection_set.append(file_node._id)
             file_node.prior_node.append(context_node._id)
             file_node.save()
-    
+
     return HttpResponseRedirect(url_name)
 
 
 @login_required
+@cache_control(must_revalidate=True, max_age=6)
 def enroll_to_course(request, group_id):
     '''
     Accepts:
@@ -1801,6 +1824,7 @@ def enroll_to_course(request, group_id):
         response_dict["success"] = True
         return HttpResponse(json.dumps(response_dict))
 
+@cache_control(must_revalidate=True, max_age=6)
 def set_release_date_css(request, group_id):
 	response_dict = {"success": False}
 	try:
@@ -1820,4 +1844,3 @@ def set_release_date_css(request, group_id):
 		response_dict["success"] = False
 		response_dict["message"] = "Something went wrong! Please try after some time"
 	return HttpResponse(json.dumps(response_dict))
-
