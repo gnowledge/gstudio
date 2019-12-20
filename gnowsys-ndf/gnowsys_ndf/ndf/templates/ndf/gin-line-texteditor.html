@@ -78,16 +78,17 @@
 
     <!-- populating replies -->
 
+    {% comment %}{{all_replies}}{% endcomment %}
     {% for reply in all_replies %}
      {% comment %} 
-     {% if resp_val == True or is_gstaff or request.user.id == each_reply.userid %}
+     {% if resp_val == True or is_gstaff or request.user.id == reply.userid %}
      {% endcomment %}
       <div class="content" content-reply-id="{{ reply.oid }}" data-reply-level="{{reply.level}}" data-userid="{{reply.userid}}" >
         <div style="margin-left:calc(({{reply.level}} - 1) * 48px); {% if reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-reply-id="{{ reply.oid }}" data-priornode-id="{{ reply.prior_node }}">
           <div class="discussion-title row " >
              <div class="discussion-title-username">
               <a  href="{% url 'dashboard' reply.userid %}" style="color:#ADABAB !important" title=" {{ reply.username }}">
-                {{ reply.username }}
+                {{ reply.contributors }}
               </a>
                 <small style="float:right;color:#999999">{{ reply.last_update }}</small>
             </div>

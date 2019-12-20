@@ -32,7 +32,7 @@ from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.views.group import *
 from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget, get_disc_replies, get_all_replies,user_access_policy, get_relation_value, check_is_gstaff, get_attribute_value,get_name_by_node_id,get_altname
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data, get_execution_time, delete_node, get_filter_querydict, update_notes_or_files_visited
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value, get_group_name_id, get_course_completetion_status, replicate_resource
@@ -44,6 +44,12 @@ from gnowsys_ndf.settings import GSTUDIO_NOTE_CREATE_POINTS, GSTUDIO_QUIZ_CORREC
 from gnowsys_ndf.ndf.views.trash import trash_resource 
 from gnowsys_ndf.ndf.views.translation import get_lang_node,get_trans_node_list,get_course_content_hierarchy, get_unit_hierarchy
 from gnowsys_ndf.ndf.views.assessment_analytics import user_assessment_results
+from pymongo import MongoClient
+import logging
+logging.basicConfig(filename='Assessment_data_extraction.log',level=logging.DEBUG)
+from collections import defaultdict
+from bs4 import BeautifulSoup
+
 
 
 GST_COURSE = node_collection.one({'_type': "GSystemType", 'name': "Course"})
@@ -2208,6 +2214,7 @@ def course_content(request, group_id):
             'unit_structure': json.dumps(unit_structure,cls=NodeJSONEncoder),
             'visited_nodes': json.dumps(visited_nodes)
             })
+    
     return render_to_response(template, context_variables)
 
 @get_execution_time
@@ -3817,6 +3824,424 @@ def update_assessment_analytics_for_buddies(offeredId, user_ids, logged_in_user_
         succes_update = False
         print "\nError occurred in update_assessment_analytics_for_buddies(). ", update_asmnt_anlytcs_for_buddies_err
     return succes_update
+#====================================assessment report code=====================================
+def get_identifier(osid_id):
+    """ return the identifier of an Osid ID.
+    For `osid_id` = 'assessment.AssessmentOffered%3A5a27dea1eb5c87013410532c%40ODL.MIT.EDU'
+    this would return '5a27dea1eb5c87013410532c'
+    """
+    return osid_id.split('%3A')[-1].split('%40')[0]
+
+
+
+
+def get_assessment_results(offered_id, MC):
+    """ get the sections / results for a given assessment offered """
+    SECTIONS = MC['assessment']['AssessmentSection']
+    TAKENS = MC['assessment']['AssessmentTaken']
+    taken_id = TAKENS.find({"assessmentOfferedId": offered_id})
+    print "Assessment Takens count:",taken_id.count()
+    asmnt_takens=[]
+    for each in taken_id:
+        Assmnt_sections = []
+        # print "individual Taken Ids:",each
+        tagent_id = each['takingAgentId']
+        # print tagent_id
+        if tagent_id == "osid.agent.Agent%3A0%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A%40MIT-ODL" or tagent_id == "osid.agent.Agent%3A220505%40MIT-ODL":
+            print "Anonymous User responses not stored"
+        else:
+            # print each['sections']
+            section_id = [ObjectId(get_identifier(section)) for section in each['sections']]
+            # print section_id
+            for section in SECTIONS.find({"_id": {"$in": section_id}}):
+                Assmnt_sections.append(section)
+
+            
+            each['sections']=Assmnt_sections
+            asmnt_takens.append(each)
+    # print "AssessmentTakens:----------------------",asmnt_takens   
+    return asmnt_takens
+    
+def get_datetime(dt_obj):
+    """ if a regular python datetime is not provided, None is returned """
+    if dt_obj is None:
+        return 'None'
+    else:
+        return dt_obj.strftime('%Y%m%d %H:%M:%S')
+
+def identifier(id_str):
+    """ Return the identifier of an OSID ID string """
+    return id_str.split('%3A')[-1].split('%40')[0]
+
+def get_submission_times(question):
+    """ return a stringified version of all the submission times,
+        in reverse chronological order """
+    if (question['responses'] and
+            'missingResponse' not in question['responses'][0]):
+        times = [str(get_datetime(
+            question['responses'][0]['submissionTime']))]
+    else:
+        times = ['None']
+    if len(question['responses']) > 1:
+        for additional_attempt in question['responses'][1::]:
+            times.append(str(get_datetime(
+                additional_attempt['submissionTime'])))
+    return ','.join(times)
+
+def format_file_name(file_dict):
+    """ Return a formatted file name by guessing at the extension from the
+    file label. For example, for:
+
+    'fileIds': {
+        u 'My Project (1)_tb': {
+            u 'assetId': u 'repository.Asset%3A5a27dea1eb5c87013410532a%40ODL.MIT.EDU',
+            u 'assetContentTypeId': u 'asset-content-genus-type%3Atb%40ODL.MIT.EDU',
+            u 'assetContentId': u 'repository.AssetContent%3A5a27dea1eb5c87013410532c%40ODL.MIT.EDU'
+        }
+    }
+
+    This method would return `5a27dea1eb5c87013410532c.tb`.
+
+    NOTE: we'll assume only a single file here, since this should only be used
+    with responses, which take one file right now.
+    """
+    label = file_dict.keys()[0]
+    guessed_extension = label.split('_')[-1]
+    file_data = file_dict[label]
+    filename = get_identifier(file_data['assetContentId'])
+    return '{0}.{1}'.format(filename, guessed_extension)
+
+
+def get_attempts(question, MC):
+    """ from the list of items, get the actual choice text
+        for each attempt """
+    # print "Question Received:",question
+    item = get_item(question['itemId'], MC)
+    if item:
+     if (question['responses'] and
+             'missingResponse' not in question['responses'][0]):
+         response = question['responses'][0]
+         # print "Response submitted :",response,"\n"
+         # print "DisplayName of Response:",response['displayName']['languageTypeId']
+         if 'choiceIds' in response and 'displayName' in response: 
+             # Need to account for multiple choice, MW sentence, etc.
+             #   So may have more than one `choiceId`.
+             # print "languageTypeId:",response['displayName']['languageTypeId']
+             dispnm = response['displayName']['languageTypeId']
+             
+             attempts = [' '.join(
+                 [get_choice_text(choice_id, item,dispnm)
+                  for choice_id in response['choiceIds']])]
+             # print "Single Attempt response submitted:",attempts    
+         elif 'text' in response:
+             attempts = [response['text']['text']]
+         elif 'fileIds' in response and response['fileIds'] != {}:
+             # non-empty file submission
+             attempts = [format_file_name(response['fileIds'])]
+         elif 'fileIds' in response and response['fileIds'] == {}:
+             attempts = ['Response recorded']
+         elif 'fileId' in response and response['fileId'] != {}:
+             # non-empty file submission pre-March 2018
+             attempts = [format_file_name_for_single_file_upload(
+                 response['fileId'],
+                 MC)]
+         elif item['genusTypeId'] == 'item-genus-type%3Aqti-extended-text-interaction%40ODL.MIT.EDU':
+             
+             attempts = ['No response recorded']
+         else:
+             
+             print('need to account for new response type,{0}'.format(response))
+             attempts = ['New ReponseType // {0}'.format(response)]
+     else:
+         attempts = ['None']
+     if len(question['responses']) > 1:
+         for additional_attempt in question['responses'][1::]:
+             if 'choiceIds' in additional_attempt and 'displayName' in additional_attempt:
+                 # print "LanguageTypeId additional attempt:",additional_attempt['displayName']['languageTypeId']
+                 dispnm = additional_attempt['displayName']['languageTypeId'] 
+                 attempts.append(' '.join(
+                     [get_choice_text(choice_id, item,dispnm)
+                      for choice_id in additional_attempt['choiceIds']]))
+                 # print "Additional_attempt Response submitted:",attempts
+    
+             elif 'text' in additional_attempt:
+                 attempts.append(additional_attempt['text']['text'])
+             elif ('fileIds' in additional_attempt and
+                   additional_attempt['fileIds'] != {}):
+                 # non-empty file submission
+                 attempts.append(
+                     format_file_name(additional_attempt['fileIds']))
+             elif ('fileIds' in additional_attempt and
+                   additional_attempt['fileIds'] == {}):
+                 attempts.append('Response recorded')
+             elif ('fileId' in additional_attempt and
+                   additional_attempt['fileId'] != {}):
+                 # non-empty file submission pre-March 2018
+                 attempts.append(format_file_name_for_single_file_upload(
+                     additional_attempt['fileId'],
+                     MC))
+             elif item['genusTypeId'] == 'item-genus-type%3Aqti-extended-text-interaction%40ODL.MIT.EDU':
+                 
+                 attempts.append('No response recorded')
+             else:
+                 print('need to account for new response type,{0}'.format(response))
+                 attempts.append('New ReponseType // {0}'.format(response))
+                 #raise TypeError('need to account for new response type,', additional_attempt)
+    else:
+     attempts = ['None']
+    
+    # print "final Attempts",attempts
+    return ','.join(attempts)
+
+def get_choice_text(choice_id, item,dispnm):
+    """ grab the choice text """
+    
+    # print "******************DisplayName:******************",dispnm   
+
+    choice_texts = [c['texts']
+                    for c in item['question']['choices']
+                    if c['id'] == choice_id ][0]
+    # print "choice_texts:",choice_texts
+    
+
+    each_ltxt=[each for each in choice_texts
+                 if each['languageTypeId']==dispnm]
+    # print "each:",each_ltxt
+    if each_ltxt:
+        return get_text_from_texts(each_ltxt)
+    else:
+        return get_text_from_texts(choice_texts)
+            
+
+
+def format_file_name_for_single_file_upload(file_dict, MC):
+    guessed_extension = get_identifier(file_dict['assetContentTypeId'])
+    ASSETS = MC['repository']['Asset']
+    asset_id = ObjectId(get_identifier(file_dict['assetId']))
+    asset = ASSETS.find_one({'_id': asset_id})
+
+    if not asset:
+        print('No matching assetid found in repository service for this asset.')
+        return 'None'
+
+    ac = [ac for ac in asset['assetContents']
+          if ac['genusTypeId'] == file_dict['assetContentTypeId']]
+    if len(ac) == 0:
+        raise LookupError('No asset content of that type')
+    filename = str(ac[0]['_id'])
+    return '{0}.{1}'.format(filename, guessed_extension)
+
+@get_execution_time
+def get_offered_id(node_id):
+    # print "Node Id: ",node_id
+    soup = BeautifulSoup(node_id.content)
+    tag = soup.find_all('iframe')[0]['src']
+    srctag = tag.split("&assessment_offered_id=",1)[1]
+    strindx=srctag.index('EDU')
+    offered_id =srctag[:strindx+3]
+    print "AssessmentOffered Id :",offered_id
+    return offered_id
+
+@get_execution_time 
+def course_assessment_data(request,group_id,node_id,all_data=False):
+    # print "lang",request.LANGUAGE_CODE
+    node_assessments = []
+    node_assessments.append(get_offered_id(Node.get_node_by_id(node_id)))
+    hi_nd = get_lang_node(node_id,'hi')
+    te_nd = get_lang_node(node_id,'te')
+    if  hi_nd!= None or  te_nd!= None:
+        if get_offered_id(hi_nd) not in node_assessments: 
+            node_assessments.append(get_offered_id(hi_nd))
+        if get_offered_id(te_nd) not in node_assessments:
+            node_assessments.append(get_offered_id(te_nd))    
+
+    print "OfferedId List:",node_assessments
+    node_name=get_altname(node_id)
+    # print node_name
+    results = []
+
+    for each_assessment in node_assessments:
+        print each_assessment
+        print "\n"
+        MC=MongoClient("localhost",27017)
+        nd = get_assessment_results(each_assessment, MC)
+        print "count:",len(nd)
+        if len(nd) > 0:
+            results.extend(nd)
+        
+    # print "Assessment results:",results
+    
+    group_obj   = Group.get_group_name_id(group_id, get_obj=True)
+    group_id    = group_obj._id
+    group_name  = group_obj.name
+    gstaff_access = check_is_gstaff(group_id, request.user)
+    allow_to_join = get_group_join_status(group_obj)
+    result_row=[]
+    final_row_list=[]
+
+    results_dict = defaultdict(list)
+
+
+
+    for r in results:
+        if r:
+            if not r['sections']:
+                logging.info('No Questions data for assessmentoffered_id:{0}'.format(get_identifier(offered_id)))
+                print('No Questions data for assessmentoffered_id:{0}'.format(get_identifier(offered_id)))
+                
+                results_dict['student_id'].append(get_identifier(r['takingAgentId']))
+                results_dict['assessment_start_time'].append(get_datetime(r['actualStartTime']))
+            
+            else:
+                for each_question in r['sections'][0]['questions']:
+                    results_dict['student_id'].append(get_identifier(r['takingAgentId']))
+                    results_dict['assessment_start_time'].append(get_datetime(r['actualStartTime']))
+                    try:
+                        results_dict['question_text'].append(get_question_text(each_question,MC))
+                        results_dict['question_submission_timestamps'].append(get_submission_times(each_question))
+                        results_dict['question_attempts'].append(get_attempts(each_question, MC))
+                    except Exception as e:
+                        print(e)
+        else:
+            print('No assessment data for this offered_id:{0}'.format(offered_id))
+            logging.info('No assessment data for this offered_id:{0}'.format(offered_id))
+            logging.info('###############################################################################')
+            results_dict['assessment_offered_id'].append(get_identifier(offered_id))
+    
+
+        def _merged_to_from(min_list, max_list, na_index):
+            # max list contains more num of list
+            # min list contains less num of list
+            partly_max_list = max_list[:len(min_list)]
+            exception_list = max_list[len(min_list):]
+            for min_list_ele,mod_max_list_ele in zip(min_list, partly_max_list):
+                for ind in na_index:
+                    partly_max_list_ele[ind] = min_list_ele[ind]
+            return partly_max_list + exception_list
+        if not gstaff_access:
+            return HttpResponseRedirect(reverse('course_content', kwargs={'group_id': ObjectId(group_id)}))
+
+        
+        
+        for key,value in results_dict.items(): 
+            for v in value:
+                if key == "student_id":
+                    # To prevent in error in case where 
+                    # User object does not exist, return user-id
+                    stud_obj = User.objects.get(pk=int(v))
+                    if stud_obj:
+                        username = stud_obj.username
+                    else:
+                        username = v                    
+
+        result_row.append(create_result_row(username,r, MC))
+        
+
+    for eachlist in result_row:
+        for each in eachlist:
+            final_row_list.append(each)
+
+    # print "final:",final_row_list
+
+    
+    template = 'ndf/gcourse_event_group.html'
+    context_variables = {
+            'group_id': group_id, 'groupid': group_id, 'group_name':group_name, 'node_name':node_name,
+            'group_obj': group_obj, 'title': 'course_assessment_data', 'allow_to_join': allow_to_join
+        }
+    banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
+    context_variables.update({'old_profile_pics':old_profile_pics,
+                        "prof_pic_obj": banner_pic_obj, 'data': json.dumps(final_row_list)})
+
+    return render_to_response(template, context_variables,
+            context_instance=RequestContext(request))
+
+
+def get_item(item_id, MC):
+    """ return the given item from all the items """
+    ITEMS = MC['assessment']['Item']
+
+    item = ITEMS.find_one({"_id": ObjectId(identifier(item_id))})
+    return item
+
+def get_question_text(question,MC):
+    """ get the item's question text from the list of items """
+    item = get_item(question['itemId'], MC)
+    if item:
+        question_texts = item['question']['texts']
+        if not question_texts:
+            return 'None'
+        else:
+            return get_text_from_texts(question_texts)
+    else:
+        return 'Couldnt Find matching Item(QnA) to AssessmentTaken'
+
+def get_text_from_texts(texts):
+    
+    text_markup = ''
+    english_language_type_id = '639-2%3AENG%40ISO'
+    eng = [t['text'] for t in texts
+           if t['languageTypeId'] == english_language_type_id]
+    
+
+    telgu_language_type_id = '639-2%3ATEL%40ISO'
+    telu=[t['text'] for t in texts 
+            if t['languageTypeId'] == telgu_language_type_id]
+    
+
+    hindi_language_type_id = '639-2%3AHIN%40ISO'
+    hindi=[t['text'] for t in texts
+            if t['languageTypeId'] == hindi_language_type_id]
+    
+
+    if eng:
+        text_markup = eng[0]
+        
+    elif telu:
+        text_markup=telu[0]
+        
+    else:
+        text_markup=hindi[0]
+        
+
+    soup = BeautifulSoup(text_markup, 'lxml')
+    q_content = ['audio', 'video', 'img']
+    if any(obj_tag in text_markup for obj_tag in ['audio', 'video', 'img']):
+        # Because we probably want to know the details of the
+        #   embedded object
+        content_type = q_content[[obj_tag in text_markup for obj_tag in ['audio', 'video', 'img']].index(True)]
+        if not soup.find("source"):
+            return soup.get_text() + '//' + content_type
+        else:
+            return soup.get_text() + '//' + content_type + '//' + soup.find("source")['src']
+    return soup.get_text()
+
+
+def create_result_row(username,result,MC):
+    """return one row representing one result"""
+
+    row =[]
+    try:
+        for question in result['sections'][0]['questions']:
+            r =[username,
+                    # get_identifier(result['takingAgentId']),
+                    get_datetime(result['actualStartTime']),
+                    get_question_text(question,MC),  
+                    get_attempts(question, MC),
+                    get_submission_times(question),
+                    ]
+            row.append(r)
+            
+
+    except Exception as e:
+        print('No questions for this student_id - {0}'.format(row[0]))
+        logging.info('No questions for this student_id - {0}'.format(row[0]))
+        row += ['None', 'None', 'None']
+    
+    # print "resultrow",row
+    return row
+    
+
 
 @get_execution_time
 def course_quiz_data(request, group_id, all_data=False):
@@ -3937,7 +4362,9 @@ def course_quiz_data(request, group_id, all_data=False):
                 user_dict[e[1]]['check'].append(e)
         else:
             user_dict[e[1]]['submit'].append(e)
-
+    
+    # print "user analytics:",user_dict_list
+    
     return_list = []
     for each_user_dict in user_dict_list:
         for ked, ved in each_user_dict.items():
@@ -3949,9 +4376,12 @@ def course_quiz_data(request, group_id, all_data=False):
             else:
                 return_list.extend(ved['submit'])
 
+    # print "Final list:",return_list
+
     banner_pic_obj,old_profile_pics = _get_current_and_old_display_pics(group_obj)
     context_variables.update({'old_profile_pics':old_profile_pics,
                         "prof_pic_obj": banner_pic_obj, 'data': json.dumps(return_list)})
+
     return render_to_response(template, context_variables,
             context_instance=RequestContext(request))
 

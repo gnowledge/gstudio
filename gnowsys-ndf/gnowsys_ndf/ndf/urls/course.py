@@ -80,5 +80,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.gcourse',
                         url(r'^/widget_page_create_edit/$', 'widget_page_create_edit', name='widget_page_create_edit'),
                         url(r'^/load_assessment_analytics/$', 'load_assessment_analytics', name='load_assessment_analytics'),
                         url(r'^/quiz_data/$', 'course_quiz_data', name='course_quiz_data'),
+                        url(r'^/assessment_data/(?P<node_id>[\w-]+)$', 'course_assessment_data', name='course_assessment_data'),
                         url(r'^/finish_lesson/(?P<node_id>[\w-]+)$', 'finish_lesson', name='finish_lesson'),
                        )

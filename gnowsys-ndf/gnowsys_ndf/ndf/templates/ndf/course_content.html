@@ -1,5 +1,6 @@
 <div class="course-content">
-    <button class="accordion-overview">Overview</button>
+    <button class="accordion-overview dake">Overview <i id="click_advance" style="float:right" class="fa fa-angle-down" aria-hidden="true"></i>
+    </button>
     <div class="panel">
          <div class="about-course  rows">            
             <div class="medium-3  large-12 columns rows">
@@ -271,8 +272,15 @@ for (i = 0; i < acc.length; i++) {
             }
         });
     })
+    
 
     $(document).on('click', '.jqtree-toggler-lesson', function(){
         $(this).find('.jqtree-toggler').click()
     })
 </script>
+<script>
+    $('.dake').click(function() {
+      $("#click_advance", this).toggleClass("fa fa-angle-up fa fa-angle-down");
+  });
+    </script>
+  
