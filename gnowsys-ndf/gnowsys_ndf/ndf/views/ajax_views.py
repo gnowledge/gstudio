@@ -7078,7 +7078,7 @@ def export_to_epub(request, group_id, export_type, node_id):
     if export_type =='lesson':
       try:
           node_obj = node_collection.one({'_id': ObjectId(node_id)})
-          epub_loc = create_epub(node_obj)
+          epub_loc = create_epub(node_obj,request.LANGUAGE_CODE)
           #print(epub_loc)
           zip_file = open(epub_loc, 'rb')
           #print(zip_file)
