@@ -17,7 +17,7 @@ from django.contrib.sites.models import Site
 from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import node_collection, triple_collection, filehive_collection, benchmark_collection
-from gnowsys_ndf.settings import MEDIA_ROOT
+from gnowsys_ndf.settings import MEDIA_ROOT, GSTUDIO_SITE_NAME, GSTUDIO_SITE_LOGO
 
 try:
     from bson import ObjectId
@@ -55,6 +55,33 @@ def task_set_notify_val(request_user_id, group_id, msg, activ, to_user):
         )
         notification.create_notice_type(render, msg, "notification")
         notification.send([to_send_user], render, {"from_user": request_user})
+        return True
+    except Exception as e:
+        print "Error in sending notification- "+str(e)
+        return False
+
+
+@task
+def activity_notify_queue(from_user_id, group_name, instance_type, to_user):
+    '''
+    Attach notification mail to celery task
+    '''
+    from_user = User.objects.get(id=from_user_id)
+    to_user = list(User.objects.filter(pk__in=to_user))
+    try:
+        rendered_msg = render_to_string(
+            "notification/activity_notification.html",
+            {
+                'contributor': from_user.username,
+                'site_logo': GSTUDIO_SITE_LOGO,
+                'site_name': GSTUDIO_SITE_NAME,
+                'group_name': group_name,
+                'instance_type': instance_type,
+                # 'instance_url': instance_url,
+            }
+        )
+        notification.create_notice_type("activity_notification", "Activity Notification" , "notification")
+        notification.send(users=to_user, extra_context=rendered_msg, label= "activity_notification")
         return True
     except Exception as e:
         print "Error in sending notification- "+str(e)

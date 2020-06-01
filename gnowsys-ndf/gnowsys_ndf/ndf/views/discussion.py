@@ -264,58 +264,58 @@ def discussion_reply(request, group_id, node_id):
                                        current_group_id=group_id,
                                        active_user_id_or_list=active_user_ids_list)
 
+            '''
+            if gs_type_node.if_file.mime_type :
+                file_creator_id = gs_type_node.created_by
+                if file_creator_id != request.user.id :
+                    counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+                    # counter_obj.no_comments_on_others_files += 1
+                    counter_obj['file']['commented_on_others_res'] += 1
+                    # counter_obj.no_comments_by_user += 1
+                    counter_obj['total_comments_by_user'] += 1
+                    # counter_obj.course_score += GSTUDIO_COMMENT_POINTS
+                    counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
 
-            # if gs_type_node.if_file.mime_type :
-            #     file_creator_id = gs_type_node.created_by
-            #     if file_creator_id != request.user.id :
-            #         counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
-            #         # counter_obj.no_comments_on_others_files += 1
-            #         counter_obj['file']['commented_on_others_res'] += 1
-            #         # counter_obj.no_comments_by_user += 1
-            #         counter_obj['total_comments_by_user'] += 1
-            #         # counter_obj.course_score += GSTUDIO_COMMENT_POINTS
-            #         counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+                    counter_obj_creator = Counter.get_counter_obj(file_creator_id, ObjectId(group_id))
+                    # counter_obj_creator.no_comments_received_on_files += 1
+                    counter_obj_creator['file']['comments_gained'] += 1
+                    # counter_obj_creator.no_comments_for_user += 1
+                    if str(counter_obj.user_id) in counter_obj_creator.file['comments_by_others_on_res'].keys():
+                        # counter_obj_creator.comments_by_others_on_files[str(counter_obj.user_id)] += 1
+                        counter_obj_creator['file']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
+                    else:
+                        # counter_obj_creator.comments_by_others_on_files.update({str(counter_obj.user_id):1})
+                        counter_obj_creator.file['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
+                    counter_obj.last_update = datetime.now()
+                    counter_obj_creator.last_update = datetime.now()
+                    counter_obj.save()
+                    counter_obj_creator.save()
+            else :
+                note_creator_id = gs_type_node.created_by
+                if note_creator_id != request.user.id :
+                    counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
+                    # counter_obj.no_comments_by_user += 1
+                    counter_obj['total_comments_by_user'] += 1
+                    # counter_obj.no_comments_on_others_notes += 1
+                    counter_obj['page']['blog']['commented_on_others_res'] += 1
+                    counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
 
-            #         counter_obj_creator = Counter.get_counter_obj(file_creator_id, ObjectId(group_id))
-            #         # counter_obj_creator.no_comments_received_on_files += 1
-            #         counter_obj_creator['file']['comments_gained'] += 1
-            #         # counter_obj_creator.no_comments_for_user += 1
-            #         if str(counter_obj.user_id) in counter_obj_creator.file['comments_by_others_on_res'].keys():
-            #             # counter_obj_creator.comments_by_others_on_files[str(counter_obj.user_id)] += 1
-            #             counter_obj_creator['file']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
-            #         else:
-            #             # counter_obj_creator.comments_by_others_on_files.update({str(counter_obj.user_id):1})
-            #             counter_obj_creator.file['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
-            #         counter_obj.last_update = datetime.now()
-            #         counter_obj_creator.last_update = datetime.now()
-            #         counter_obj.save()
-            #         counter_obj_creator.save()
-            # else :
-            #     note_creator_id = gs_type_node.created_by
-            #     if note_creator_id != request.user.id :
-            #         counter_obj = Counter.get_counter_obj(request.user.id, ObjectId(group_id))
-            #         # counter_obj.no_comments_by_user += 1
-            #         counter_obj['total_comments_by_user'] += 1
-            #         # counter_obj.no_comments_on_others_notes += 1
-            #         counter_obj['page']['blog']['commented_on_others_res'] += 1
-            #         counter_obj['group_points'] += GSTUDIO_COMMENT_POINTS
+                    counter_obj_creator = Counter.get_counter_obj(note_creator_id, ObjectId(group_id))
+                    # counter_obj_creator.no_comments_for_user += 1
+                    # counter_obj_creator.no_comments_received_on_notes += 1
+                    counter_obj_creator['page']['blog']['comments_gained'] += 1
 
-            #         counter_obj_creator = Counter.get_counter_obj(note_creator_id, ObjectId(group_id))
-            #         # counter_obj_creator.no_comments_for_user += 1
-            #         # counter_obj_creator.no_comments_received_on_notes += 1
-            #         counter_obj_creator['page']['blog']['comments_gained'] += 1
-
-            #         # if str(counter_obj.user_id) in counter_obj_creator.comments_by_others_on_notes.keys():
-            #         if str(counter_obj.user_id) in counter_obj_creator.page.blog['comments_by_others_on_res'].keys():
-            #             # counter_obj_creator.comments_by_others_on_notes[str(counter_obj.user_id)] += 1
-            #             counter_obj_creator['page']['blog']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
-            #         else:
-            #             counter_obj_creator.page.blog['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
-            #         counter_obj.last_update = datetime.now()
-            #         counter_obj_creator.last_update = datetime.now()
-            #         counter_obj.save()
-            #         counter_obj_creator.save()
-
+                    # if str(counter_obj.user_id) in counter_obj_creator.comments_by_others_on_notes.keys():
+                    if str(counter_obj.user_id) in counter_obj_creator.page.blog['comments_by_others_on_res'].keys():
+                        # counter_obj_creator.comments_by_others_on_notes[str(counter_obj.user_id)] += 1
+                        counter_obj_creator['page']['blog']['comments_by_others_on_res'][str(counter_obj.user_id)] += 1
+                    else:
+                        counter_obj_creator.page.blog['comments_by_others_on_res'].update({str(counter_obj.user_id):1})
+                    counter_obj.last_update = datetime.now()
+                    counter_obj_creator.last_update = datetime.now()
+                    counter_obj.save()
+                    counter_obj_creator.save()
+            '''
             formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
 
             files = []

@@ -10,7 +10,7 @@ from gnowsys_ndf.ndf.models import Node, Counter
 from gnowsys_ndf.ndf.models import node_collection, triple_collection
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import get_execution_time, get_all_subscribed_users, get_group_name_id
-from gnowsys_ndf.ndf.views.tasks import task_set_notify_val
+from gnowsys_ndf.ndf.views.tasks import task_set_notify_val, activity_notify_queue
 import json
 
 try:
@@ -275,3 +275,7 @@ def invite_admins(request,group_id):
     except Exception as e:
         print "Exception in invite_admins in notify view "+str(e)
         return HttpResponse("Failure")
+
+@get_execution_time
+def activity_notification(from_user_id, group_name, instance_type, to_user_id):
+    return activity_notify_queue(from_user_id, group_name, instance_type, to_user_id)

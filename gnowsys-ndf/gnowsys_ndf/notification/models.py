@@ -27,7 +27,6 @@ class LanguageStoreNotAvailable(Exception):
 def create_notice_type(label, display, description, **kwargs):
     NoticeType.create(label, display, description, **kwargs)
 
-
 class NoticeType(models.Model):
     
     label = models.CharField(_("label"), max_length=40)
@@ -55,7 +54,7 @@ class NoticeType(models.Model):
         This is intended to be used by other apps as a post_syncdb manangement step.
         """
         try:
-            notice_type = cls._default_manager.get(label=label)
+            notice_type = cls.objects.get(label=label)
             updated = False
             if display != notice_type.display:
                 notice_type.display = display

@@ -21,6 +21,8 @@ from gnowsys_ndf.ndf.models import node_collection
 
 from gnowsys_ndf.ndf.views.methods import get_execution_time, staff_required, auto_enroll
 from gnowsys_ndf.ndf.views.methods import get_language_tuple, create_gattribute, create_thread_for_node
+from gnowsys_ndf.ndf.views.notify import activity_notification
+
 
 ''' -- common db queries -- '''
 
@@ -39,18 +41,26 @@ def node_create_edit(request,
     # check for POST method to node update operation
     if request.method == "POST":
 
+        object_type = "Object"
+        creation_flag = False
         # put validations
         if node_type not in node_collection.db.connection._registered_documents.keys():
             raise ValueError('Improper node_type passed')
 
-        kwargs={}
-        group_name, group_id = Group.get_group_name_id(group_id)
+        kwargs = {}
+        group_obj = Group.get_group_name_id(group_id, get_obj=True)
+        group_name = group_altname = group_obj.name
+        if group_obj.altnames:
+            group_altname = group_obj.altnames
+        group_id = group_obj._id
+
         member_of_name, member_of_id = GSystemType.get_gst_name_id(member_of)
 
         if node_id: # existing node object
             node_obj = Node.get_node_by_id(node_id)
 
         else: # create new
+            creation_flag = True
             kwargs={
                     'group_set': group_id,
                     'member_of': member_of_id
@@ -64,14 +74,16 @@ def node_create_edit(request,
         node_obj.save(group_id=group_id)
         node_id = node_obj['_id']
 
-        # Consider for Blog page creation
         if member_of_name == "Page":
             blog_page_gst_name, blog_page_gst_id = GSystemType.get_gst_name_id("Blog page")
+            # Consider for Blog page creation
             if blog_page_gst_id in node_obj.type_of:
+                object_type = "Note"
                 discussion_enable_at = node_collection.one({"_type": "AttributeType", "name": "discussion_enable"})
                 create_gattribute(node_obj._id, discussion_enable_at, True)
                 return_status = create_thread_for_node(request,group_id, node_obj)
 
+                # Update Counter objects
                 active_user_ids_list = [request.user.id]
                 if GSTUDIO_BUDDY_LOGIN:
                     active_user_ids_list += Buddy.get_buddy_userids_list_within_datetime(request.user.id, datetime.datetime.now())
@@ -83,6 +95,16 @@ def node_create_edit(request,
                     each_counter_obj['group_points'] += GSTUDIO_NOTE_CREATE_POINTS
                     each_counter_obj.last_update = datetime.datetime.now()
                     each_counter_obj.save()
+
+        if creation_flag:
+            object_type = member_of_name
+            # Send email notifications
+            try:
+                activity_notification(from_user_id=request.user.id,
+                 group_name=group_altname, instance_type=object_type, to_user_id=group_obj.author_set)
+            except Exception as notification_err:
+                print "\n!!!Error while sending notification. ", notification_err
+                pass
 
         post_req = request.POST
         attrs_to_create_update = [f for f in post_req.keys() if ('attribute' in f)]
