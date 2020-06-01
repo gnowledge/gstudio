@@ -27,7 +27,6 @@ from gnowsys_ndf.ndf.models  import node_collection, triple_collection, filehive
 from gnowsys_ndf.ndf.models import HistoryManager, RCS
 from gnowsys_ndf.settings import GSTUDIO_DATA_ROOT, GSTUDIO_LOGS_DIR_PATH, MEDIA_ROOT, GSTUDIO_INSTITUTE_ID, RCS_REPO_DIR
 from users_dump_restore import load_users_dump
-from import_logic import *
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from schema_mapping import update_factory_schema_mapper
 from gnowsys_ndf.ndf.views.utils import replace_in_list, merge_lists_and_maintain_unique_ele
@@ -37,6 +36,7 @@ DATA_RESTORE_PATH = None
 DATA_DUMP_PATH = None
 DEFAULT_USER_ID = 1
 DEFAULT_USER_SET = False
+
 USER_ID_MAP = {}
 SCHEMA_ID_MAP = {}
 log_file = None
@@ -61,34 +61,92 @@ Following will be available:
     CONFIG_VARIABLES.MD5='aeba0e3629fb0443861c699ae327d962'
 '''
 
+def create_log_file(req_log_file_name):
+    '''
+        Creates log file in gstudio-logs/ with 
+        the name of the dump folder
+    '''
+    log_file_name = req_log_file_name + '.log'
+    if not os.path.exists(GSTUDIO_LOGS_DIR_PATH):
+        os.makedirs(GSTUDIO_LOGS_DIR_PATH)
+    log_file_path = os.path.join(GSTUDIO_LOGS_DIR_PATH, log_file_name)
+    return log_file_path
+
 
 def call_exit():
     print "\n Exiting..."
     os._exit(0)
 
-# def get_file_path_with_id(node_id):
-#     file_name = (node_id + '.json')
-#     collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
-#     # Example:
-#     # if -- file_name := "523f59685a409213818e3ec6.json"
-#     # then -- collection_hash_dirs := "6/c/3/8/
-#     # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
-#     # here n := hash_level_num
-#     collection_hash_dirs = ""
-#     for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
-#         collection_hash_dirs += \
-#             (node_id[-2**pos] + "/")
-#     file_path = \
-#         os.path.join(collection_dir, \
-#                          (collection_hash_dirs + file_name))
-#     # print "\n\nfilepath: ", file_path
-#     return file_path
+def read_config_file(DATA_RESTORE_PATH):
+    """
+    Read migration_configs.py file generated during
+     the export of group and load the variables in 
+     CONFIG_VARIABLES to be accessible in entire program
+    """
+    global CONFIG_VARIABLES
+    CONFIG_VARIABLES = imp.load_source('config_variables',
+            os.path.join(DATA_RESTORE_PATH,'migration_configs.py'))
+    print "\nCONFIG_VARIABLES: ", CONFIG_VARIABLES
+    return CONFIG_VARIABLES
 
+def validate_data_dump(dump, md5, *args):
+    """
+    For validation of the exported dump and the 
+     importing data-dump, calculate MD5 and
+     check with CONFIG_VARIABLES.MD5
+     This will ensure the exported data is NOT altered
+     before importing
+    """
+    log_stmt = ""
+    from checksumdir import dirhash
+    md5hash = dirhash(dump, 'md5')
+    if md5 != md5hash:
+        # print "\nargs: ", args
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
+        else:
+            proceed_without_validation = raw_input("MD5 not matching. Restoration not recommended.\n \
+                            Enter (y/Y) to continue ?")
+        if proceed_without_validation not in ['y', 'Y']:
+            log_stmt += "\n Checksum validation Failed on dump data"
+            call_exit()
+    else:
+        print "\nValidation Success..!"
+        proceed_with_validation = ''
+        if args and len(args) == 4:
+            proceed_without_validation = args[1]
+        else:
+            proceed_with_validation = raw_input("MD5 Matching.\n \
+                            Enter (y/Y) to proceed to restoration")
+        if proceed_with_validation in ['y', 'Y']:
+            log_stmt += "\n Checksum validation Success on dump data"
+    return log_stmt
+
+def get_file_path_with_id(node_id, DATA_DUMP_PATH):
+    file_name = (node_id + '.json')
+    
+    collection_dir = os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo', 'Nodes')
+
+    # Example:
+    # if -- file_name := "523f59685a409213818e3ec6.json"
+    # then -- collection_hash_dirs := "6/c/3/8/
+    # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
+    # here n := hash_level_num
+    collection_hash_dirs = ""
+    for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
+        collection_hash_dirs += \
+            (node_id[-2**pos] + "/")
+    file_path = \
+        os.path.join(collection_dir, \
+                         (collection_hash_dirs + file_name))
+    # print "\n\nfilepath: ", file_path
+    return file_path
+
+'''
 def check_group_availability(*args):
     group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
     global log_file
     global DEFAULT_USER_ID
-    global DATA_RESTORE_PATH
 
     print '\n\n Restoring Group'
     log_file.write("\n Restoring Group")
@@ -103,12 +161,12 @@ def check_group_availability(*args):
             log_file.write("\n Group with Restore Group ID is FOUND on Target system.")
             call_exit()
         else:
-            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID, DATA_DUMP_PATH)
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
             if fp:
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
-                restore_node(fp, None, DATA_RESTORE_PATH, log_file_path)
+                restore_node(fp)
             group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             group_node.group_admin = [DEFAULT_USER_ID]
             group_node.save()
@@ -126,51 +184,49 @@ def check_group_availability(*args):
             print " Cancelling to restore."
             call_exit()
         else:
-            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID, DATA_DUMP_PATH)
+            fp = get_file_path_with_id(CONFIG_VARIABLES.GROUP_ID)
             if fp:
                 if not fp.endswith(',v'):
                     fp = fp + ',v'
                 log_file.write("\n Restoring Group: " + str(fp))
-                restore_node(fp, None, DATA_RESTORE_PATH, log_file_path)
+                restore_node(fp)
             group_node = node_collection.one({'_id': ObjectId(CONFIG_VARIABLES.GROUP_ID)})
             group_node.group_admin = [DEFAULT_USER_ID]
             group_node.save()
             log_file.write("\n Group Merge confirmed.")
             print " Proceeding to restore."
-
 '''
-def user_objs_restoration(*args):
+
+def user_objs_restoration(restore_users_flag, user_json_file_path, DATA_DUMP_PATH, *args):
     global USER_ID_MAP
     global DEFAULT_USER_ID
     global DEFAULT_USER_SET
-    global log_file
+    log_stmt = ""
     user_json_data = None
-
-    if CONFIG_VARIABLES.RESTORE_USER_DATA:
+    if restore_users_flag:
         user_dump_restore = raw_input("\n\tUser dump is available.  \
             Would you like to restore it (y/n) ?: ")
         if user_dump_restore in ['y', 'Y']:
-            log_file.write("\n Request for users restoration : Yes.")
+            log_stmt += "\n Request for users restoration : Yes."
 
-            user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
             with open(user_json_file_path, 'rb+') as user_json_fin:
                 user_json_data = json.loads(user_json_fin.read())
                 print "\n Restoring Users. Please wait.."
                 USER_ID_MAP = load_users_dump(DATA_DUMP_PATH, user_json_data)
-                log_file.write("\n USER_ID_MAP: "+ str(USER_ID_MAP))
+                log_stmt += "\n USER_ID_MAP: "+ str(USER_ID_MAP)
                 print "\n Completed Restoring Users."
         else:
-            log_file.write("\n Request for users restoration : No.")
+            log_stmt += "\n Request for users restoration : No."
             DEFAULT_USER_SET = True
             default_user_confirmation = raw_input("\n\tRestoration will use default user-id=1. \
             \n\tEnter y to continue, or n if you want to use some other id?: ")
             if default_user_confirmation in ['y', 'Y']:
-                log_file.write("\n Request for Default user with id=1 : Yes.")
+                log_stmt += "\n Request for Default user with id=1 : Yes."
                 DEFAULT_USER_ID = 1
             else:
-                log_file.write("\n Request for Default user with id=1 : No.")
+                log_stmt += "\n Request for Default user with id=1 : No."
                 DEFAULT_USER_ID = int(raw_input("Enter user-id: "))
-                log_file.write("\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET))
+                log_stmt += "\n Request for Setting Default user with id :" + str(DEFAULT_USER_SET)
     else:
 
         print "*"*80
@@ -184,8 +240,8 @@ def user_objs_restoration(*args):
             DEFAULT_USER_SET = True
             DEFAULT_USER_ID = 1
         print "\n No RESTORE_USER_DATA available. Setting Default user with id: 1"
-        log_file.write("\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET))
-
+        log_stmt += "\n No RESTORE_USER_DATA available. Setting Default user with id :" + str(DEFAULT_USER_SET)
+    return log_stmt
 
 def update_schema_id_for_triple(document_json):
     if SCHEMA_ID_MAP:
@@ -200,15 +256,13 @@ def update_schema_id_for_triple(document_json):
             document_json[u'attribute_type'] = SCHEMA_ID_MAP[document_json[u'attribute_type']]
             log_file.write("\nNEW attribute_type id " + str(document_json[u'attribute_type']))
     return document_json
-'''
 
-def update_group_set(document_json):
-    if 'group_set' in document_json:
-        if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
-            document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
-    return document_json
+# def update_group_set(document_json):
+#     if 'group_set' in document_json:
+#         if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in document_json['group_set']:
+#             document_json['group_set'].append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+#     return document_json
 
-'''
 def _mapper(json_obj, key, MAP_obj, is_list=False):
     log_file.write("\n Calling _mapper:\n\t " + str(json_obj)+ str(key)+ str(MAP_obj)+ str(is_list))
 
@@ -219,9 +273,7 @@ def _mapper(json_obj, key, MAP_obj, is_list=False):
                     replace_in_list(json_obj[key],eu, MAP_obj[eu])
         else:
             json_obj[key] = MAP_obj[json_obj[key]]
-'''
 
-'''
 def update_schema_and_user_ids(document_json):
     log_file.write("\n Invoked update_schema_and_user_ids:\n\t " + str(document_json))
     global DEFAULT_USER_SET
@@ -249,8 +301,10 @@ def update_schema_and_user_ids(document_json):
     log_file.write("\n Finished update_schema_and_user_ids:\n\t " + str(document_json))
     return document_json
 
-    # else:
-    #     Schema is same. No updation required.
+    '''
+    else:
+        Schema is same. No updation required.
+    '''
 
 def copy_version_file(filepath):
     if os.path.exists(filepath):
@@ -262,6 +316,7 @@ def copy_version_file(filepath):
         cp = "cp  -v " + rcs_file_path + " " +" --parents " + RCS_REPO_DIR + "/"
         subprocess.Popen(cp,stderr=subprocess.STDOUT,shell=True)
         os.chdir(cwd_path)
+
 
 def restore_filehive_objects(rcs_filehives_path):
     print "\nRestoring Filehives.."
@@ -299,7 +354,7 @@ def restore_node_objects(rcs_nodes_path, non_grp_root_node=None):
     for dir_, _, files in os.walk(rcs_nodes_path):
         for filename in files:
             filepath =  os.path.join(dir_, filename)
-            restore_node(filepath,non_grp_root_node)
+            restore_node(filepath, non_grp_root_node)
 
 def restore_triple_objects(rcs_triples_path):
     print "\nRestoring Triples.."
@@ -386,108 +441,166 @@ def restore_counter_objects(rcs_counters_path):
                 #     counter_obj.last_update = counter_json['last_update']
                 #     counter_changed = True
 
-                if counter_obj.is_group_member != counter_json['is_group_member'] :
-                    counter_obj.is_group_member = counter_json['is_group_member']
+                if counter_obj.assessment != counter_json['assessment'] :
+                    counter_obj.assessment = counter_json['assessment']
                     counter_changed = True
 
-                if counter_obj.modules_completed != counter_json['modules_completed'] :
-                    counter_obj.modules_completed = counter_json['modules_completed']
+                if counter_obj.assessment != counter_json['assessment'] :
+                    counter_obj.assessment = counter_json['assessment']
                     counter_changed = True
 
-                if counter_obj.course_score != counter_json['course_score'] :
-                    counter_obj.course_score = counter_json['course_score']
+                if counter_obj['course']['modules']['completed'] != counter_json['course']['modules']['completed'] :
+                    counter_obj['course']['modules']['completed'] = counter_json['course']['modules']['completed']
+                    counter_changed = True
+                if counter_obj['course']['units']['completed'] != counter_json['course']['units']['completed'] :
+                    counter_obj['course']['units']['completed'] = counter_json['course']['units']['completed']
                     counter_changed = True
 
-                if counter_obj.units_completed != counter_json['units_completed'] :
-                    counter_obj.units_completed = counter_json['units_completed']
+                if counter_obj.group_points != counter_json['group_points'] :
+                    counter_obj.group_points = counter_json['group_points']
                     counter_changed = True
 
-                if counter_obj.no_comments_by_user != counter_json['no_comments_by_user'] :
-                    counter_obj.no_comments_by_user = counter_json['no_comments_by_user']
+                if counter_obj.total_comments_by_user != counter_json['total_comments_by_user'] :
+                    counter_obj.total_comments_by_user = counter_json['total_comments_by_user']
                     counter_changed = True
 
-                if counter_obj.no_comments_for_user != counter_json['no_comments_for_user'] :
-                    counter_obj.no_comments_for_user = counter_json['no_comments_for_user']
+                if counter_obj.visited_nodes != counter_json['visited_nodes'] :
+                    counter_obj.visited_nodes = counter_json['visited_nodes']
                     counter_changed = True
 
-                if counter_obj.no_files_created != counter_json['no_files_created'] :
-                    counter_obj.no_files_created = counter_json['no_files_created']
+                if counter_obj['file']['avg_rating_gained'] != counter_json['file']['avg_rating_gained']:
+                    counter_obj['file']['avg_rating_gained'] = counter_json['file']['avg_rating_gained']
                     counter_changed = True
 
-                if counter_obj.no_visits_gained_on_files != counter_json['no_visits_gained_on_files'] :
-                    counter_obj.no_visits_gained_on_files = counter_json['no_visits_gained_on_files']
+                if counter_obj['file']['commented_on_others_res'] != counter_json['file']['commented_on_others_res']:
+                    counter_obj['file']['commented_on_others_res'] = counter_json['file']['commented_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_files != counter_json['no_comments_received_on_files'] :
-                    counter_obj.no_comments_received_on_files = counter_json['no_comments_received_on_files']
+                if counter_obj['file']['comments_by_others_on_res'] != counter_json['file']['comments_by_others_on_res']:
+                    counter_obj['file']['comments_by_others_on_res'] = counter_json['file']['comments_by_others_on_res']
                     counter_changed = True
 
-                if counter_obj.no_others_files_visited != counter_json['no_others_files_visited'] :
-                    counter_obj.no_others_files_visited = counter_json['no_others_files_visited']
+                if counter_obj['file']['comments_gained'] != counter_json['file']['comments_gained']:
+                    counter_obj['file']['comments_gained'] = counter_json['file']['comments_gained']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_files != counter_json['no_comments_on_others_files'] :
-                    counter_obj.no_comments_on_others_files = counter_json['no_comments_on_others_files']
+                if counter_obj['file']['created'] != counter_json['file']['created']:
+                    counter_obj['file']['created'] = counter_json['file']['created']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_files != counter_json['rating_count_received_on_files'] :
-                    counter_obj.rating_count_received_on_files = counter_json['rating_count_received_on_files']
+                if counter_obj['file']['rating_count_received'] != counter_json['file']['rating_count_received']:
+                    counter_obj['file']['rating_count_received'] = counter_json['file']['rating_count_received']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_files != counter_json['avg_rating_received_on_files'] :
-                    counter_obj.avg_rating_received_on_files = counter_json['avg_rating_received_on_files']
+                if counter_obj['file']['visits_gained'] != counter_json['file']['visits_gained']:
+                    counter_obj['file']['visits_gained'] = counter_json['file']['visits_gained']
                     counter_changed = True
 
-                if counter_obj.no_questions_attempted != counter_json['no_questions_attempted'] :
-                    counter_obj.no_questions_attempted = counter_json['no_questions_attempted']
+                if counter_obj['file']['visits_on_others_res'] != counter_json['file']['visits_on_others_res']:
+                    counter_obj['file']['visits_on_others_res'] = counter_json['file']['visits_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_correct_answers != counter_json['no_correct_answers'] :
-                    counter_obj.no_correct_answers = counter_json['no_correct_answers']
+                if counter_obj['page']['blog']['avg_rating_gained'] != counter_json['page']['blog']['avg_rating_gained']:
+                    counter_obj['page']['blog']['avg_rating_gained'] = counter_json['page']['blog']['avg_rating_gained']
                     counter_changed = True
 
-                if counter_obj.no_incorrect_answers != counter_json['no_incorrect_answers'] :
-                    counter_obj.no_incorrect_answers = counter_json['no_incorrect_answers']
+                if counter_obj['page']['blog']['commented_on_others_res'] != counter_json['page']['blog']['commented_on_others_res']:
+                    counter_obj['page']['blog']['commented_on_others_res'] = counter_json['page']['blog']['commented_on_others_res']
                     counter_changed = True
 
-                if counter_obj.no_notes_written != counter_json['no_notes_written'] :
-                    counter_obj.no_notes_written = counter_json['no_notes_written']
+                if counter_obj['page']['blog']['comments_by_others_on_res'] != counter_json['page']['blog']['comments_by_others_on_res']:
+                    counter_obj['page']['blog']['comments_by_others_on_res'] = counter_json['page']['blog']['comments_by_others_on_res']
                     counter_changed = True
 
-                if counter_obj.no_views_gained_on_notes != counter_json['no_views_gained_on_notes'] :
-                    counter_obj.no_views_gained_on_notes = counter_json['no_views_gained_on_notes']
+                if counter_obj['page']['blog']['comments_gained'] != counter_json['page']['blog']['comments_gained']:
+                    counter_obj['page']['blog']['comments_gained'] = counter_json['page']['blog']['comments_gained']
                     counter_changed = True
 
-                if counter_obj.no_others_notes_visited != counter_json['no_others_notes_visited'] :
-                    counter_obj.no_others_notes_visited = counter_json['no_others_notes_visited']
+                if counter_obj['page']['blog']['created'] != counter_json['page']['blog']['created']:
+                    counter_obj['page']['blog']['created'] = counter_json['page']['blog']['created']
                     counter_changed = True
 
-                if counter_obj.no_comments_received_on_notes != counter_json['no_comments_received_on_notes'] :
-                    counter_obj.no_comments_received_on_notes = counter_json['no_comments_received_on_notes']
+                if counter_obj['page']['blog']['rating_count_received'] != counter_json['page']['blog']['rating_count_received']:
+                    counter_obj['page']['blog']['rating_count_received'] = counter_json['page']['blog']['rating_count_received']
                     counter_changed = True
 
-                if counter_obj.no_comments_on_others_notes != counter_json['no_comments_on_others_notes'] :
-                    counter_obj.no_comments_on_others_notes = counter_json['no_comments_on_others_notes']
+                if counter_obj['page']['blog']['visits_gained'] != counter_json['page']['blog']['visits_gained']:
+                    counter_obj['page']['blog']['visits_gained'] = counter_json['page']['blog']['visits_gained']
                     counter_changed = True
 
-                if counter_obj.rating_count_received_on_notes != counter_json['rating_count_received_on_notes'] :
-                    counter_obj.rating_count_received_on_notes = counter_json['rating_count_received_on_notes']
+                if counter_obj['page']['blog']['visits_on_others_res'] != counter_json['page']['blog']['visits_on_others_res']:
+                    counter_obj['page']['blog']['visits_on_others_res'] = counter_json['page']['blog']['visits_on_others_res']
                     counter_changed = True
 
-                if counter_obj.avg_rating_received_on_notes != counter_json['avg_rating_received_on_notes'] :
-                    counter_obj.avg_rating_received_on_notes = counter_json['avg_rating_received_on_notes']
+                if counter_obj['page']['info']['avg_rating_gained'] != counter_json['page']['info']['avg_rating_gained']:
+                    counter_obj['page']['info']['avg_rating_gained'] = counter_json['page']['info']['avg_rating_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['commented_on_others_res'] != counter_json['page']['info']['commented_on_others_res']:
+                    counter_obj['page']['info']['commented_on_others_res'] = counter_json['page']['info']['commented_on_others_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['comments_by_others_on_res'] != counter_json['page']['info']['comments_by_others_on_res']:
+                    counter_obj['page']['info']['comments_by_others_on_res'] = counter_json['page']['info']['comments_by_others_on_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['comments_gained'] != counter_json['page']['info']['comments_gained']:
+                    counter_obj['page']['info']['comments_gained'] = counter_json['page']['info']['comments_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['created'] != counter_json['page']['info']['created']:
+                    counter_obj['page']['info']['created'] = counter_json['page']['info']['created']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['rating_count_received'] != counter_json['page']['info']['rating_count_received']:
+                    counter_obj['page']['info']['rating_count_received'] = counter_json['page']['info']['rating_count_received']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['visits_gained'] != counter_json['page']['info']['visits_gained']:
+                    counter_obj['page']['info']['visits_gained'] = counter_json['page']['info']['visits_gained']
+                    counter_changed = True 
+
+                if counter_obj['page']['info']['visits_on_others_res'] != counter_json['page']['info']['visits_on_others_res']:
+                    counter_obj['page']['info']['visits_on_others_res'] = counter_json['page']['info']['visits_on_others_res']
+                    counter_changed = True 
+
+                if counter_obj['page']['wiki']['avg_rating_gained'] != counter_json['page']['wiki']['avg_rating_gained']:
+                    counter_obj['page']['wiki']['avg_rating_gained'] = counter_json['page']['wiki']['avg_rating_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['commented_on_others_res'] != counter_json['page']['wiki']['commented_on_others_res']:
+                    counter_obj['page']['wiki']['commented_on_others_res'] = counter_json['page']['wiki']['commented_on_others_res']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['comments_by_others_on_res'] != counter_json['page']['wiki']['comments_by_others_on_res']:
+                    counter_obj['page']['wiki']['comments_by_others_on_res'] = counter_json['page']['wiki']['comments_by_others_on_res']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['comments_gained'] != counter_json['page']['wiki']['comments_gained']:
+                    counter_obj['page']['wiki']['comments_gained'] = counter_json['page']['wiki']['comments_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['created'] != counter_json['page']['wiki']['created']:
+                    counter_obj['page']['wiki']['created'] = counter_json['page']['wiki']['created']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['rating_count_received'] != counter_json['page']['wiki']['rating_count_received']:
+                    counter_obj['page']['wiki']['rating_count_received'] = counter_json['page']['wiki']['rating_count_received']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['visits_gained'] != counter_json['page']['wiki']['visits_gained']:
+                    counter_obj['page']['wiki']['visits_gained'] = counter_json['page']['wiki']['visits_gained']
+                    counter_changed = True
+                if counter_obj['page']['wiki']['visits_on_others_res'] != counter_json['page']['wiki']['visits_on_others_res']:
+                    counter_obj['page']['wiki']['visits_on_others_res'] = counter_json['page']['wiki']['visits_on_others_res']
+                    counter_changed = True
+                if counter_obj['quiz']['attempted'] != counter_json['quiz']['attempted']:
+                    counter_obj['quiz']['attempted'] = counter_json['quiz']['attempted']
+                    counter_changed = True
+                if counter_obj['quiz']['correct'] != counter_json['quiz']['correct']:
+                    counter_obj['quiz']['correct'] = counter_json['quiz']['correct']
+                    counter_changed = True
+                if counter_obj['quiz']['incorrect'] != counter_json['quiz']['incorrect']:
+                    counter_obj['quiz']['incorrect'] = counter_json['quiz']['incorrect']
                     counter_changed = True
 
-                if counter_obj.comments_by_others_on_files != counter_json['comments_by_others_on_files'] and counter_json['comments_by_others_on_files']:
-                    n.comments_by_others_on_files.extend(counter_json['comments_by_others_on_files'])
-                    counter_changed = True
-
-                if counter_obj.comments_by_others_on_notes != counter_json['comments_by_others_on_notes'] and counter_json['comments_by_others_on_notes']:
-                    n.comments_by_others_on_notes.extend(counter_json['comments_by_others_on_notes'])
-                    counter_changed = True
 
                 if counter_changed:
-                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj), + "\n\tNew: "+str(counter_json))
+                    log_file.write("\n Counter Updated: \n\t OLD: " + str(counter_obj) + "\n\tNew: "+str(counter_json))
                     counter_obj.save()
             else:
                 try:
@@ -496,25 +609,32 @@ def restore_counter_objects(rcs_counters_path):
                 except Exception as counter_insert_err:
                     log_file.write("\nError while inserting Counter obj" + str(counter_insert_err))
                     pass
-'''
 
-# def call_group_import(rcs_repo_path,non_grp_root_node=None):
+def call_group_import(rcs_repo_path, req_log_file_path, data_restore_path, non_grp_root_node=None):
 
-#     global DATA_RESTORE_PATH
-#     rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
-#     rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
-#     rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
-#     rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
-#     # Following sequence is IMPORTANT
-#     # restore_filehive_objects(rcs_filehives_path)
-#     restore_node_objects(rcs_nodes_path, log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
-#     restore_triple_objects(rcs_triples_path)
+    global log_file_path
+    global log_file
+    global DATA_RESTORE_PATH
+    log_file_path = req_log_file_path
+    DATA_RESTORE_PATH = data_restore_path
+    log_file = open(log_file_path, 'a+')
+    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
 
-#     # skip foll. command katkamrachana 21Apr2017
-#     # Instead run python manage.py fillCounter
-#     # restore_counter_objects(rcs_counters_path)
+    rcs_filehives_path = os.path.join(rcs_repo_path, "Filehives")
+    rcs_nodes_path = os.path.join(rcs_repo_path, "Nodes")
+    rcs_triples_path = os.path.join(rcs_repo_path, "Triples")
+    rcs_counters_path = os.path.join(rcs_repo_path, "Counters")
 
-'''
+    # Following sequence is IMPORTANT
+    restore_filehive_objects(rcs_filehives_path)
+    restore_node_objects(rcs_nodes_path, non_grp_root_node)
+    restore_triple_objects(rcs_triples_path)
+
+    # skip foll. command katkamrachana 21Apr2017
+    # Instead run python manage.py fillCounter
+    restore_counter_objects(rcs_counters_path)
+
+
 def copy_media_data(media_path):
     # MEDIA_ROOT is destination usually: /data/media/
     # media_path is "dump-data/data/media"
@@ -522,107 +642,44 @@ def copy_media_data(media_path):
         media_copy_cmd = "rsync -avzhP " + media_path + "/*  " + MEDIA_ROOT + "/"
         subprocess.Popen(media_copy_cmd,stderr=subprocess.STDOUT,shell=True)
         log_file.write("\n Media Copied:  " + str(media_path) )
-'''
 
-def core_import(non_grp_root_node=None, *args):
+# def core_import(non_grp_root_node=None, *args):
+#     global log_file
+#     log_file_path = create_log_file(DATA_RESTORE_PATH)
+#     print "\n Log will be found at: ", log_file_path
+#     log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
+#     print "\n Validating the data-dump"
+#     validate_data_dump(*args)
+#     print "\n Checking the dump Group-id availability."
+#     check_group_availability(*args)
+#     print "\n User Restoration."
+#     user_objs_restoration(*args)
+#     print "\n Factory Schema Restoration. Please wait.."
+#     # print "\n SCHEMA: ", SCHEMA_ID_MAP
+#     call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
+#     copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
+
+
+def restore_node(filepath, non_grp_root_node=None, data_restore_path=None, req_log_file_path=None):
+    '''
+    non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
+    and we intend to skip the dumped-node-id having the name 
+    and member_of same but that differ in ObjectId.
+    (dumped_node_id, exisiting_node_id)
+    '''
     global log_file
+    global SCHEMA_ID_MAP
+    global DATA_RESTORE_PATH
     global log_file_path
-    datetimestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_file_name = 'artifacts_restore_' + str(GSTUDIO_INSTITUTE_ID) + "_"+ str(datetimestamp)
-    log_file_path = create_log_file(log_file_name)
-    log_file = open(log_file_path, 'w+')
-    log_file.write("\n######### Script ran on : " + str(datetime.datetime.now()) + " #########\n\n")
-    log_file.write("\nUpdated CONFIG_VARIABLES: "+ str(CONFIG_VARIABLES))
-    print "\n Validating the data-dump"
-    print "\nDATA_DUMP_PATH: ", DATA_DUMP_PATH
-    log_file.write(validate_data_dump(DATA_DUMP_PATH,CONFIG_VARIABLES.MD5, *args))
-    print "\n Checking the dump Group-id availability."
-    check_group_availability(*args)
-    print "\n User Restoration."
-    user_json_file_path = os.path.join(DATA_DUMP_PATH, 'users_dump.json')
-    log_stmt = user_objs_restoration(CONFIG_VARIABLES.RESTORE_USER_DATA , user_json_file_path, DATA_DUMP_PATH, *args)
-    log_file.write(log_stmt)
-    print "\n Factory Schema Restoration. Please wait.."
-    # print "\n SCHEMA: ", SCHEMA_ID_MAP
-    call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'), 
-        log_file_path, DATA_RESTORE_PATH, non_grp_root_node)
-    # call_group_import(os.path.join(DATA_DUMP_PATH, 'data', 'rcs-repo'),non_grp_root_node)
-    copy_media_data(os.path.join(DATA_DUMP_PATH, 'media_files', 'data', 'media'))
+    if not DATA_RESTORE_PATH and data_restore_path:
+        DATA_RESTORE_PATH = data_restore_path
+    if not log_file or log_file_path and req_log_file_path:
+        log_file_path = req_log_file_path
+        log_file = open(log_file_path, 'a+')
 
-class Command(BaseCommand):
-    def handle(self, *args, **options):
+    if not SCHEMA_ID_MAP:
+        SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
 
-        global DATA_RESTORE_PATH
-        global DATA_DUMP_PATH
-        global SCHEMA_ID_MAP
-        global log_file_path
-        global CONFIG_VARIABLES
-        if args and len(args) == 4:
-            DATA_RESTORE_PATH = args[0]
-        else:
-            DATA_RESTORE_PATH = raw_input("\n\tEnter absolute path of data-dump folder to restore:")
-        print "\nDATA_RESTORE_PATH: ", DATA_RESTORE_PATH
-        if os.path.exists(DATA_RESTORE_PATH):
-            # Check if DATA_DUMP_PATH has dump, if not then its dump of Node holding Groups.
-            if os.path.exists(os.path.join(DATA_RESTORE_PATH, 'dump')):
-                # Single Group Dump
-                DATA_DUMP_PATH = os.path.join(DATA_RESTORE_PATH, 'dump')
-                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
-                CONFIG_VARIABLES =  read_config_file(DATA_RESTORE_PATH)
-                core_import(None,*args)
-            else:
-                # Multi Group Dump
-                # Get the dumps of Groups and loop over each dump to import
-                # gd == group-dump
-                print "\n***** NON Group Dump found. *****\n"
-                global GROUP_CONTAINERS
-                GRP_CONTAINERS_CUR = node_collection.find({'name': {'$in': GROUP_CONTAINERS},
-                    '_type': 'GSystemType'})
-                GRP_CONTAINERS_IDS = [cont._id for cont in GRP_CONTAINERS_CUR]
-                SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_RESTORE_PATH)
-                dump_dir = [os.path.join(DATA_RESTORE_PATH,gd) for gd in os.listdir(DATA_RESTORE_PATH) if os.path.isdir(os.path.join(DATA_RESTORE_PATH,gd))]
-                print "\n Total Groups to be Restored: ", len(dump_dir)
-                for each_gd_abs_path in dump_dir:
-                    # Call this tmw
-                    # SCHEMA_ID_MAP = update_factory_schema_mapper(DATA_DUMP_PATH)
-                    DATA_DUMP_PATH = os.path.join(each_gd_abs_path, 'dump')
-                    DATA_RESTORE_PATH = each_gd_abs_path
-                    CONFIG_VARIABLES =  read_config_file(DATA_RESTORE_PATH)
-
-                    non_grp_root_node_obj = node_collection.one({
-                        '_id': ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID)
-                    })
-                    if non_grp_root_node_obj:
-                        core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
-                    else:
-                        non_grp_root_node_obj = node_collection.one({
-                                'name': CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME,
-                                'member_of': {'$in': GRP_CONTAINERS_IDS}})
-
-                        if non_grp_root_node_obj:
-                            # if non_grp_root_node_obj._id != ObjectId(CONFIG_VARIABLES.ROOT_DUMP_NODE_ID):
-                            #     # Module exists, but ID is different
-                            #     core_import(None,*args)
-                            # else:
-                            core_import((CONFIG_VARIABLES.ROOT_DUMP_NODE_ID,CONFIG_VARIABLES.ROOT_DUMP_NODE_NAME),*args)
-                        else:
-                            core_import(None,*args)
-
-                    # print "\n each_gd_abs_path: ", os.path.join(DATA_RESTORE_PATH,each_gd_abs_path)
-            print "*"*70
-            print "\n Log will be found at: ", log_file_path
-            print "*"*70
-            
-        else:
-            print "\n No dump found at entered path."
-            call_exit()
-'''
-def restore_node(filepath, non_grp_root_node=None):
-    # non_grp_root_node tuple (ObjectId, name) is used if the GSystem existing on target 
-    # and we intend to skip the dumped-node-id having the name 
-    # and member_of same but that differ in ObjectId.
-    # (dumped_node_id, exisiting_node_id)
-    global log_file
     log_file.write("\nRestoring Node: " +  str(filepath))
 
     node_json = get_json_file(filepath)
@@ -726,24 +783,23 @@ def restore_node(filepath, non_grp_root_node=None):
                 #     log_file.write("\n New collection_set :\n\t "+ str(node_obj.collection_set))
                 #     node_changed = True
 
-
-                if node_obj.name != node_json['name'] and node_json['name']:
-                    log_file.write("\n Old name :\n\t "+ str(node_obj.name))
-                    node_obj.name = node_json['name']
-                    node_changed = True
-                    log_file.write("\n New name :\n\t "+ str(node_obj.name))
-
-                if node_obj.altnames != node_json['altnames'] and node_json['altnames']:
-                    log_file.write("\n Old altnames :\n\t "+ str(node_obj.altnames))
-                    node_obj.altnames = node_json['altnames']
-                    node_changed = True
-                    log_file.write("\n New altnames :\n\t "+ str(node_obj.altnames))
-
                 if node_obj.content != node_json['content'] and node_json['content']:
                     log_file.write("\n Old content :\n\t "+ str(node_obj.content))
                     node_obj.content = node_json['content']
                     node_changed = True
                     log_file.write("\n New content :\n\t "+ str(node_obj.content))
+
+                if node_obj.name != node_json['name'] and node_json['name']:
+                    log_file.write("\n Old name :\n\t "+ str(node_obj.name))
+                    node_obj.name = unicode(node_json['name'])
+                    node_changed = True
+                    log_file.write("\n New name :\n\t "+ str(node_obj.name))
+
+                if node_obj.altnames != node_json['altnames'] and node_json['altnames']:
+                    log_file.write("\n Old altnames :\n\t "+ str(node_obj.altnames))
+                    node_obj.altnames = unicode(node_json['altnames'])
+                    node_changed = True
+                    log_file.write("\n New altnames :\n\t "+ str(node_obj.altnames))
 
                 log_file.write("\n Old collection_set :\n\t "+ str(node_obj.collection_set))
                 log_file.write("\n Requested collection_set :\n\t "+ str(node_json['collection_set']))
@@ -756,8 +812,9 @@ def restore_node(filepath, non_grp_root_node=None):
 
                 log_file.write("\n Old group_set :\n\t "+ str(node_obj.group_set))
 
-                if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
-                    node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                # if 'GROUP_ID' in CONFIG_VARIABLES:
+                #     if ObjectId(CONFIG_VARIABLES.GROUP_ID) not in node_obj.group_set:
+                #         node_obj.group_set.append(ObjectId(CONFIG_VARIABLES.GROUP_ID))
 
                 # node_obj.group_set = [ObjectId(CONFIG_VARIABLES.GROUP_ID)]
                 log_file.write("\n New group_set :\n\t "+ str(node_obj.group_set))
@@ -772,12 +829,13 @@ def restore_node(filepath, non_grp_root_node=None):
                 copy_version_file(filepath)
                 log_file.write("\n RCS file copied : \n\t" + str(filepath))
                 node_json = update_schema_and_user_ids(node_json)
-                node_json = update_group_set(node_json)
+                # node_json = update_group_set(node_json)
                 try:
                     log_file.write("\n Inserting Node doc : \n\t" + str(node_json))
                     node_id = node_collection.collection.insert(node_json)
                     node_obj = node_collection.one({'_id': node_id})
-                    node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
+                    if 'GROUP_ID' in CONFIG_VARIABLES:
+                        node_obj.save(groupid=ObjectId(CONFIG_VARIABLES.GROUP_ID))
                     log_file.write("\nUpdate RCS using save()")
                 except Exception as node_insert_err:
                     log_file.write("\nError while inserting Node obj" + str(node_insert_err))
@@ -786,7 +844,7 @@ def restore_node(filepath, non_grp_root_node=None):
         print "\n Error in restore_node_obj_err: ", restore_node_obj_err
         log_file.write("\nOuter Error while inserting Node obj" + str(restore_node_obj_err))
         pass
-'''
+
 # def parse_datetime_values(d):
 #     # This decoder will be moved to models next to class NodeJSONEncoder
 #     if u'uploaded_at' in d:
@@ -806,7 +864,7 @@ def restore_node(filepath, non_grp_root_node=None):
 #                 if each_key in ["start_time", "end_time", "start_enroll", "end_enroll"]:
 #                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
 #     return d
-'''
+
 def parse_json_values(d):
     # This decoder will be moved to models next to class NodeJSONEncoder
     if u'uploaded_at' in d:
@@ -827,6 +885,7 @@ def parse_json_values(d):
                     each_attr_dict[each_key] = datetime.datetime.fromtimestamp(each_val/1e3)
     return d
 
+
 def get_json_file(filepath):
     
     # this will create a .json file of the document(node)
@@ -838,13 +897,6 @@ def get_json_file(filepath):
         # fp = filepath
         if fp.endswith(',v'):
             fp = fp.split(',')[0]
-
-        if not os.path.exists(fp):
-            if filepath.endswith(',v'):
-                fp = fp.split(',')[0]
-            elif filepath.endswith('.json'):
-                fp = filepath
-        # print "fp: ", fp
         with open(fp, 'r') as version_file:
             obj_as_json = json.loads(version_file.read(), object_hook=json_util.object_hook)
             parse_json_values(obj_as_json)
@@ -854,4 +906,3 @@ def get_json_file(filepath):
     except Exception as get_json_err:
         print "Exception while getting JSON: ", get_json_err
         pass
-'''
