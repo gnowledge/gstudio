@@ -1,4 +1,4 @@
-django==1.6.5
+django==1.11.29
 django-mongokit==0.2.6
 django-registration==1.0
 # django-ratings==0.3.7
