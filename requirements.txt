@@ -62,7 +62,7 @@ sympy==1.0
 bs4==0.0.1
 html==1.16
 checksumdir==1.1.0
-cryptography==1.4
+cryptography==3.2
 diskcache==3.0.1
 
 # version needed to overwrite on all above intermediate installs
