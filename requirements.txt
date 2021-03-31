@@ -37,7 +37,7 @@ nltk==3.2.1
 
 # QBANK-LITE REQ: https://github.com/CLIxIndia-Dev/qbank-lite/blob/master/requirements.txt
 # also make sure following are updated w.r.t qbank repo
-lxml==3.6.0
+lxml==4.6.3
 dlkit==0.7.0
 beautifulsoup4==4.4.1
 cffi==1.7.0
