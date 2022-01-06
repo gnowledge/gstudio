@@ -23,7 +23,7 @@ django-memcache-admin
 django-simple-captcha==0.4.5
 hashfs==0.6.0
 ox>=2.1.651
-celery==3.1.19
+celery==5.2.2
 django-celery==3.1.16
 django-mailbox==4.4.1
 Fabric==1.12.0
