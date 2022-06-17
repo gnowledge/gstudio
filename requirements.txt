@@ -16,7 +16,7 @@ django-json-rpc==0.6.3
 https://bitbucket.org/zalew/django-online-status/get/tip.zip
 git+https://github.com/anujag/django-registration-email.git
 stemming==1.0.1
-numpy==1.9.0
+numpy==1.21.0
 python-memcached==1.58
 django-memcache-admin
 # pandora-client==0.2.197
