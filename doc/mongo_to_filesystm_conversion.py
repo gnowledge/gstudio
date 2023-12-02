@@ -65,10 +65,10 @@ def serialize_doc(doc):
     if 'question' in doc and doc['question'] is not None:
         doc['question']['_id'] = str(doc['question']['_id'])
         print doc['question']['_id']
-    if 'answers' in doc and doc['answers'] is not []:
+    if 'answers' in doc and doc['answers'] != []:
         for answer in doc['answers']:
             answer['_id'] = str(answer['_id'])
-    if 'assetContents' in doc and doc['assetContents'] is not []:
+    if 'assetContents' in doc and doc['assetContents'] != []:
         for asset_content in doc['assetContents']:
             asset_content['_id'] = str(asset_content['_id'])
 
